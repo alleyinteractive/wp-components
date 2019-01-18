@@ -151,14 +151,7 @@ class Component implements \JsonSerializable {
 	 * Render the frontend component.
 	 */
 	public function render() {
-		if ( function_exists( 'ai_get_template_part' ) ) {
-			\ai_get_template_part(
-				'components/modules/featured-article/template-parts/index',
-				[
-					'component'  => $this,
-				]
-			);
-		}
+		// Extend this function with adapter
 	}
 
 	/**
