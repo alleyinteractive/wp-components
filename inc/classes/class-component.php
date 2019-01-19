@@ -81,6 +81,7 @@ class Component implements \JsonSerializable {
 		} else {
 			$this->config[ $key ] = $value;
 		}
+
 		return $this;
 	}
 
@@ -94,7 +95,36 @@ class Component implements \JsonSerializable {
 		if ( array_key_exists( $key, $this->config ) ) {
 			return $this->config[ $key ];
 		}
+
 		return null;
+	}
+
+	/**
+	 * Merge an array with this component's current config.
+	 *
+	 * @param  array $new_config Config array.
+	 * @return mixed An instance of this class.
+	 */
+	public function merge_config( $new_config ) {
+		if ( ! empty( $this->config ) ) {
+			array_merge( $this->config, $new_config );
+		}
+
+		return $this;
+	}
+
+	/**
+	 * Merge an array with this component's current config, recursively.
+	 *
+	 * @param  array $new_config Config array.
+	 * @return mixed An instance of this class.
+	 */
+	public function merge_config_deep( $new_config ) {
+		if ( ! empty( $this->config ) ) {
+			array_merge_recursive( $this->config, $new_config );
+		}
+
+		return $this;
 	}
 
 	/**
@@ -145,13 +175,6 @@ class Component implements \JsonSerializable {
 	public function prepend_child( $child ) {
 		array_unshift( $this->children, $chilld );
 		return $this;
-	}
-
-	/**
-	 * Render the frontend component.
-	 */
-	public function render() {
-		// Extend this function with adapter
 	}
 
 	/**

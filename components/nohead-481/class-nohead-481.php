@@ -18,4 +18,10 @@ class Nohead_481 extends Component {
 	 * @var string
 	 */
 	public $name = 'nohead-481';
+
+	public function default_config() {
+		return [
+			'test' => 'Ornare interdum imperdiet est urna',
+		];
+	}
 }
