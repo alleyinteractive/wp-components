@@ -54,7 +54,6 @@ trait WP_Post {
 		// Post ID was passed.
 		if ( 0 !== absint( $post ) ) {
 			$this->set_post( get_post( $post ) );
-			$this->post_has_set();
 			return $this;
 		}
 

@@ -126,6 +126,28 @@ class Component implements \JsonSerializable {
 	}
 
 	/**
+	 * Append an array of component to the children array.
+	 *
+	 * @param array $children Array of components.
+	 * @return mixed An instance of this class.
+	 */
+	public function append_children( array $children ) {
+		$this->children = array_merge( $this->children, $children );
+		return $this;
+	}
+
+	/**
+	 * Prepend an array of component to the children array.
+	 *
+	 * @param array $children Array of components.
+	 * @return mixed An instance of this class.
+	 */
+	public function prepend_children( array $children ) {
+		$this->children = array_merge( $children, $this->children );
+		return $this;
+	}
+
+	/**
 	 * Append a component to the children array.
 	 *
 	 * @param Component $child Child component.

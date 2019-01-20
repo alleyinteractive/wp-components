@@ -17,14 +17,14 @@ namespace WP_Component;
 require_once 'inc/classes/class-component.php';
 
 // Load traits.
+require_once 'inc/traits/trait-guest-author.php';
+require_once 'inc/traits/trait-menu.php';
 require_once 'inc/traits/trait-wp-post.php';
-require_once 'inc/traits/trait-wp-user.php';
 require_once 'inc/traits/trait-wp-term.php';
+require_once 'inc/traits/trait-wp-user.php';
 
 // Load Components.
 require_once 'components/body/class-body.php';
 require_once 'components/byline/class-byline.php';
 require_once 'components/head/class-head.php';
 require_once 'components/image/class-image.php';
-require_once 'components/menu/class-menu.php';
-require_once 'components/menu-item/class-menu-item.php';
