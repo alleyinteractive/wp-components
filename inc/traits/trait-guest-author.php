@@ -1,6 +1,6 @@
 <?php
 /**
- * Guest_Author trait.
+ * Guest Author trait.
  *
  * @package WP_Component
  */
@@ -31,30 +31,17 @@ trait Guest_Author {
 	/**
 	 * Set the user object.
 	 *
+	 * @todo Finish implementing this trait setter.
+	 *
 	 * @param mixed $user User object, user ID, or null to use global $user
 	 *                    object.
 	 */
-	public function set_guest_author( $user = null ) {
+	public function set_guest_author( $guest_author = null ) {
 
 		// Post was passed.
-		if ( $user instanceof \WP_User ) {
-			$this->user = $user;
-			$this->user_has_set();
-			return $this;
-		}
-
-		// Use global $user.
-		if ( is_null( $user ) ) {
-			global $user;
-			$this->user = $user;
-			$this->user_has_set();
-			return $this;
-		}
-
-		// user ID was passed.
-		if ( 0 !== absint( $user ) ) {
-			$this->set_user( get_user( $user ) );
-			$this->user_has_set();
+		if ( 'guest-author' === ( $guest_author->type ?? '' ) ) {
+			$this->guest_author = $guest_author;
+			$this->guest_author_has_set();
 			return $this;
 		}
 

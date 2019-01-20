@@ -29,7 +29,6 @@ class Byline extends Component {
 	 * @return array Default config.
 	 */
 	public function default_config() {
-		echo 'okay';
 		return [
 			'link' => '',
 			'name' => '',
@@ -96,7 +95,7 @@ class Byline extends Component {
 	}
 
 	/**
-	 * Handling for CoAuthors Plus guest author objects.
+	 * Handling for Co-Authors Plus guest author objects.
 	 */
 	public function guest_author_has_set() {
 		$this->set_config( 'name', $this->guest_author->ID ?? '' );
