@@ -33,7 +33,6 @@ require_once 'components/byline/class-byline.php';
 require_once 'components/head/class-head.php';
 require_once 'components/image/class-image.php';
 require_once 'components/menu/class-menu.php';
-require_once 'components/menu-item/class-menu-item.php';
 
 // Load PHP renderer
 require_once 'wp-components-php/wp-components-php.php';
