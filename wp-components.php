@@ -32,7 +32,6 @@ require_once 'components/body/class-body.php';
 require_once 'components/byline/class-byline.php';
 require_once 'components/head/class-head.php';
 require_once 'components/image/class-image.php';
-require_once 'components/menu/class-menu.php';
 
 // Load PHP renderer
 require_once 'wp-components-php/wp-components-php.php';
