@@ -13,6 +13,8 @@
 
 namespace WP_Component;
 
+define( 'WP_COMPONENTS_PATH', dirname( __FILE__ ) );
+
 // Load classes.
 require_once 'inc/classes/class-component.php';
 
@@ -28,3 +30,6 @@ require_once 'components/head/class-head.php';
 require_once 'components/image/class-image.php';
 require_once 'components/menu/class-menu.php';
 require_once 'components/menu-item/class-menu-item.php';
+
+// Load PHP renderer
+require_once 'wp-components-php/wp-components-php.php';
