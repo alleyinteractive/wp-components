@@ -54,7 +54,7 @@ trait WP_Query {
 	 */
 	public function set_query( $wp_query = null ) {
 
-		// Post was passed.
+		// WP_Query object was passed.
 		if ( $wp_query instanceof \WP_Query ) {
 			$this->query = $wp_query;
 			$this->query_has_set();
