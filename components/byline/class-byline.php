@@ -98,7 +98,7 @@ class Byline extends Component {
 	 * Handling for Co-Authors Plus guest author objects.
 	 */
 	public function guest_author_has_set() {
-		$this->set_config( 'name', $this->guest_author->ID ?? '' );
+		$this->set_config( 'name', $this->guest_author->display_name ?? '' );
 		$this->set_config( 'link', get_author_posts_url( $this->guest_author->ID, $this->guest_author->user_nicename ) );
 	}
 }
