@@ -126,7 +126,7 @@ class Component implements \JsonSerializable {
 	}
 
 	/**
-	 * Append an array of component to the children array.
+	 * Append an array of components to the children array.
 	 *
 	 * @param array $children Array of components.
 	 * @return mixed An instance of this class.
