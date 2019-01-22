@@ -2,36 +2,68 @@
 /**
  * Plugin Name:     WP Components
  * Plugin URI:      alley.co
- * Description:     Build WordPress themes using Components.
+ * Description:     Build WordPress themes using components.
  * Author:          jameswalterburke
  * Text Domain:     wp-components
  * Domain Path:     /languages
  * Version:         0.1.0
  *
- * @package         WP_Component
+ * @package         WP_Components
  */
 
-namespace WP_Component;
+namespace WP_Components;
 
+/**
+ * Define the path of this plugin.
+ */
 define( 'WP_COMPONENTS_PATH', dirname( __FILE__ ) );
 
-// Load classes.
-require_once 'inc/classes/class-component.php';
+/**
+ * Define the path to the assets used in the PHP rendering system.
+ */
+define( 'WP_COMPONENTS_PHP_ASSET_PATH', get_stylesheet_directory() . '/client/build' );
 
-// Load traits.
-require_once 'inc/traits/trait-author.php';
-require_once 'inc/traits/trait-guest-author.php';
-require_once 'inc/traits/trait-menu.php';
-require_once 'inc/traits/trait-wp-post.php';
-require_once 'inc/traits/trait-wp-query.php';
-require_once 'inc/traits/trait-wp-term.php';
-require_once 'inc/traits/trait-wp-user.php';
+// Load template tag helpers.
+require_once 'inc/wp-render/template-tags.php';
 
-// Load Components.
-require_once 'components/body/class-body.php';
-require_once 'components/byline/class-byline.php';
-require_once 'components/head/class-head.php';
-require_once 'components/image/class-image.php';
+/**
+ * Autoloader.
+ */
+spl_autoload_register(
+	function( $class ) {
+		$class = ltrim( $class, '\\' );
+		if ( false !== strpos( $class, 'WP_Components' ) ) {
 
-// Load PHP renderer
-require_once 'wp-components-php/wp-components-php.php';
+			/**
+			 * Strip the namespace, replace underscores with dashes, and lowercase.
+			 *
+			 * `\WP_Component\Component\Slim_Navigation\Menu`
+			 * becomes
+			 * `slim-navigation\class-menu.php`
+			 */
+			$class = strtolower(
+				str_replace(
+					[ 'WP_Component\\Component\\', '_' ],
+					[ '', '-' ],
+					$class
+				)
+			);
+
+
+			$dirs  = explode( '\\', $class );
+			$class = array_pop( $dirs );
+
+			// Attempt to load the class.
+			$class_path  = WP_COMPONENTS_PATH . rtrim( '/inc/' . implode( '/', $dirs ), '/' ) . "/class-{$class}.php";
+			if ( file_exists( $class_path ) ) {
+				require_once $class_path;
+			}
+
+			// Attempt to load the trait.
+			$trait_path  = WP_COMPONENTS_PATH . rtrim( '/inc/' . implode( '/', $dirs ), '/' ) . "/trait-{$class}.php";
+			if ( file_exists( $trait_path ) ) {
+				require_once $trait_path;
+			}
+		}
+	}
+);

@@ -5,7 +5,7 @@
  * @package WP_Component
  */
 
-namespace WP_Component\PHP;
+namespace Render_WP;
 
 /**
  * Render Controller.
