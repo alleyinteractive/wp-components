@@ -27,7 +27,7 @@ function render( $component_instance ) {
 /**
  * Helper for rendering and caching a component
  *
- * @param \Wp_Component\Component $component_instance Instance of a component (or template) to render
+ * @param \WP_Component\Component $component_instance Instance of a component (or template) to render
  * @param bool|array              $cache              If set, the template part will be cached. If
  *                                                    true, results will be cached for
  *                                                    {@see Render_Controller::$default_cache_ttl} and
