@@ -42,7 +42,7 @@ function render_cached( $component_instance, $cache = true ) {
 /**
  * Return the markup of a component template
  *
- * @param \Wp_Component\Component $component_instance Instance of a component (or template) to render
+ * @param \WP_Component\Component $component_instance Instance of a component (or template) to render
  */
 function return_template( $component_instance ) {
 	return Render_Controller::instance()->render( $component_instance, true );
