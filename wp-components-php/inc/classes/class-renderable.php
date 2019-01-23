@@ -119,7 +119,7 @@ class Renderable {
 	}
 
 	/**
-	 * Resolve and render a component's JS
+	 * Resolve and render a component's JS.
 	 */
 	public function render_js() {
 		$name = $this->component_instance->name;
