@@ -104,7 +104,6 @@ class Renderable {
 	/**
 	 * Resolve and render a component's CSS
 	 *
-	 * @param string $name Component name.
 	 */
 	public function render_css() {
 		$name = $this->component_instance->name;
