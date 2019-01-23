@@ -37,6 +37,7 @@ class Renderable {
 	 * Class constructor.
 	 *
 	 * @param \Wp_Component\Component $component_instance Instance of a component (or template) to render
+	 * @param bool                    $return             Should this component's markup be returned instead of printed?
 	 */
 	public function __construct( $component_instance, $return = false ) {
 		$this->component_instance = $component_instance;
@@ -49,7 +50,7 @@ class Renderable {
 	 * @param string $template_slug Slug of template to load.
 	 */
 	public function render( $template_slug = 'index' ) {
-		$this->template_slug = $template_slug ?? $this->template_slug;
+		$this->template_slug = $template_slug;
 
 		if ( $this->return ) {
 			return $this->get_contents();

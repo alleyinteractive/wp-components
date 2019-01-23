@@ -95,7 +95,7 @@ class Render_Controller {
 				if ( $return ) {
 					return $renderable;
 				} else {
-					echo $renderable; // wpcs: xss ok.
+					echo $renderable;
 					return;
 				}
 			}
