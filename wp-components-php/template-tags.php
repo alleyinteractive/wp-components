@@ -11,7 +11,7 @@ namespace WP_Component\PHP;
  * Helper for rendering a component
  *
  * @param \Wp_Component\Component $component_instance Instance of a component (or template) to render
- * @param bool                    $return             Should this component's markup be return instead of
+ * @param bool                    $return             Should this component's markup be returned instead of
  *                                                    printed?
  * @param bool|array              $cache              If set, the template part will be cached. If
  *                                                    true, results will be cached for
