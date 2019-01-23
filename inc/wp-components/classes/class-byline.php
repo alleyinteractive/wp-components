@@ -12,8 +12,8 @@ namespace WP_Components;
  */
 class Byline extends Component {
 
-	use \WP_Component\WP_User;
-	use \WP_Component\Guest_Author;
+	use \WP_Components\WP_User;
+	use \WP_Components\Guest_Author;
 
 	/**
 	 * Unique component slug.
