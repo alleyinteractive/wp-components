@@ -121,7 +121,6 @@ class Renderable {
 	/**
 	 * Resolve and render a component's JS
 	 *
-	 * @param string $name Component name.
 	 */
 	public function render_js() {
 		$name = $this->component_instance->name;
