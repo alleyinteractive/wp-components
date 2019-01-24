@@ -36,12 +36,12 @@ class Renderable {
 	/**
 	 * Class constructor.
 	 *
-	 * @param \Wp_Component\Component $component_instance Instance of a component (or template) to render
-	 * @param bool                    $return             Should this component's markup be returned instead of printed?
+	 * @param \Wp_Component\Component $component_instance Instance of a component (or template) to render.
+	 * @param bool                    $return             Whether or not this component's markup be returned instead of printed.
 	 */
 	public function __construct( $component_instance, $return = false ) {
 		$this->component_instance = $component_instance;
-		$this->return = $return;
+		$this->return             = $return;
 	}
 
 	/**
@@ -73,13 +73,13 @@ class Renderable {
 	/**
 	 * Require the partial
 	 *
-	 * @return string
+	 * @return void
 	 */
 	public function require() {
 		$partial = $this->locate_component_partial();
 
 		if ( ! empty( $partial ) ) {
-			require( $partial );
+			require $partial;
 		}
 	}
 
@@ -89,16 +89,16 @@ class Renderable {
 	 * @return string
 	 */
 	public function locate_component_partial() {
-		$theme_components_path = apply_filters(
+		$theme_components_path  = apply_filters(
 			'wp_components_php_component_path',
 			get_stylesheet_directory() . '/inc'
 		);
 		$component_partial_path = '/components/' . $this->component_instance->name . '/template-parts/' . $this->template_slug . '.php';
 
 		if ( defined( 'WP_COMPONENTS_PATH' ) && file_exists( WP_COMPONENTS_PATH . $component_partial_path ) ) {
-			require( WP_COMPONENTS_PATH . $component_partial_path );
-		} else if ( file_exists( $theme_components_path . $component_partial_path ) ) {
-			require( $theme_components_path . $component_partial_path );
+			return WP_COMPONENTS_PATH . $component_partial_path;
+		} elseif ( file_exists( $theme_components_path . $component_partial_path ) ) {
+			return $theme_components_path . $component_partial_path;
 		}
 	}
 
@@ -106,13 +106,13 @@ class Renderable {
 	 * Resolve and render a component's CSS.
 	 */
 	public function render_css() {
-		$name = $this->component_instance->name;
+		$name         = $this->component_instance->name;
 		$default_path = WP_COMPONENTS_PHP_ASSET_PATH . '/' . $name . '.css';
-		$css = apply_filters( 'wp_components_php_resolve_asset', $default_path, $name, 'css' );
+		$css          = apply_filters( 'wp_components_php_resolve_asset', $default_path, $name, 'css' );
 
 		if ( $name !== $css ) {
 			printf(
-				'<link rel="stylesheet" href="%1$s" class="%2$s" />',
+				'<link rel="stylesheet" href="%1$s" class="%2$s" />', // phpcs:ignore WordPress.WP.EnqueuedResources.NonEnqueuedStylesheet
 				esc_url( $css ),
 				esc_attr( $name . '-component-css' )
 			);
@@ -123,13 +123,13 @@ class Renderable {
 	 * Resolve and render a component's JS.
 	 */
 	public function render_js() {
-		$name = $this->component_instance->name;
+		$name         = $this->component_instance->name;
 		$default_path = WP_COMPONENTS_PHP_ASSET_PATH . '/' . $name . '.js';
-		$javascript = apply_filters( 'wp_components_php_resolve_asset', $default_path, $name, 'js' );
+		$javascript   = apply_filters( 'wp_components_php_resolve_asset', $default_path, $name, 'js' );
 
 		if ( $name !== $javascript ) {
 			printf(
-				'<script src="%1$s" class="%2$s" type="text/javascript" async></script>',
+				'<script src="%1$s" class="%2$s" type="text/javascript" async></script>', // phpcs:ignore WordPress.WP.EnqueuedResources.NonEnqueuedScript
 				esc_url( $javascript ),
 				esc_attr( $name . '-component-js' )
 			);
