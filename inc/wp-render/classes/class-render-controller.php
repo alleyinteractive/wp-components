@@ -62,9 +62,9 @@ class Render_Controller {
 	/**
 	 * Render a component and its children
 	 *
-	 * @param \Wp_Component\Component $component_instance Instance of a component (or template) to render
-	 * @param bool                    $return             Should this component's markup be return instead of
-	 *                                                    printed?
+	 * @param \Wp_Component\Component $component_instance Instance of a component (or template) to render.
+	 * @param bool                    $return             Whether or not this component's markup be return instead of
+	 *                                                    printed.
 	 * @param bool|array              $cache              If set, the template part will be cached. If
 	 *                                                    true, results will be cached for
 	 *                                                    {@see Render_Controller::$default_cache_ttl} and
@@ -74,7 +74,6 @@ class Render_Controller {
 	 */
 	public function render( $component_instance, $return = false, $cache = false ) {
 		if ( $cache ) {
-
 			if ( is_bool( $cache ) ) {
 				$cache = array();
 			}
@@ -95,7 +94,7 @@ class Render_Controller {
 				if ( $return ) {
 					return $renderable;
 				} else {
-					echo $renderable; // wpcs: xss ok.
+					echo $renderable; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 					return;
 				}
 			}
@@ -118,7 +117,7 @@ class Render_Controller {
 			if ( $return ) {
 				return $contents;
 			} else {
-				echo $contents; // wpcs: xss ok.
+				echo $contents; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 			}
 		}
 	}
@@ -137,7 +136,7 @@ class Render_Controller {
 		$name = $component_instance->name;
 		$this->push( new Renderable( $component_instance, $return ) );
 
-		// Render component markup and assets
+		// Render component markup and assets.
 		$this->current_renderable->render_css();
 		$this->current_renderable->render_js();
 		$results = $this->current_renderable->render();
@@ -154,12 +153,12 @@ class Render_Controller {
 	public function render_children( $children = [] ) {
 		$contents = '';
 
-		// Use current renderable if provided child array is empty
+		// Use current renderable if provided child array is empty.
 		if ( empty( $children ) ) {
 			$children = $this->current_renderable->component_instance->children;
 		}
 
-		// If we don't still have an empty array, render all children
+		// If we don't still have an empty array, render all children.
 		if ( ! empty( $children ) ) {
 			foreach ( $children as $child ) {
 				$contents = $this->render( $child );
@@ -175,7 +174,7 @@ class Render_Controller {
 	 * @param Renderable $renderable The renderable we're loading.
 	 */
 	protected function push( $renderable ) {
-		$this->stack[] = $renderable;
+		$this->stack[]            = $renderable;
 		$this->current_renderable = $renderable;
 	}
 
