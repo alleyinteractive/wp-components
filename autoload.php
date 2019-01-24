@@ -19,7 +19,7 @@ spl_autoload_register(
 			/**
 			 * Strip the namespace, replace underscores with dashes, and lowercase.
 			 *
-			 * `\WP_Component\Body`
+			 * `\WP_Components\Body`
 			 * becomes
 			 * `body`
 			 */
