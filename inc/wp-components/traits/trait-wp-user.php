@@ -5,7 +5,7 @@
  * @package WP_Component
  */
 
-namespace WP_Component;
+namespace WP_Components;
 
 /**
  * WP_User trait.

@@ -1,16 +1,16 @@
 <?php
 /**
- * Shortcut helpers for component PHP templates
+ * Helper functions.
  *
  * @package WP_Component
  */
 
-namespace WP_Component\PHP;
+namespace Render_WP;
 
 /**
- * Helper for rendering a component
+ * Helper for rendering a component.
  *
- * @param \WP_Component\Component $component_instance Instance of a component (or template) to render.
+ * @param \WP_Components\Component $component_instance Instance of a component (or template) to render.
  */
 function render( $component_instance ) {
 	Render_Controller::instance()->render( $component_instance );
@@ -19,7 +19,7 @@ function render( $component_instance ) {
 /**
  * Helper for rendering and caching a component
  *
- * @param \WP_Component\Component $component_instance Instance of a component (or template) to render.
+ * @param \WP_Components\Component $component_instance Instance of a component (or template) to render.
  * @param bool|array              $cache              If set, the template part will be cached. If
  *                                                    true, results will be cached for
  *                                                    {@see Render_Controller::$default_cache_ttl} and
@@ -34,7 +34,7 @@ function render_cached( $component_instance, $cache = true ) {
 /**
  * Return the markup of a component template
  *
- * @param \WP_Component\Component $component_instance Instance of a component (or template) to render.
+ * @param \WP_Components\Component $component_instance Instance of a component (or template) to render.
  */
 function return_template( $component_instance ) {
 	return Render_Controller::instance()->render( $component_instance, true );
@@ -77,7 +77,7 @@ function render_children( $children = [] ) {
  *
  * @param string $key   The config key to access.
  * @param string $value The value to check against.
- * @return \Wp_Component\Component
+ * @return \WP_Components\Component
  */
 function filter_children( $key, $value ) {
 	return array_values(
@@ -106,7 +106,7 @@ function filter_children_by_name( $name ) {
  *
  * @param string $key   The config key to access.
  * @param string $value The value to check against.
- * @return \Wp_Component\Component
+ * @return \WP_Components\Component
  */
 function find_child( $key, $value ) {
 	$children = filter_children( $key, $value );

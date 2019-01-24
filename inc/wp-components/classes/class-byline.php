@@ -5,15 +5,15 @@
  * @package WP_Component
  */
 
-namespace WP_Component;
+namespace WP_Components;
 
 /**
  * Byline.
  */
 class Byline extends Component {
 
-	use \WP_Component\WP_User;
-	use \WP_Component\Guest_Author;
+	use \WP_Components\WP_User;
+	use \WP_Components\Guest_Author;
 
 	/**
 	 * Unique component slug.
