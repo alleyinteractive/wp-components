@@ -6,7 +6,7 @@
  * @package WP_Component
  */
 
-namespace WP_Component;
+namespace WP_Components;
 
 /**
  * Author trait.
