@@ -3,7 +3,7 @@
  * Trait that handles logic handling between WP_User objects and guest author
  * objects.
  *
- * @package WP_Component
+ * @package WP_Components
  */
 
 namespace WP_Components;

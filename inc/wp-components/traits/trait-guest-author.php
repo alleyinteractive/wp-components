@@ -2,7 +2,7 @@
 /**
  * Guest Author trait.
  *
- * @package WP_Component
+ * @package WP_Components
  */
 
 namespace WP_Components;

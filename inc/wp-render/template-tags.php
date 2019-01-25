@@ -2,7 +2,7 @@
 /**
  * Helper functions.
  *
- * @package WP_Component
+ * @package WP_Components
  */
 
 namespace Render_WP;
