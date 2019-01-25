@@ -1,6 +1,8 @@
 <?php
 /**
  * Autoloaders.
+ *
+ * @package WP_Components
  */
 
 namespace WP_Components;

@@ -3,7 +3,7 @@
  * Trait that handles logic handling between WP_User objects and guest author
  * objects.
  *
- * @package WP_Component
+ * @package WP_Components
  */
 
 namespace WP_Components;
@@ -70,13 +70,12 @@ trait Author {
 		}
 
 		return $display_name;
-
 	}
 
 	/**
 	 * Set the author using either a WP_User or Guest Author post object.
 	 *
-	 * @param mixed $user
+	 * @param mixed $author The author.
 	 */
 	public function set_author( $author = null ) {
 

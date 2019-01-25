@@ -55,7 +55,7 @@ class Renderable {
 		if ( $this->return ) {
 			return $this->get_contents();
 		} else {
-			$this->require();
+			$this->require_partial();
 		}
 	}
 
@@ -66,7 +66,7 @@ class Renderable {
 	 */
 	public function get_contents() {
 		ob_start();
-		$this->require();
+		$this->require_partial();
 		return ob_get_clean();
 	}
 
@@ -75,7 +75,7 @@ class Renderable {
 	 *
 	 * @return void
 	 */
-	public function require() {
+	public function require_partial() {
 		$partial = $this->locate_component_partial();
 
 		if ( ! empty( $partial ) ) {

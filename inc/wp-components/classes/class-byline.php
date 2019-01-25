@@ -2,7 +2,7 @@
 /**
  * Byline component.
  *
- * @package WP_Component
+ * @package WP_Components
  */
 
 namespace WP_Components;
@@ -59,10 +59,10 @@ class Byline extends Component {
 		if ( ! function_exists( 'get_coauthors' ) ) {
 
 			// Setup byline using post author.
-			$post = get_post( $post_id );
-			if ( $post instanceof \WP_Post ) {
+			$post_object = get_post( $post_id );
+			if ( $post_object instanceof \WP_Post ) {
 				$byline = new Byline();
-				$byline->set_user( $post->post_author );
+				$byline->set_user( $post_object->post_author );
 				return [ $byline ];
 			}
 			return [];
