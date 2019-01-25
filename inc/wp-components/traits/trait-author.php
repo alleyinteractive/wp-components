@@ -70,13 +70,12 @@ trait Author {
 		}
 
 		return $display_name;
-
 	}
 
 	/**
 	 * Set the author using either a WP_User or Guest Author post object.
 	 *
-	 * @param mixed $user
+	 * @param mixed $author The author.
 	 */
 	public function set_author( $author = null ) {
 

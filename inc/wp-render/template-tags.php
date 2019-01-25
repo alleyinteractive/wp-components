@@ -20,12 +20,12 @@ function render( $component_instance ) {
  * Helper for rendering and caching a component
  *
  * @param \WP_Components\Component $component_instance Instance of a component (or template) to render.
- * @param bool|array              $cache              If set, the template part will be cached. If
- *                                                    true, results will be cached for
- *                                                    {@see Render_Controller::$default_cache_ttl} and
- *                                                    the transient will be generated from this
- *                                                    variable. Optionally, either can be set by
- *                                                    passing an array with 'key' and/or 'ttl' keys.
+ * @param bool|array               $cache              If set, the template part will be cached. If
+ *                                                     true, results will be cached for
+ *                                                     {@see Render_Controller::$default_cache_ttl} and
+ *                                                     the transient will be generated from this
+ *                                                     variable. Optionally, either can be set by
+ *                                                     passing an array with 'key' and/or 'ttl' keys.
  */
 function render_cached( $component_instance, $cache = true ) {
 	Render_Controller::instance()->render( $component_instance, false, $cache );
@@ -81,9 +81,12 @@ function render_children( $children = [] ) {
  */
 function filter_children( $key, $value ) {
 	return array_values(
-		array_filter( get_children(), function( $child ) use ( $key, $value ) {
-			return $value === $child->get_config( $key );
-		} )
+		array_filter(
+			get_children(),
+			function( $child ) use ( $key, $value ) {
+				return $value === $child->get_config( $key );
+			}
+		)
 	);
 };
 
@@ -95,9 +98,12 @@ function filter_children( $key, $value ) {
  */
 function filter_children_by_name( $name ) {
 	return array_values(
-		array_filter( get_children(), function( $child ) use ( $name ) {
-			return $name === $child->name;
-		} )
+		array_filter(
+			get_children(),
+			function( $child ) use ( $name ) {
+				return $name === $child->name;
+			}
+		)
 	);
 };
 

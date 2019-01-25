@@ -33,8 +33,7 @@ trait Guest_Author {
 	 *
 	 * @todo Finish implementing this trait setter.
 	 *
-	 * @param mixed $user User object, user ID, or null to use global $user
-	 *                    object.
+	 * @param \WP_Post|null $guest_author Guest Author post.
 	 */
 	public function set_guest_author( $guest_author = null ) {
 
@@ -46,7 +45,7 @@ trait Guest_Author {
 		}
 
 		// Something else went wrong.
-		// @todo deuserine how to handle error messages.
+		// @todo determine how to handle error messages.
 		return $this;
 	}
 

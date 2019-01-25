@@ -225,9 +225,12 @@ class Component implements \JsonSerializable {
 			$words = explode( '_', $key );
 
 			// Capitalize each key part.
-			array_walk( $words, function( &$word ) {
-				$word = ucwords( $word );
-			} );
+			array_walk(
+				$words,
+				function( &$word ) {
+					$word = ucwords( $word );
+				}
+			);
 
 			// Reassemble key.
 			$new_key = implode( '', $words );
