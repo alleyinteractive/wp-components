@@ -12,7 +12,7 @@ namespace WP_Components;
  */
 class Menu_Item extends Component {
 
-	use \WP_Components\WP_Menu_item;
+	use \WP_Components\WP_Menu_Item;
 
 	/**
 	 * Unique component slug.
