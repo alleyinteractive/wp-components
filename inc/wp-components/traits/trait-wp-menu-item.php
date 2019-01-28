@@ -23,6 +23,7 @@ trait WP_Menu_Item {
 	 * Set the menu item object.
 	 *
 	 * @param mixed $menu_item Post object or menu item ID.
+	 * @return self
 	 */
 	public function set_menu_item( $menu_item = null ) {
 		// Post was passed.
@@ -66,10 +67,12 @@ trait WP_Menu_Item {
 		$label = ( 'custom' === $this->menu_item->type ) ? $this->menu_item->post_title : $this->menu_item->title;
 
 		// Default fields.
-		return $this->merge_config( [
-			'id'          => $this->menu_item->ID,
-			'label'       => $label,
-			'url'         => $this->menu_item->url,
-		] );
+		return $this->merge_config(
+			[
+				'id'    => $this->menu_item->ID,
+				'label' => $label,
+				'url'   => $this->menu_item->url,
+			]
+		);
 	}
 }

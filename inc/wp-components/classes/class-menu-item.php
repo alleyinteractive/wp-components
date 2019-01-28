@@ -28,9 +28,9 @@ class Menu_Item extends Component {
 	 */
 	public function default_config() {
 		return [
-			'id'          => '',
-			'label'       => '',
-			'url'         => '',
+			'id'    => '',
+			'label' => '',
+			'url'   => '',
 		];
 	}
 
