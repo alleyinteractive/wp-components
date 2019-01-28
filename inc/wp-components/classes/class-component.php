@@ -101,7 +101,7 @@ class Component implements \JsonSerializable {
 	 * Merge new values into the current config.
 	 *
 	 * @param  array $new_config Config array to merge in.
-	 * @return array Merged config
+	 * @return self
 	 */
 	public function merge_config( array $new_config ) {
 		$this->config = array_merge( $this->config, $new_config );
