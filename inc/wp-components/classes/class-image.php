@@ -8,7 +8,7 @@
 namespace WP_Components;
 
 /**
- * Defines the components of the image.
+ * Image
  */
 class Image extends Component {
 	/**
@@ -46,23 +46,24 @@ class Image extends Component {
 	 */
 	public function default_config() {
 		return [
-			'aspect_ratio'  => 9 / 16,
-			'attachment_id' => 0,
-			'alt'           => '',
-			'caption'       => '',
-			'crops'         => '',
-			'height'        => 0,
-			'image_size'    => 'full',
-			'lazyload'      => true,
-			'lqipSrc'       => '',
-			'post_id'       => 0,
-			'retina'        => true,
-			'sources'       => [],
-			'source_tags'   => [],
-			'src'           => '',
-			'srcset'        => '',
-			'url'           => '',
-			'width'         => 0,
+			'aspect_ratio'       => 9 / 16,
+			'attachment_id'      => 0,
+			'alt'                => '',
+			'caption'            => '',
+			'crops'              => '',
+			'fallback_image_url' => 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7',
+			'height'             => 0,
+			'image_size'         => 'full',
+			'lazyload'           => true,
+			'lqipSrc'            => '',
+			'post_id'            => 0,
+			'retina'             => true,
+			'sources'            => [],
+			'source_tags'        => [],
+			'src'                => '',
+			'srcset'             => '',
+			'url'                => '',
+			'width'              => 0,
 		];
 	}
 
@@ -140,7 +141,7 @@ class Image extends Component {
 	 */
 	public function set_attachment_id( $attachment_id ) {
 		$attachment_url = strtok( wp_get_attachment_image_url( absint( $attachment_id ), 'full' ), '?' );
-		$url            = ! empty( $attachment_url ) ? $attachment_url : WP_IRVING_URL . '/client/images/image-missing.svg';
+		$url            = ! empty( $attachment_url ) ? $attachment_url : $this->get_config( 'fallback_image_url' );
 
 		$this->merge_config(
 			[
@@ -199,9 +200,9 @@ class Image extends Component {
 			$this->merge_config(
 				[
 					'image_size' => $image_size,
-					'sources' => $size_config['sources'],
-					'retina' => $size_config['retina'] ?? $this->config['retina'],
-					'lazyload' => $size_config['lazyload'] ?? $this->config['lazyload'],
+					'sources'    => $size_config['sources'],
+					'retina'     => $size_config['retina'] ?? $this->config['retina'],
+					'lazyload'   => $size_config['lazyload'] ?? $this->config['lazyload'],
 				]
 			);
 		}
@@ -238,7 +239,8 @@ class Image extends Component {
 	 * @return Component Current instance of this class.
 	 */
 	public function configure( $picture ) {
-		$image_meta = wp_get_attachment_metadata( $this->config['attachment_id'] );
+		$image_meta    = wp_get_attachment_metadata( $this->config['attachment_id'] );
+		$use_basic_img = 1 === count( $this->get_config( 'sources' ) );
 
 		$this->merge_config(
 			[
@@ -248,10 +250,12 @@ class Image extends Component {
 				'lqip_src'    => $this->get_lqip_src(),
 				'url'         => $this->get_config( 'url' ),
 				'picture'     => $picture,
-				'sizes'       => $this->get_sizes(),
-				'source_tags' => $picture ? $this->get_source_tags() : [],
-				'src'         => esc_url( $this->get_config( 'url' ) ),
-				'srcset'      => $this->get_srcset(),
+				'sizes'       => ! $use_basic_img ? $this->get_sizes() : '',
+				'source_tags' => ( $picture && ! $use_basic_img ) ? $this->get_source_tags() : [],
+				'src'         => $use_basic_img ?
+					$this->apply_transforms( $this->get_config['sources'][0]['transforms'] ) :
+					esc_url( $this->get_config( 'url' ) ),
+				'srcset'      => ! $use_basic_img ? $this->get_srcset() : '',
 				'width'       => $image_meta['width'] ?? 0,
 			]
 		);
@@ -329,11 +333,11 @@ class Image extends Component {
 		foreach ( $sources as $params ) {
 			// Get source URL.
 			$transforms = $params['transforms'];
-			$src_url = $this->apply_transforms( $transforms );
+			$src_url    = $this->apply_transforms( $transforms );
 
 			// Add retina source to srcset, if applicable.
 			if ( $this->config['retina'] ) {
-				$retina_url = $this->apply_transforms( $transforms, 2 );
+				$retina_url    = $this->apply_transforms( $transforms, 2 );
 				$srcset_string = "{$src_url} 1x, {$retina_url} 2x";
 			} else {
 				$srcset_string = $src_url;
@@ -379,7 +383,7 @@ class Image extends Component {
 
 		foreach ( $sources as $params ) {
 			// Get source URL.
-			$src_url = $this->apply_transforms( $params['transforms'] );
+			$src_url    = $this->apply_transforms( $params['transforms'] );
 
 			// Get descriptor.
 			$descriptor = $params['descriptor'];
@@ -387,7 +391,7 @@ class Image extends Component {
 			// Add retina source to srcset, if applicable.
 			if ( is_numeric( $descriptor ) ) {
 				if ( $this->config['retina'] && ( empty( $params['retina'] ?? '' ) || $params['retina'] ) ) {
-					$retina_url = $this->apply_transforms( $params['transforms'], 2 );
+					$retina_url        = $this->apply_transforms( $params['transforms'], 2 );
 					$retina_descriptor = absint( $descriptor ) * 2;
 					$srcset[]          = "{$retina_url} {$retina_descriptor}w";
 				}
