@@ -55,7 +55,7 @@ class Image extends Component {
 			'height'             => 0,
 			'image_size'         => 'full',
 			'lazyload'           => true,
-			'lqipSrc'            => '',
+			'lqipSrc'            => 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7',
 			'post_id'            => 0,
 			'retina'             => true,
 			'sources'            => [],
@@ -369,7 +369,7 @@ class Image extends Component {
 		return $this->apply_transforms( [
 			'quality' => [ 60 ],
 			'resize'  => [ 60, 60 * $aspect_ratio ],
-		] )->config['url'];
+		] );
 	}
 
 	/**
@@ -609,8 +609,8 @@ class Image extends Component {
 	 * @param string $url       Url to which to apply transforms. Defaults to the original attachment URL.
 	 * @return string New URL with transform applied
 	 */
-	public function apply_transform( $transform, $args, $url = false ) {
-		$source_url = $url ?? $this->get_config( 'url' );
+	public function apply_transform( $transform, $args, $url = '' ) {
+		$source_url = ! empty( $url ) ? $url : $this->get_config( 'url' );
 
 		// If transform method doesn't exist, return original URL.
 		if ( ! method_exists( $this, $transform ) ) {
