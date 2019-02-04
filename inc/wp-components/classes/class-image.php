@@ -94,29 +94,38 @@ class Image extends Component {
 		self::$crop_sizes = array_merge( self::$crop_sizes, $crop_sizes );
 
 		// Register image sizes.
-		add_action( 'after_setup_theme', function() {
-			foreach ( Image::$crop_sizes as $crop_size ) {
-				foreach ( $crop_size as $key => $params ) {
-					$params = wp_parse_args( $params, [
-						'crop'   => false,
-						'height' => 0,
-						'width'  => 0,
-					] );
-					add_image_size( $key, $params['width'], $params['height'], $params['crop'] );
+		add_action(
+			'after_setup_theme',
+			function() {
+				foreach ( Image::$crop_sizes as $crop_size ) {
+					foreach ( $crop_size as $key => $params ) {
+						$params = wp_parse_args(
+							$params,
+							[
+								'crop'   => false,
+								'height' => 0,
+								'width'  => 0,
+							]
+						);
+						add_image_size( $key, $params['width'], $params['height'], $params['crop'] );
+					}
 				}
 			}
-		} );
+		);
 
 		// Setup WPCOM Thumbnail Editor image ratio map.
-		add_filter( 'wpcom_thumbnail_editor_args', function( $args ) {
-			$mapping = [];
-			foreach ( Image::$crop_sizes as $key => $crop_size ) {
-				$mapping[ $key ] = $mapping[ $key ] ?? [];
-				$mapping[ $key ] = array_merge( $mapping[ $key ], array_keys( $crop_size ) );
+		add_filter(
+			'wpcom_thumbnail_editor_args',
+			function( $args ) {
+				$mapping = [];
+				foreach ( Image::$crop_sizes as $key => $crop_size ) {
+					$mapping[ $key ] = $mapping[ $key ] ?? [];
+					$mapping[ $key ] = array_merge( $mapping[ $key ], array_keys( $crop_size ) );
+				}
+				$args['image_ratio_map'] = $mapping;
+				return $args;
 			}
-			$args['image_ratio_map'] = $mapping;
-			return $args;
-		} );
+		);
 	}
 
 	/**
@@ -215,14 +224,17 @@ class Image extends Component {
 			$sources = $this->config['sources'];
 			foreach ( $sources as &$source ) {
 				// Convert stored coordinates into crop friendly parameters.
-				$source['transforms'] = array_merge( [
-					'crop' => [
-						$crops[ $image_size ][0] . 'px',
-						$crops[ $image_size ][1] . 'px',
-						( $crops[ $image_size ][2] - $crops[ $image_size ][0] ) . 'px',
-						( $crops[ $image_size ][3] - $crops[ $image_size ][1] ) . 'px',
+				$source['transforms'] = array_merge(
+					[
+						'crop' => [
+							$crops[ $image_size ][0] . 'px',
+							$crops[ $image_size ][1] . 'px',
+							( $crops[ $image_size ][2] - $crops[ $image_size ][0] ) . 'px',
+							( $crops[ $image_size ][3] - $crops[ $image_size ][1] ) . 'px',
+						],
 					],
-				], $source['transforms'] );
+					$source['transforms']
+				);
 			}
 			$this->set_config( 'sources', $sources );
 		}
@@ -366,10 +378,12 @@ class Image extends Component {
 			return '';
 		}
 
-		return $this->apply_transforms( [
-			'quality' => [ 60 ],
-			'resize'  => [ 60, 60 * $aspect_ratio ],
-		] );
+		return $this->apply_transforms(
+			[
+				'quality' => [ 60 ],
+				'resize'  => [ 60, 60 * $aspect_ratio ],
+			]
+		);
 	}
 
 	/**
@@ -605,7 +619,8 @@ class Image extends Component {
 	 *
 	 * @see  https://developer.wordpress.com/docs/photon/api/#fit
 	 *
-	 * @param array  $transform Transform to apply
+	 * @param array  $transform Transform to apply.
+	 * @param array  $args      Array of transform arguments.
 	 * @param string $url       Url to which to apply transforms. Defaults to the original attachment URL.
 	 * @return string New URL with transform applied
 	 */
