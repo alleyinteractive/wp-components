@@ -50,6 +50,47 @@ spl_autoload_register(
 		}
 	}
 );
+/**
+ * Autoloader for components in a theme.
+ */
+spl_autoload_register(
+	function( $class ) {
+
+		// Filter to define the namespace.
+		$theme_component_namespace = apply_filters( 'wp_components_theme_components_namespace', '' );
+		if ( empty( $theme_component_namespace ) ) {
+			return;
+		}
+
+		// Trim leading dashes.
+		$class = ltrim( $class, '\\' );
+
+		// Is this under the WP_Components namespace?
+		if ( false !== strpos( $class, $theme_component_namespace ) ) {
+			/**
+			 * Strip the namespace, replace underscores with dashes, and lowercase.
+			 *
+			 * `\WP_Components\Body`
+			 * becomes
+			 * `body`
+			 */
+			$class = strtolower(
+				str_replace(
+					[ $theme_component_namespace, '_' ],
+					[ '', '-' ],
+					$class
+				)
+			);
+
+			$dirs  = explode( '\\', $class );
+			$class = array_pop( $dirs );
+			$path  = apply_filters( 'wp_components_theme_components_path', $class, $dirs );
+			if ( file_exists( $path ) ) {
+				require_once $path;
+			}
+		}
+	}
+);
 
 /**
  * Autoloader for WP_Render.
