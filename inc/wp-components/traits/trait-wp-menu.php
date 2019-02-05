@@ -127,7 +127,8 @@ trait WP_Menu {
 								'title'    => $menu_item->title,
 							]
 						),
-						$menu_items, $menu_item_id
+						$menu_items,
+						$menu_item_id
 					);
 				}
 

@@ -104,7 +104,7 @@ class Component implements \JsonSerializable {
 	 * @return self
 	 */
 	public function merge_config( array $new_config ) {
-		$this->config = array_merge( $this->config, $new_config );
+		$this->config = wp_parse_args( $new_config, $this->config );
 		return $this;
 	}
 
