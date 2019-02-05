@@ -22,11 +22,13 @@ trait WP_Menu {
 	/**
 	 * Set the menu object.
 	 *
-	 * @param mixed $menu Term object or menu location
+	 * @param mixed $menu Term object or menu location.
 	 */
 	public function set_menu( $menu = null ) {
-		// Menu location was passed
+
+		// Menu location was passed.
 		if ( is_string( $menu ) ) {
+
 			// Get menu locations.
 			$locations = get_nav_menu_locations();
 
@@ -95,7 +97,8 @@ trait WP_Menu {
 
 			// Is the current menu item a child of the parent item.
 			if ( $menu_item_parent_id === $parent_id ) {
-				// Get menu_item_class config and fall back to WP Components menu item
+
+				// Get menu_item_class config and fall back to WP Components menu item.
 				$menu_item_class = $this->get_config( 'menu_item_class' ) ?? '\WP_Components\Component\Menu_Item';
 
 				if ( ! class_exists( $menu_item_class ) ) {
@@ -112,7 +115,8 @@ trait WP_Menu {
 				$parent_ids = array_map( 'absint', wp_list_pluck( $menu_items, 'menu_item_parent' ) );
 
 				if ( in_array( $menu_item_id, $parent_ids, true ) ) {
-					// Get menu class
+
+					// Get menu class.
 					$menu_class = get_class( $this );
 
 					// Recursively build children menu items.

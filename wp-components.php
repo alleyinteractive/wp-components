@@ -24,7 +24,7 @@ define( 'WP_COMPONENTS_PATH', dirname( __FILE__ ) );
 define( 'WP_COMPONENTS_PHP_ASSET_PATH', get_stylesheet_directory() . '/client/build' );
 
 // Include autoloaders.
-require_once 'autoload.php';
+require_once 'inc/autoload.php';
 
 // Load WP_Render template tags.
 require_once 'inc/wp-render/template-tags.php';
