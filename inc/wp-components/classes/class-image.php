@@ -265,7 +265,7 @@ class Image extends Component {
 				'sizes'       => ! $use_basic_img ? $this->get_sizes() : '',
 				'source_tags' => ( $picture && ! $use_basic_img ) ? $this->get_source_tags() : [],
 				'src'         => $use_basic_img ?
-					$this->apply_transforms( $this->get_config['sources'][0]['transforms'] ) :
+					$this->apply_transforms( $this->get_config( 'sources' )[0]['transforms'] ) :
 					esc_url( $this->get_config( 'url' ) ),
 				'srcset'      => ! $use_basic_img ? $this->get_srcset() : '',
 				'width'       => $image_meta['width'] ?? 0,
