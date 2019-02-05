@@ -259,7 +259,7 @@ class Image extends Component {
 	 */
 	public function configure( $picture ) {
 		$image_meta    = wp_get_attachment_metadata( $this->config['attachment_id'] );
-		$this->use_basic_img = 1 === count( $this->get_config( 'sources' ) );
+		$this->use_basic_img = ( 1 === count( $this->get_config( 'sources' ) ) && ! $this->get_config( 'retina' ) );
 
 		$this->merge_config(
 			[
