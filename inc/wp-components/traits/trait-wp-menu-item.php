@@ -34,7 +34,7 @@ trait WP_Menu_Item {
 			return $this;
 		}
 
-		// ID passed in
+		// ID passed in.
 		if ( 0 !== absint( $menu_item ) ) {
 			$this->set_menu_item( get_post( $menu_item ) );
 			return $this;
@@ -55,7 +55,6 @@ trait WP_Menu_Item {
 	/**
 	 * Parse a menu post.
 	 *
-	 * @param  WP_Post $menu_object Menu post object.
 	 * @return Menu_Item An instance of the Menu_Item component.
 	 */
 	public function set_config_from_menu_item() {
