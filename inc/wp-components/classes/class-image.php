@@ -55,7 +55,7 @@ class Image extends Component {
 			'height'             => 0,
 			'image_size'         => 'full',
 			'lazyload'           => true,
-			'lqipSrc'            => 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7',
+			'lqip_src'           => 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7',
 			'post_id'            => 0,
 			'retina'             => true,
 			'sources'            => [],
@@ -63,6 +63,8 @@ class Image extends Component {
 			'src'                => '',
 			'srcset'             => '',
 			'url'                => '',
+			'use_basic_img'      => false,
+			'using_fallback'     => false,
 			'width'              => 0,
 		];
 	}
@@ -251,24 +253,30 @@ class Image extends Component {
 	 * @return Component Current instance of this class.
 	 */
 	public function configure( $picture ) {
-		$image_meta    = wp_get_attachment_metadata( $this->config['attachment_id'] );
-		$use_basic_img = 1 === count( $this->get_config( 'sources' ) );
+		$image_meta = wp_get_attachment_metadata( $this->config['attachment_id'] );
 
+		// Set flags for using a basic <img> tag or using the fallback URL.
 		$this->merge_config(
 			[
-				'alt'         => $this->get_alt_text(),
-				'caption'     => ! empty( $this->config['attachment_id'] ) ? wp_get_attachment_caption( $this->config['attachment_id'] ) : '',
-				'height'      => $image_meta['height'] ?? 0,
-				'lqip_src'    => $this->get_lqip_src(),
-				'url'         => $this->get_config( 'url' ),
-				'picture'     => $picture,
-				'sizes'       => ! $use_basic_img ? $this->get_sizes() : '',
-				'source_tags' => ( $picture && ! $use_basic_img ) ? $this->get_source_tags() : [],
-				'src'         => $use_basic_img ?
-					$this->apply_transforms( $this->get_config( 'sources' )[0]['transforms'] ) :
-					esc_url( $this->get_config( 'url' ) ),
-				'srcset'      => ! $use_basic_img ? $this->get_srcset() : '',
-				'width'       => $image_meta['width'] ?? 0,
+				'use_basic_img'  => ( 1 === count( $this->get_config( 'sources' ) ) && ! $this->get_config( 'retina' ) ),
+				'using_fallback' => $this->get_config( 'fallback_image_url' ) === $this->get_config( 'url' ),
+			]
+		);
+
+		// Set image config.
+		$this->merge_config(
+			[
+				'alt'            => $this->get_alt_text(),
+				'caption'        => ! empty( $this->config['attachment_id'] ) ? wp_get_attachment_caption( $this->config['attachment_id'] ) : '',
+				'height'         => $image_meta['height'] ?? 0,
+				'lqip_src'       => $this->get_lqip_src(),
+				'url'            => $this->get_config( 'url' ),
+				'picture'        => $picture,
+				'sizes'          => $this->get_sizes(),
+				'source_tags'    => $picture ? $this->get_source_tags() : [],
+				'src'            => $this->get_src(),
+				'srcset'         => $this->get_srcset(),
+				'width'          => $image_meta['width'] ?? 0,
 			]
 		);
 
@@ -342,6 +350,11 @@ class Image extends Component {
 		$source_tags = [];
 		$sources     = (array) $this->config['sources'];
 
+		// Don't set this if we're using a basic <img> tag or using the fallback image.
+		if ( $this->get_config( 'use_basic_img' ) || $this->get_config( 'using_fallback' ) ) {
+			return [];
+		}
+
 		foreach ( $sources as $params ) {
 			// Get source URL.
 			$transforms = $params['transforms'];
@@ -366,16 +379,29 @@ class Image extends Component {
 	}
 
 	/**
+	 * Get source attribute for this image.
+	 *
+	 * @return string LQIP source URL
+	 */
+	public function get_src() : string {
+		if ( $this->get_config( 'using_fallback' ) || ! $this->get_config( 'use_basic_img' ) ) {
+			return $this->get_config( 'url' );
+		}
+
+		return $this->apply_transforms( $this->get_config( 'sources' )[0]['transforms'] );
+	}
+
+	/**
 	 * Get source URL for lqip functionality
 	 *
 	 * @return string LQIP source URL
 	 */
-	public function get_lqip_src(): string {
+	public function get_lqip_src() : string {
 		$aspect_ratio = $this->config['aspect_ratio'];
 
-		// Return early if no aspect ratio is set.
-		if ( empty( $aspect_ratio ) ) {
-			return '';
+		// Return default if no aspect ratio is set.
+		if ( empty( $aspect_ratio ) || strstr( $this->get_config( 'url' ), 'data:' ) ) {
+			return $this->get_config( 'lqip_src' );
 		}
 
 		return $this->apply_transforms(
@@ -394,6 +420,11 @@ class Image extends Component {
 	public function get_srcset() : string {
 		$srcset  = [];
 		$sources = (array) $this->config['sources'];
+
+		// Don't set this if we're using a basic <img> tag or using the fallback image.
+		if ( $this->get_config( 'use_basic_img' ) || $this->get_config( 'using_fallback' ) ) {
+			return '';
+		}
 
 		foreach ( $sources as $params ) {
 			// Get source URL.
@@ -422,12 +453,17 @@ class Image extends Component {
 	/**
 	 * Prepare config for use with an <picture> tag.
 	 *
-	 * @return array
+	 * @return string
 	 */
-	public function get_sizes() {
+	public function get_sizes() : string {
 		$sizes   = [];
 		$sources = (array) $this->config['sources'];
 		$default = false;
+
+		// Don't set this if we're using a basic <img> tag or using the fallback image.
+		if ( $this->get_config( 'use_basic_img' ) || $this->get_config( 'using_fallback' ) ) {
+			return '';
+		}
 
 		foreach ( $sources as $params ) {
 			if ( is_numeric( $params['descriptor'] ) ) {
@@ -645,13 +681,12 @@ class Image extends Component {
 	/**
 	 * Apply an array of transforms to an image src URL
 	 *
-	 * @param array $transforms         parameters for all transforms to apply.
-	 * @param int   $density_multiplier screen density multiplier.
+	 * @param array  $transforms         parameters for all transforms to apply.
+	 * @param int    $density_multiplier screen density multiplier.
+	 * @param string $url                Url to which to apply transforms. Defaults to the original attachment URL.
 	 * @return string Url with all transforms applied
 	 */
-	public function apply_transforms( array $transforms, $density_multiplier = 1 ) {
-		$url = '';
-
+	public function apply_transforms( array $transforms, $density_multiplier = 1, $url = '' ) {
 		// Loop through transforms.
 		foreach ( $transforms as $transform => $values ) {
 			// Add multiplier.
