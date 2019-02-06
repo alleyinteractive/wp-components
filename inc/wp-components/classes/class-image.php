@@ -256,10 +256,12 @@ class Image extends Component {
 		$image_meta = wp_get_attachment_metadata( $this->config['attachment_id'] );
 
 		// Set flags for using a basic <img> tag or using the fallback URL.
-		$this->merge_config( [
-			'use_basic_img'  => ( 1 === count( $this->get_config( 'sources' ) ) && ! $this->get_config( 'retina' ) ),
-			'using_fallback' => $this->get_config( 'fallback_image_url' ) === $this->get_config( 'url' ),
-		] );
+		$this->merge_config(
+			[
+				'use_basic_img'  => ( 1 === count( $this->get_config( 'sources' ) ) && ! $this->get_config( 'retina' ) ),
+				'using_fallback' => $this->get_config( 'fallback_image_url' ) === $this->get_config( 'url' ),
+			]
+		);
 
 		// Set image config.
 		$this->merge_config(
@@ -459,7 +461,7 @@ class Image extends Component {
 		$default = false;
 
 		// Don't set this if we're using a basic <img> tag or using the fallback image.
-		if ( $this->get_config( 'use_basic_img' ) || $this->get_config( 'using_fallback' )  ) {
+		if ( $this->get_config( 'use_basic_img' ) || $this->get_config( 'using_fallback' ) ) {
 			return '';
 		}
 
