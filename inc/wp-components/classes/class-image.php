@@ -19,13 +19,6 @@ class Image extends Component {
 	public $name = 'image';
 
 	/**
-	 * Should a basic <img> with a `src` attribute be used?
-	 *
-	 * @var bool
-	 */
-	public $use_basic_img = false;
-
-	/**
 	 * Image sizes.
 	 *
 	 * @var array
@@ -70,6 +63,8 @@ class Image extends Component {
 			'src'                => '',
 			'srcset'             => '',
 			'url'                => '',
+			'use_basic_img'      => false,
+			'using_fallback'     => false,
 			'width'              => 0,
 		];
 	}
@@ -258,26 +253,30 @@ class Image extends Component {
 	 * @return Component Current instance of this class.
 	 */
 	public function configure( $picture ) {
-		$image_meta    = wp_get_attachment_metadata( $this->config['attachment_id'] );
-		$this->use_basic_img = ( 1 === count( $this->get_config( 'sources' ) ) && ! $this->get_config( 'retina' ) );
+		$image_meta = wp_get_attachment_metadata( $this->config['attachment_id'] );
 
+		// Set flags for using a basic <img> tag or using the fallback URL.
+		$this->merge_config( [
+			'use_basic_img'  => ( 1 === count( $this->get_config( 'sources' ) ) && ! $this->get_config( 'retina' ) ),
+			'using_fallback' => $this->get_config( 'fallback_image_url' ) === $this->get_config( 'url' ),
+		] );
+
+		// Set image config.
 		$this->merge_config(
 			[
-				'alt'         => $this->get_alt_text(),
-				'caption'     => ! empty( $this->config['attachment_id'] ) ? wp_get_attachment_caption( $this->config['attachment_id'] ) : '',
-				'height'      => $image_meta['height'] ?? 0,
-				'lqip_src'    => $this->get_lqip_src(),
-				'url'         => $this->get_config( 'url' ),
-				'picture'     => $picture,
-				'sizes'       => $this->get_sizes(),
-				'source_tags' => $picture ? $this->get_source_tags() : [],
-				'src'         => $this->get_src(),
-				'srcset'      => $this->get_srcset(),
-				'width'       => $image_meta['width'] ?? 0,
+				'alt'            => $this->get_alt_text(),
+				'caption'        => ! empty( $this->config['attachment_id'] ) ? wp_get_attachment_caption( $this->config['attachment_id'] ) : '',
+				'height'         => $image_meta['height'] ?? 0,
+				'lqip_src'       => $this->get_lqip_src(),
+				'url'            => $this->get_config( 'url' ),
+				'picture'        => $picture,
+				'sizes'          => $this->get_sizes(),
+				'source_tags'    => $picture ? $this->get_source_tags() : [],
+				'src'            => $this->get_src(),
+				'srcset'         => $this->get_srcset(),
+				'width'          => $image_meta['width'] ?? 0,
 			]
 		);
-
-
 
 		return $this;
 	}
@@ -349,8 +348,8 @@ class Image extends Component {
 		$source_tags = [];
 		$sources     = (array) $this->config['sources'];
 
-		// Don't set this if we're using a basic <img> tag.
-		if ( $this->use_basic_img ) {
+		// Don't set this if we're using a basic <img> tag or using the fallback image.
+		if ( $this->get_config( 'use_basic_img' ) || $this->get_config( 'using_fallback' ) ) {
 			return [];
 		}
 
@@ -383,7 +382,7 @@ class Image extends Component {
 	 * @return string LQIP source URL
 	 */
 	public function get_src() : string {
-		if ( $this->get_config( 'fallback_image_url' ) === $this->get_config( 'url' ) || ! $this->use_basic_img ) {
+		if ( $this->get_config( 'using_fallback' ) || ! $this->get_config( 'use_basic_img' ) ) {
 			return $this->get_config( 'url' );
 		}
 
@@ -420,8 +419,8 @@ class Image extends Component {
 		$srcset  = [];
 		$sources = (array) $this->config['sources'];
 
-		// Don't set this if we're using a basic <img> tag.
-		if ( $this->use_basic_img ) {
+		// Don't set this if we're using a basic <img> tag or using the fallback image.
+		if ( $this->get_config( 'use_basic_img' ) || $this->get_config( 'using_fallback' ) ) {
 			return '';
 		}
 
@@ -459,8 +458,8 @@ class Image extends Component {
 		$sources = (array) $this->config['sources'];
 		$default = false;
 
-		// Don't set this if we're using a basic <img> tag.
-		if ( $this->use_basic_img ) {
+		// Don't set this if we're using a basic <img> tag or using the fallback image.
+		if ( $this->get_config( 'use_basic_img' ) || $this->get_config( 'using_fallback' )  ) {
 			return '';
 		}
 
