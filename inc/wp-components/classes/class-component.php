@@ -208,6 +208,18 @@ class Component implements \JsonSerializable {
 	}
 
 	/**
+	 * Helper to preserve keys of an array of config values.
+	 *
+	 * @param  array $config_array Array of config values for which keys must be preserved.
+	 * @return array
+	 */
+	public function preserve_keys( $config_array ) : array {
+		$config_array['_preserve_keys'] = true;
+
+		return $config_array;
+	}
+
+	/**
 	 * Convert all array keys to camel case.
 	 *
 	 * @param array $array        Array to convert.
@@ -215,6 +227,11 @@ class Component implements \JsonSerializable {
 	 * @return array Updated array with camel-cased keys.
 	 */
 	public function camel_case_keys( $array, $array_holder = [] ) {
+		// Don't transform array with this key.
+		if ( array_key_exists( '_preserve_keys', $array ) ) {
+			unset( $array['_preserve_keys'] );
+			return $array;
+		}
 
 		// Setup for recursion.
 		$camel_case_array = ! empty( $array_holder ) ? $array_holder : [];
