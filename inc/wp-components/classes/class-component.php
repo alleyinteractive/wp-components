@@ -44,11 +44,11 @@ class Component implements \JsonSerializable {
 	 * Determine which config keys should not be transformed into camelCase.
 	 *
 	 * NOTE: this will not prevent the key itself from being camelcased,
-	 * only the keys of the config value if it is an array.
+	 * only the keys of the config value if it is an associative array.
 	 *
 	 * @var array
 	 */
-	public $preserve_keys = [];
+	public $preserve_inner_keys = [];
 
 	/**
 	 * Component constructor.
@@ -259,8 +259,8 @@ class Component implements \JsonSerializable {
 
 			if (
 				! is_array( $value )
-				// Don't recursively camelCase if this key is in the $preserve_keys property.
-				|| ( ! empty( $this->preserve_keys ) && in_array( $key, $this->preserve_keys, true ) )
+				// Don't recursively camelCase if this key is in the $preserve_inner_keys property.
+				|| ( ! empty( $this->preserve_inner_keys ) && in_array( $key, $this->preserve_inner_keys, true ) )
 			) {
 				// Set new key value.
 				$camel_case_array[ $new_key ] = $value;
