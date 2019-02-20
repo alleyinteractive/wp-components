@@ -39,9 +39,9 @@ class Term extends Component {
 	 * Fires after the term object has been set on this class.
 	 */
 	public function term_has_set() {
-		$this->set_config( 'id', $this->term->term_id );
-		$this->set_config( 'name', html_entity_decode( $this->term->name ) );
-		$this->set_config( 'slug', $this->term->slug );
-		$this->set_config( 'link', get_term_link( $this->term ) );
+		$this->wp_term_set_name();
+		$this->wp_term_set_id();
+		$this->wp_term_set_slug();
+		$this->wp_term_set_link();
 	}
 }
