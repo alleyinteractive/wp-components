@@ -28,3 +28,8 @@ require_once 'inc/autoload.php';
 
 // Load WP_Render template tags.
 require_once 'inc/wp-render/template-tags.php';
+
+// WP Components CLI command.
+if ( defined( 'WP_CLI' ) && WP_CLI ) {
+	require_once 'inc/wp-components/cli/class-scaffold-cli-command.php';
+}
