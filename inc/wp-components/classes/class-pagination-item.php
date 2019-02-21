@@ -44,7 +44,7 @@ class Pagination_Item extends Component {
 		$doc = new \DOMDocument();
 		$doc->loadHTML( $link );
 
-		// phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase
+		// phpcs:ignore WordPress.NamingConventions.ValidVariableName.NotSnakeCaseMemberVar
 		$this->set_config( 'text', $doc->textContent );
 
 		// Handle classes.

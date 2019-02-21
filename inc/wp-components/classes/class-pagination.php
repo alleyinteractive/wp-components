@@ -68,7 +68,6 @@ class Pagination extends Component {
 	 * the various core functions reference the correct query.
 	 */
 	public function get_pagination_links() {
-
 		global $wp_query;
 
 		// Get the current global object and replace with our current query.
