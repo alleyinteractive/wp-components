@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<ruleset name="WP Starter Theme">
+<ruleset name="WP Components Plugin">
 	<description>PHP_CodeSniffer standard for WP Components.</description>
 
 	<!--
