@@ -98,7 +98,7 @@ class Social_Sharing extends Component {
 								// Translators: %1$s - article title, %2$s - article url.
 								esc_html__( 'Check out this story: %1$s %2$s', 'wp-components' ),
 								$this->get_title(),
-								$this->get_url(),
+								$this->get_url()
 							)
 						),
 					],
