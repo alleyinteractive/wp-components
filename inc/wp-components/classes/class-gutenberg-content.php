@@ -92,10 +92,7 @@ class Gutenberg_Content extends Component {
 
 			// Handle nested blocks.
 			$children_blocks_as_components = array_map(
-				[
-					$this,
-					'convert_block_to_component'
-				],
+				[ $this, 'convert_block_to_component' ],
 				(array) ( $block['innerBlocks'] ?? [] )
 			);
 
@@ -107,10 +104,7 @@ class Gutenberg_Content extends Component {
 
 		// Handle nested blocks.
 		$children_blocks_as_components = array_map(
-			[
-				$this,
-				'convert_block_to_component'
-			],
+			[ $this, 'convert_block_to_component' ],
 			(array) ( $block['innerBlocks'] ?? [] )
 		);
 
