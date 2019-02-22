@@ -203,7 +203,7 @@ class Component implements \JsonSerializable {
 	 * @return mixed An instance of this class.
 	 */
 	public function children_callback( $callback ) {
-		array_map( $callback, &$this->children );
+		$this->children = array_map( $callback, $this->children );
 
 		return $this;
 	}
