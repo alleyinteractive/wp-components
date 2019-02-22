@@ -12,6 +12,9 @@ namespace WP_Components;
  */
 class Head extends Component {
 
+	use WP_Query;
+	use WP_Post;
+
 	/**
 	 * Unique component slug.
 	 *
@@ -20,13 +23,14 @@ class Head extends Component {
 	public $name = 'head';
 
 	/**
-	 * Define the default config of a head.
-	 *
-	 * @return array A default config.
+	 * Hook into post being set.
 	 */
-	public function default_config() {
-		return [
-			'name' => '',
-		];
+	public function query_has_set() {
+	}
+
+	/**
+	 * Hook into post being set.
+	 */
+	public function post_has_set() {
 	}
 }
