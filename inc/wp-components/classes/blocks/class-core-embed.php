@@ -43,7 +43,7 @@ class Core_Embed extends \WP_Components\Component {
 	/**
 	 * Add a script to the container.
 	 *
-	 * @param array $script_attrs - The attributes of a script tag.
+	 * @param array $script_attrs The attributes of a script tag.
 	 */
 	public static function add_script( array $script_attrs ) {
 		// Avoid duplicated script tags.
