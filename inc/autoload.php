@@ -18,6 +18,7 @@ spl_autoload_register(
 
 		// Is this under the WP_Components namespace?
 		if ( false !== strpos( $object, 'WP_Components' ) ) {
+
 			/**
 			 * Strip the namespace, replace underscores with dashes, and lowercase.
 			 *
@@ -37,7 +38,7 @@ spl_autoload_register(
 			$object = array_pop( $dirs );
 
 			// Check if this is a class.
-			$object_path  = WP_COMPONENTS_PATH . rtrim( '/inc/' . implode( '/', $dirs ), '/' ) . "/wp-components/classes/class-{$object}.php";
+			$object_path  = WP_COMPONENTS_PATH . rtrim( '/inc/wp-components/classes/' . implode( '/', $dirs ), '/' ) . "/class-{$object}.php";
 			if ( file_exists( $object_path ) ) {
 				require_once $object_path;
 			}
