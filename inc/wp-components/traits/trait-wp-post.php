@@ -140,7 +140,7 @@ trait WP_Post {
 	 *
 	 * @return mixed An instance of the class.
 	 */
-	public function wp_post_set_link() {
+	public function wp_post_set_permalink() {
 		$this->set_config( 'permalink', $this->wp_post_get_permalink() );
 		return $this;
 	}
@@ -181,5 +181,20 @@ trait WP_Post {
 	public function wp_post_set_excerpt() {
 		$this->set_config( 'excerpt', $this->wp_post_get_excerpt() );
 		return $this;
+	}
+
+	/**
+	 * Create Image component and append to children.
+	 *
+	 * @param string $size Image size to use for child image component.
+	 */
+	public function wp_post_set_featured_image( $size = 'full' ) {
+		$this->append_children(
+			[
+				( new \WP_Components\Image() )
+					->set_post_id( $this->get_post_id() )
+					->set_config_for_size( $size ),
+			]
+		);
 	}
 }
