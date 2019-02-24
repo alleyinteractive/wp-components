@@ -186,7 +186,7 @@ class Component implements \JsonSerializable {
 	 * @return mixed An instance of this class.
 	 */
 	public function prepend_child( $child ) {
-		array_unshift( $this->children, $chilld );
+		array_unshift( $this->children, $child );
 		return $this;
 	}
 
