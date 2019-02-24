@@ -54,7 +54,6 @@ trait WP_Term {
 		// term ID was passed.
 		if ( 0 !== absint( $term ) ) {
 			$this->set_term( get_term( $term ) );
-			$this->term_has_set();
 			return $this;
 		}
 
