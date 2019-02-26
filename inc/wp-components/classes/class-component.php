@@ -200,6 +200,7 @@ class Component implements \JsonSerializable {
 	/**
 	 * Execute a function on each child of this component.
 	 *
+	 * @param callable $callback Callback function.
 	 * @return mixed An instance of this class.
 	 */
 	public function children_callback( $callback ) {
