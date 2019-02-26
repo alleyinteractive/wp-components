@@ -26,7 +26,7 @@ class Social_Sharing extends Component {
 	 *
 	 * @return array Default config.
 	 */
-	public function default_component() {
+	public function default_config() {
 		return [
 			'services'      => [],
 			'display_icons' => true,
@@ -60,7 +60,8 @@ class Social_Sharing extends Component {
 							'u' => $this->get_url(),
 						],
 						'https://www.facebook.com/sharer.php/'
-					)
+					),
+					'display_icon' => $this->get_config( 'display_icons' ),
 				]
 			);
 	}
@@ -81,7 +82,8 @@ class Social_Sharing extends Component {
 							'url'  => $this->get_url(),
 						],
 						'https://twitter.com/share/'
-					)
+					),
+					'display_icon' => $this->get_config( 'display_icons' ),
 				]
 			);
 	}
@@ -108,7 +110,8 @@ class Social_Sharing extends Component {
 							),
 						],
 						'https://api.whatsapp.com/send/'
-					)
+					),
+					'display_icon' => $this->get_config( 'display_icons' ),
 				]
 			);
 	}
@@ -130,7 +133,8 @@ class Social_Sharing extends Component {
 							'summary' => $this->get_excerpt(),
 						],
 						'https://www.linkedin.com/shareArticle/'
-					)
+					),
+					'display_icon' => $this->get_config( 'display_icons' ),
 				]
 			);
 	}
@@ -152,7 +156,8 @@ class Social_Sharing extends Component {
 							'description' => $this->get_excerpt(),
 						],
 						'https://pinterest.com/pin/create/button/'
-					)
+					),
+					'display_icon' => $this->get_config( 'display_icons' ),
 				]
 			);
 	}
@@ -174,7 +179,8 @@ class Social_Sharing extends Component {
 							'description' => $this->get_excerpt(),
 						],
 						'mailto:'
-					)
+					),
+					'display_icon' => $this->get_config( 'display_icons' ),
 				]
 			);
 	}
