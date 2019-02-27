@@ -96,7 +96,7 @@ trait Author {
 		}
 
 		// Something else went wrong.
-		// @todo deuserine how to handle error messages.
+		// @todo determine how to handle error messages.
 		return $this;
 	}
 
