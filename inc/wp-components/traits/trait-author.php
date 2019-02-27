@@ -88,7 +88,7 @@ trait Author {
 
 		if (
 			$author instanceof \WP_Post
-			&& 'guest_author' === ( $author->type ?? '' )
+			&& 'guest-author' === ( $author->post_type ?? '' )
 		) {
 			$this->set_guest_author( $author );
 			$this->author_has_set();
