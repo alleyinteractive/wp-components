@@ -34,12 +34,12 @@ class Gutenberg_Content extends Component {
 				( new HTML() )
 					->set_config(
 						'content',
-						apply_filters( 'the_content', $this->post->post_content )
+						apply_filters( 'the_content', $this->post->post_content ?? '' )
 					)
 			);
 
 		} else {
-			$blocks = (array) parse_blocks( $this->post->post_content );
+			$blocks = (array) parse_blocks( $this->post->post_content ?? '' );
 
 			// Filter any empty parsed blocks.
 			$blocks = array_values(
