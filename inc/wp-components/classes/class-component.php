@@ -153,7 +153,10 @@ class Component implements \JsonSerializable {
 	 * @return mixed An instance of this class.
 	 */
 	public function append_children( array $children ) {
-		$this->children = array_merge( $this->children, $children );
+		if ( ! empty( $children ) ) {
+			$children = array_filter( $children );
+			$this->children = array_merge( $this->children, $children );
+		}
 		return $this;
 	}
 
@@ -164,7 +167,10 @@ class Component implements \JsonSerializable {
 	 * @return mixed An instance of this class.
 	 */
 	public function prepend_children( array $children ) {
-		$this->children = array_merge( $children, $this->children );
+		if ( ! empty( $children ) ) {
+			$children = array_filter( $children );
+			$this->children = array_merge( $children, $this->children );
+		}
 		return $this;
 	}
 
@@ -175,7 +181,9 @@ class Component implements \JsonSerializable {
 	 * @return mixed An instance of this class.
 	 */
 	public function append_child( $child ) {
-		array_push( $this->children, $child );
+		if ( ! empty( $child ) ) {
+			array_push( $this->children, $child );
+		}
 		return $this;
 	}
 
@@ -186,7 +194,9 @@ class Component implements \JsonSerializable {
 	 * @return mixed An instance of this class.
 	 */
 	public function prepend_child( $child ) {
-		array_unshift( $this->children, $child );
+		if ( ! empty( $child ) ) {
+			array_unshift( $this->children, $child );
+		}
 		return $this;
 	}
 

@@ -1,6 +1,6 @@
 <?php
 /**
- * Social Sharing Item component.
+ * Social Item component.
  *
  * @package WP_Components
  */
@@ -8,16 +8,16 @@
 namespace WP_Components;
 
 /**
- * Social Sharing.
+ * Social Item.
  */
-class Social_Sharing_Item extends Component {
+class Social_Item extends Component {
 
 	/**
 	 * Unique component slug.
 	 *
 	 * @var string
 	 */
-	public $name = 'social-sharing-item';
+	public $name = 'social-item';
 
 	/**
 	 * Define a default config.
