@@ -19,11 +19,11 @@ trait Author {
 	 * @return string
 	 */
 	public function get_author_type() {
-		if ( ! is_null( $this->user ) ) {
+		if ( ! is_null( $this->user ?? null ) ) {
 			return 'wp_user';
 		}
 
-		if ( ! is_null( $this->guest_author ) ) {
+		if ( ! is_null( $this->guest_author ?? null ) ) {
 			return 'guest_author';
 		}
 
@@ -88,7 +88,7 @@ trait Author {
 
 		if (
 			$author instanceof \WP_Post
-			&& 'guest_author' === ( $author->type ?? '' )
+			&& 'guest-author' === ( $author->post_type ?? '' )
 		) {
 			$this->set_guest_author( $author );
 			$this->author_has_set();
@@ -96,7 +96,7 @@ trait Author {
 		}
 
 		// Something else went wrong.
-		// @todo deuserine how to handle error messages.
+		// @todo determine how to handle error messages.
 		return $this;
 	}
 
