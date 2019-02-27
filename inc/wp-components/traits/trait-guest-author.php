@@ -38,7 +38,7 @@ trait Guest_Author {
 	public function set_guest_author( $guest_author = null ) {
 
 		// Post was passed.
-		if ( 'guest-author' === ( $guest_author->type ?? '' ) ) {
+		if ( 'guest-author' === ( $guest_author->post_type ?? '' ) ) {
 			$this->guest_author = $guest_author;
 			$this->guest_author_has_set();
 			return $this;
