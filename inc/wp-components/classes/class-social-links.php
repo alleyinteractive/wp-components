@@ -34,6 +34,7 @@ class Social_Links extends Component {
 	/**
 	 * Retrieve service labels for use in custom fields.
 	 *
+	 * @param  array $link_configs Array of configs to use for creating new social item components.
 	 * @return array Array of services with labels.
 	 */
 	public function create_link_components( $link_configs ) {
