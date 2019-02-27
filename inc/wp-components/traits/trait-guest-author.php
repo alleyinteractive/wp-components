@@ -55,4 +55,24 @@ trait Guest_Author {
 	public function guest_author_has_set() {
 		// Silence is golden.
 	}
+
+	/**
+	 * Create Image component and add to children.
+	 *
+	 * @todo Add a fallback image.
+	 *
+	 * @param string $size Image size to use for child image component.
+	 * @return self
+	 */
+	public function set_guest_author_avatar( $size = 'full' ) : self {
+		$this->append_child(
+			[
+				( new \WP_Components\Image() )
+					->set_post_id( $this->get_guest_author_id() )
+					->set_config_for_size( $size ),
+			]
+		);
+
+		return $this;
+	}
 }
