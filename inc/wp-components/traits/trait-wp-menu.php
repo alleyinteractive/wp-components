@@ -105,7 +105,7 @@ trait WP_Menu {
 				$menu_item_class = $this->get_config( 'menu_item_class' ) ?? '\WP_Components\Menu_Item';
 
 				if ( ! class_exists( $menu_item_class ) ) {
-					return;
+					return [];
 				}
 
 				// Get parsed menu item.
