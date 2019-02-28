@@ -70,7 +70,7 @@ trait WP_Menu {
 	 */
 	public function parse_wp_menu() : self {
 		if ( empty( $this->menu ) || ! $this->menu instanceof \WP_Term ) {
-			return;
+			return $this;
 		}
 
 		$menu_items = wp_get_nav_menu_items( $this->menu );

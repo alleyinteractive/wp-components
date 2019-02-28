@@ -61,7 +61,7 @@ trait WP_Menu_Item {
 	 */
 	public function set_config_from_menu_item() : self {
 		if ( empty( $this->menu_item ) ) {
-			return;
+			return $this;
 		}
 
 		// Determine label based on type.

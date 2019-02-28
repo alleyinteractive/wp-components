@@ -45,7 +45,7 @@ class Pagination extends Component {
 
 		// Validate result.
 		if ( empty( $pagination_links ) ) {
-			return;
+			return $this;
 		}
 
 		// Convert each HTML link to a Pagination_Item.
