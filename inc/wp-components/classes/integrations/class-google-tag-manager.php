@@ -24,7 +24,7 @@ class Google_Tag_Manager extends Component {
 	 *
 	 * @return array Default config.
 	 */
-	public function default_config() {
+	public function default_config() : array {
 		return [
 			'container_id' => '',
 		];

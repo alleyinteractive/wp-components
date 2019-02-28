@@ -23,8 +23,10 @@ class Gutenberg_Content extends Component {
 
 	/**
 	 * Fires after the post object has been set on this class.
+	 *
+	 * @return self
 	 */
-	public function post_has_set() {
+	public function post_has_set() : self {
 
 		// If gutenberg is not enabled return the post's content as raw HTML.
 		if ( ! function_exists( 'parse_blocks' ) ) {
@@ -67,9 +69,9 @@ class Gutenberg_Content extends Component {
 	 * @todo: Create "columns" and "column" components that can handle placing child blocks within the wrapping markup.
 	 *
 	 * @param array $block A parsed block associative array.
-	 * @return Component
+	 * @return object Component instance
 	 */
-	private function convert_block_to_component( $block ) {
+	private function convert_block_to_component( $block ) : object {
 
 		$block = (array) $block;
 

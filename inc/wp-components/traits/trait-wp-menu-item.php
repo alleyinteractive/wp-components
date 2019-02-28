@@ -23,9 +23,9 @@ trait WP_Menu_Item {
 	 * Set the menu item object.
 	 *
 	 * @param mixed $menu_item Post object or menu item ID.
-	 * @return self
+	 * @return object Instance of the class this trait is implemented on.
 	 */
-	public function set_menu_item( $menu_item = null ) {
+	public function set_menu_item( $menu_item = null ) : self {
 		// Post was passed.
 		if ( $menu_item instanceof \WP_Post && 'nav_menu_item' === $menu_item->post_type ) {
 			$this->menu_item = $menu_item;
@@ -47,17 +47,19 @@ trait WP_Menu_Item {
 
 	/**
 	 * Callback function for classes to override.
+	 *
+	 * @return object Instance of the class this trait is implemented on.
 	 */
-	public function menu_item_has_set() {
-		// Silence is golden.
+	public function menu_item_has_set() : self {
+		return $this;
 	}
 
 	/**
 	 * Parse a menu post.
 	 *
-	 * @return Menu_Item An instance of the Menu_Item component.
+	 * @return object Instance of the class this trait is implemented on.
 	 */
-	public function set_config_from_menu_item() {
+	public function set_config_from_menu_item() : self {
 		if ( empty( $this->menu_item ) ) {
 			return;
 		}

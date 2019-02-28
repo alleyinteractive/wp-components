@@ -26,7 +26,7 @@ class Pagination extends Component {
 	 *
 	 * @return array Default config.
 	 */
-	public function default_config() {
+	public function default_config() : array {
 		return [
 			'base_url'             => '',
 			'url_params_to_remove' => [],
@@ -35,8 +35,10 @@ class Pagination extends Component {
 
 	/**
 	 * Hook into query being set.
+	 *
+	 * @return self
 	 */
-	public function query_has_set() {
+	public function query_has_set() : self {
 
 		// Get the pagination links for the query.
 		$pagination_links = $this->get_pagination_links();
@@ -66,8 +68,10 @@ class Pagination extends Component {
 	/**
 	 * We need to carefully insert the Irving query as the global query so
 	 * the various core functions reference the correct query.
+	 *
+	 * @return array
 	 */
-	public function get_pagination_links() {
+	public function get_pagination_links() : array {
 		global $wp_query;
 
 		// Get the current global object and replace with our current query.

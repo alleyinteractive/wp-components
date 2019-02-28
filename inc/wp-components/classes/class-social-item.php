@@ -24,7 +24,7 @@ class Social_Item extends Component {
 	 *
 	 * @return array Default config.
 	 */
-	public function default_config() {
+	public function default_config() : array {
 		return [
 			'display_icon' => true,
 			'type'         => '',

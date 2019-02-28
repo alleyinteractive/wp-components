@@ -24,7 +24,7 @@ class HTML extends Component {
 	 *
 	 * @return array
 	 */
-	public function default_config() {
+	public function default_config() : array {
 		return [
 			'content' => '',
 		];

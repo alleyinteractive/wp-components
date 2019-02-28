@@ -24,13 +24,19 @@ class Head extends Component {
 
 	/**
 	 * Hook into post being set.
+	 *
+	 * @return self
 	 */
-	public function query_has_set() {
+	public function query_has_set() : self {
+		return $this;
 	}
 
 	/**
 	 * Hook into post being set.
+	 *
+	 * @return self
 	 */
-	public function post_has_set() {
+	public function post_has_set() : self {
+		return $this;
 	}
 }

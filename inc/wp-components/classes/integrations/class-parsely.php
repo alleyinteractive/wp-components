@@ -26,7 +26,7 @@ class Parsely extends Component {
 	 *
 	 * @return array Default config.
 	 */
-	public function default_config() {
+	public function default_config() : array {
 		return [
 			'site' => '',
 		];

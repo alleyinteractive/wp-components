@@ -21,24 +21,16 @@ class Menu extends Component {
 	 */
 	public $name = 'menu';
 
-
 	/**
 	 * Define a default config.
 	 *
 	 * @return array Default config.
 	 */
-	public function default_config() {
+	public function default_config() : array {
 		return [
 			'location'        => '',
 			'title'           => '',
 			'menu_item_class' => '',
 		];
-	}
-
-	/**
-	 * Callback function for classes to override.
-	 */
-	public function menu_has_set() {
-		// Silence is golden.
 	}
 }

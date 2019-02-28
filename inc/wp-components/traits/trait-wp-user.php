@@ -24,7 +24,7 @@ trait WP_User {
 	 *
 	 * @return int
 	 */
-	public function get_user_id() {
+	public function get_user_id() : int {
 		return absint( $this->user->ID ?? 0 );
 	}
 
@@ -33,8 +33,9 @@ trait WP_User {
 	 *
 	 * @param mixed $user User object, user ID, or null to use global $user
 	 *                    object.
+	 * @return object Instance of the class this trait is implemented on.
 	 */
-	public function set_user( $user = null ) {
+	public function set_user( $user = null ) : self {
 
 		// Post was passed.
 		if ( $user instanceof \WP_User ) {
@@ -65,8 +66,10 @@ trait WP_User {
 
 	/**
 	 * Callback function for classes to override.
+	 *
+	 * @return object Instance of the class this trait is implemented on.
 	 */
 	public function user_has_set() {
-		// Silence is golden.
+		return $this;
 	}
 }

@@ -51,6 +51,17 @@ class Component implements \JsonSerializable {
 	public $preserve_inner_keys = [];
 
 	/**
+	 * Flag to determine if the component has encountered a "fatal" error.
+	 * Rather than returning `null`, we set this flag so that the component can
+	 * be removed during the `to_array()` or render equivalent function. This
+	 * approach allows us to preserve method chaining without using an
+	 * `optional()` helper or similar functionality.
+	 *
+	 * @var boolean
+	 */
+	public $is_valid = true;
+
+	/**
 	 * Component constructor.
 	 */
 	public function __construct() {
@@ -62,9 +73,9 @@ class Component implements \JsonSerializable {
 	 * Helper to change a components name.
 	 *
 	 * @param  string $name New component name.
-	 * @return mixed An instance of this class.
+	 * @return self
 	 */
-	public function set_name( string $name ) {
+	public function set_name( string $name ) : self {
 		$this->name = $name;
 		return $this;
 	}
@@ -74,7 +85,7 @@ class Component implements \JsonSerializable {
 	 *
 	 * @return array Default config.
 	 */
-	public function default_config() {
+	public function default_config() : array {
 		return [];
 	}
 
@@ -85,7 +96,7 @@ class Component implements \JsonSerializable {
 	 * @param mixed        $value Config value.
 	 * @return self
 	 */
-	public function set_config( $key, $value = null ) {
+	public function set_config( $key, $value = null ) : self {
 		if ( is_array( $key ) && is_null( $value ) ) {
 			$this->config = $key;
 		} else {
@@ -97,8 +108,8 @@ class Component implements \JsonSerializable {
 	/**
 	 * Helper to set a top level config value.
 	 *
-	 * @param  string $key   Config key.
-	 * @return mixed An instance of this class.
+	 * @param string $key Config key.
+	 * @return mixed Config value or null.
 	 */
 	public function get_config( $key ) {
 		if ( array_key_exists( $key, $this->config ) ) {
@@ -110,10 +121,10 @@ class Component implements \JsonSerializable {
 	/**
 	 * Merge new values into the current config.
 	 *
-	 * @param  array $new_config Config array to merge in.
+	 * @param array $new_config Config array to merge in.
 	 * @return self
 	 */
-	public function merge_config( array $new_config ) {
+	public function merge_config( array $new_config ) : self {
 		$this->config = wp_parse_args( $new_config, $this->config );
 		return $this;
 	}
@@ -123,7 +134,7 @@ class Component implements \JsonSerializable {
 	 *
 	 * @return array Default children.
 	 */
-	public function default_children() {
+	public function default_children() : array {
 		return [];
 	}
 
@@ -132,9 +143,9 @@ class Component implements \JsonSerializable {
 	 *
 	 * @param  array   $children Children for this component.
 	 * @param  boolean $append   Append children to existing children.
-	 * @return mixed An instance of this class.
+	 * @return self
 	 */
-	public function set_children( array $children, $append = false ) {
+	public function set_children( array $children, $append = false ) : self {
 		if ( $append ) {
 			$this->children = array_merge(
 				$this->children,
@@ -150,9 +161,9 @@ class Component implements \JsonSerializable {
 	 * Append an array of components to the children array.
 	 *
 	 * @param array $children Array of components.
-	 * @return mixed An instance of this class.
+	 * @return self
 	 */
-	public function append_children( array $children ) {
+	public function append_children( array $children ) : self {
 		if ( ! empty( $children ) ) {
 			$children = array_filter( $children );
 			$this->children = array_merge( $this->children, $children );
@@ -164,9 +175,9 @@ class Component implements \JsonSerializable {
 	 * Prepend an array of components to the children array.
 	 *
 	 * @param array $children Array of components.
-	 * @return mixed An instance of this class.
+	 * @return self
 	 */
-	public function prepend_children( array $children ) {
+	public function prepend_children( array $children ) : self {
 		if ( ! empty( $children ) ) {
 			$children = array_filter( $children );
 			$this->children = array_merge( $children, $this->children );
@@ -178,9 +189,9 @@ class Component implements \JsonSerializable {
 	 * Append a component to the children array.
 	 *
 	 * @param Component $child Child component.
-	 * @return mixed An instance of this class.
+	 * @return self
 	 */
-	public function append_child( $child ) {
+	public function append_child( $child ) : self {
 		if ( ! empty( $child ) ) {
 			if ( is_array( $child ) ) {
 				$child = $child[0];
@@ -194,9 +205,9 @@ class Component implements \JsonSerializable {
 	 * Prepend a component to the children array.
 	 *
 	 * @param Component $child Child component.
-	 * @return mixed An instance of this class.
+	 * @return self
 	 */
-	public function prepend_child( $child ) {
+	public function prepend_child( $child ) : self {
 		if ( ! empty( $child ) ) {
 			if ( is_array( $child ) ) {
 				$child = $child[0];
@@ -217,12 +228,52 @@ class Component implements \JsonSerializable {
 	 * Execute a function on each child of this component.
 	 *
 	 * @param callable $callback Callback function.
-	 * @return mixed An instance of this class.
+	 * @return self
 	 */
-	public function children_callback( $callback ) {
+	public function children_callback( $callback ) : self {
 		$this->children = array_map( $callback, $this->children );
-
 		return $this;
+	}
+
+	/**
+	 * Helper to set this component's is_valid flag to false.
+	 *
+	 * @return self
+	 */
+	public function set_invalid() : self {
+		$this->is_valid = false;
+		return $this;
+	}
+
+	/**
+	 * Helper to set this component's is_valid flag to true.
+	 *
+	 * @return self
+	 */
+	public function set_valid() : self {
+		$this->is_valid = true;
+		return $this;
+	}
+
+	/**
+	 * Trigger a fatal error on this component and log a message.
+	 *
+	 * @param string $error_message Optional error message.
+	 * @return self
+	 */
+	public function has_error( $error_message = '' ) : self {
+
+		// If a message exists and WP debugging is enabled for logging.
+		if (
+			! empty( $error_message )
+			&& defined( 'WP_DEBUG' )
+			&& WP_DEBUG
+			&& defined( 'WP_DEBUG_LOG' )
+			&& WP_DEBUG_LOG
+		) {
+			error_log( $error_message );
+		}
+		return $this->set_invalid();
 	}
 
 	/**
@@ -245,7 +296,8 @@ class Component implements \JsonSerializable {
 	 * @param array $array_holder Parent array holder for recursive array.
 	 * @return array Updated array with camel-cased keys.
 	 */
-	public function camel_case_keys( $array, $array_holder = [] ) {
+	public function camel_case_keys( $array, $array_holder = [] ) : array {
+
 		// Setup for recursion.
 		$camel_case_array = ! empty( $array_holder ) ? $array_holder : [];
 
@@ -299,7 +351,7 @@ class Component implements \JsonSerializable {
 	 *
 	 * @return array
 	 */
-	public function jsonSerialize() {
+	public function jsonSerialize() : array {
 		return $this->to_array();
 	}
 }

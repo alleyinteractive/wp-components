@@ -26,7 +26,7 @@ class Menu_Item extends Component {
 	 *
 	 * @return array Default config.
 	 */
-	public function default_config() {
+	public function default_config() : array {
 		return [
 			'id'    => '',
 			'label' => '',
@@ -36,8 +36,11 @@ class Menu_Item extends Component {
 
 	/**
 	 * Callback function for classes to override.
+	 *
+	 * @return self
 	 */
-	public function menu_item_has_set() {
+	public function menu_item_has_set() : self {
 		$this->set_config_from_menu_item();
+		return $this;
 	}
 }

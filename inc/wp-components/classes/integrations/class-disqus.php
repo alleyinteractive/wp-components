@@ -26,7 +26,7 @@ class Disqus extends Component {
 	 *
 	 * @return array Default config.
 	 */
-	public function default_config() {
+	public function default_config() : array {
 		return [
 			'forum_shortname' => '',
 			'page_identifier' => '',
@@ -36,9 +36,12 @@ class Disqus extends Component {
 
 	/**
 	 * Hook into post being set.
+	 *
+	 * @return self
 	 */
-	public function post_has_set() {
+	public function post_has_set() : self {
 		$this->set_config( 'page_url', get_the_permalink( $this->post ) );
 		$this->set_config( 'page_identifier', $this->post->ID . ' ' . $this->post->guid );
+		return $this;
 	}
 }

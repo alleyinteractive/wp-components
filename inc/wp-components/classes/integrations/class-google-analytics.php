@@ -24,7 +24,7 @@ class Google_Analytics extends Component {
 	 *
 	 * @return array Default config.
 	 */
-	public function default_config() {
+	public function default_config() : array {
 		return [
 			'tracking_id' => '',
 		];
