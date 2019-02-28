@@ -282,6 +282,7 @@ class Component implements \JsonSerializable {
 	 * @return array
 	 */
 	public function to_array() : array {
+		echo $this->name;
 		return [
 			'name'     => $this->name,
 			'config'   => (object) $this->camel_case_keys( $this->config ),

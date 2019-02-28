@@ -190,7 +190,7 @@ trait WP_Post {
 	 * @return object Instance of the class this trait is implemented on.
 	 */
 	public function wp_post_set_featured_image( $size = 'full' ) : self {
-		$this->append_children(
+		return $this->append_children(
 			[
 				( new \WP_Components\Image() )
 					->set_post_id( $this->get_post_id() )
