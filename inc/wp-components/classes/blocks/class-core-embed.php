@@ -31,7 +31,7 @@ class Core_Embed extends \WP_Components\Component {
 	 *
 	 * @return array Default config.
 	 */
-	public function default_config() {
+	public function default_config() : array {
 		return [
 			'content'  => '',
 			'provider' => '',
@@ -61,7 +61,7 @@ class Core_Embed extends \WP_Components\Component {
 	 *
 	 * @return array
 	 */
-	public static function get_scripts() {
+	public static function get_scripts() : array {
 		$scripts = static::$scripts;
 		static::$scripts = [];
 		return $scripts;
@@ -73,7 +73,7 @@ class Core_Embed extends \WP_Components\Component {
 	 * @param array|object $block The saved markup of an embed block.
 	 * @return \WP_Components\Blocks\Core_Embed
 	 */
-	public function set_from_block( $block ) {
+	public function set_from_block( $block ) : self {
 
 		// Typecast to handle differences between Gutenberg versions.
 		$block          = (array) $block;

@@ -24,7 +24,7 @@ trait WP_Term {
 	 *
 	 * @return int
 	 */
-	public function get_term_id() {
+	public function get_term_id() : int {
 		return absint( $this->term->ID ?? 0 );
 	}
 
@@ -33,8 +33,9 @@ trait WP_Term {
 	 *
 	 * @param mixed $term Term object, term ID, or null to use global $term
 	 *                    object.
+	 * @return object Instance of the class this trait is implemented on.
 	 */
-	public function set_term( $term = null ) {
+	public function set_term( $term = null ) : self {
 
 		// Term was passed.
 		if ( $term instanceof \WP_Term ) {
@@ -64,9 +65,11 @@ trait WP_Term {
 
 	/**
 	 * Callback function for classes to override.
+	 *
+	 * @return object Instance of the class this trait is implemented on.
 	 */
-	public function term_has_set() {
-		// Silence is golden.
+	public function term_has_set() : self {
+		return $this;
 	}
 
 	/**
@@ -74,7 +77,7 @@ trait WP_Term {
 	 *
 	 * @return bool
 	 */
-	public function is_valid_term() {
+	public function is_valid_term() : bool {
 		if ( $this->term instanceof \WP_Term ) {
 			return true;
 		}
@@ -86,16 +89,18 @@ trait WP_Term {
 	 *
 	 * @return int
 	 */
-	public function wp_term_get_id() {
+	public function wp_term_get_id() : int {
 		$term_id = $this->term->term_id ?? 0;
 		return absint( $term_id );
 	}
 
 	/**
 	 * Set the `id` config to the term ID.
+	 *
+	 * @return object Instance of the class this trait is implemented on.
 	 */
-	public function wp_term_set_id() {
-		$this->set_config( 'id', $this->wp_term_get_id() );
+	public function wp_term_set_id() : self {
+		return $this->set_config( 'id', $this->wp_term_get_id() );
 	}
 
 	/**
@@ -103,16 +108,18 @@ trait WP_Term {
 	 *
 	 * @return string
 	 */
-	public function wp_term_get_name() {
+	public function wp_term_get_name() : string {
 		$name = $this->term->name ?? '';
 		return html_entity_decode( $name );
 	}
 
 	/**
 	 * Set the `name` config to the term name.
+	 *
+	 * @return object Instance of the class this trait is implemented on.
 	 */
-	public function wp_term_set_name() {
-		$this->set_config( 'name', $this->wp_term_get_name() );
+	public function wp_term_set_name() : self {
+		return $this->set_config( 'name', $this->wp_term_get_name() );
 	}
 
 	/**
@@ -120,15 +127,17 @@ trait WP_Term {
 	 *
 	 * @return string
 	 */
-	public function wp_term_get_taxonomy() {
+	public function wp_term_get_taxonomy() : string {
 		return $this->term->taxonomy ?? '';
 	}
 
 	/**
 	 * Set the `taxonomy` config to the term taxonomy.
+	 *
+	 * @return object Instance of the class this trait is implemented on.
 	 */
-	public function wp_term_set_taxonomy() {
-		$this->set_config( 'taxonomy', $this->wp_term_get_taxonomy() );
+	public function wp_term_set_taxonomy() : self {
+		return $this->set_config( 'taxonomy', $this->wp_term_get_taxonomy() );
 	}
 
 	/**
@@ -136,15 +145,17 @@ trait WP_Term {
 	 *
 	 * @return string
 	 */
-	public function wp_term_get_slug() {
+	public function wp_term_get_slug() : string {
 		return $this->term->slug ?? '';
 	}
 
 	/**
 	 * Set the `slug` config to the term slug.
+	 *
+	 * @return object Instance of the class this trait is implemented on.
 	 */
-	public function wp_term_set_slug() {
-		$this->set_config( 'slug', $this->wp_term_get_slug() );
+	public function wp_term_set_slug() : self {
+		return $this->set_config( 'slug', $this->wp_term_get_slug() );
 	}
 
 	/**
@@ -152,7 +163,7 @@ trait WP_Term {
 	 *
 	 * @return string
 	 */
-	public function wp_term_get_link() {
+	public function wp_term_get_link() : string {
 		if ( $this->is_valid_term() ) {
 			return get_term_link( $this->term );
 		}
@@ -161,8 +172,10 @@ trait WP_Term {
 
 	/**
 	 * Set the `link` config to the term link.
+	 *
+	 * @return object Instance of the class this trait is implemented on.
 	 */
-	public function wp_term_set_link() {
-		$this->set_config( 'link', $this->wp_term_get_link() );
+	public function wp_term_set_link() : self {
+		return $this->set_config( 'link', $this->wp_term_get_link() );
 	}
 }

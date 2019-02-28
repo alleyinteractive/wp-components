@@ -23,8 +23,9 @@ trait WP_Menu {
 	 * Set the menu object.
 	 *
 	 * @param mixed $menu Term object or menu location.
+	 * @return object Instance of the class this trait is implemented on.
 	 */
-	public function set_menu( $menu = null ) {
+	public function set_menu( $menu = null ) : self {
 
 		// Menu location was passed.
 		if ( is_string( $menu ) ) {
@@ -55,19 +56,21 @@ trait WP_Menu {
 
 	/**
 	 * Callback function for classes to override.
+	 *
+	 * @return object Instance of the class this trait is implemented on.
 	 */
-	public function menu_has_set() {
-		// Silence is golden.
+	public function menu_has_set() : self {
+		return $this;
 	}
 
 	/**
 	 * Build a menu component by parsing a menu.
 	 *
-	 * @return Menu An instance of the Menu class.
+	 * @return object Instance of the class this trait is implemented on.
 	 */
-	public function parse_wp_menu() {
+	public function parse_wp_menu() : self {
 		if ( empty( $this->menu ) || ! $this->menu instanceof \WP_Term ) {
-			return;
+			return $this;
 		}
 
 		$menu_items = wp_get_nav_menu_items( $this->menu );
@@ -85,7 +88,7 @@ trait WP_Menu {
 	 * @param  integer $parent_id  Parent menu ID.
 	 * @return array All menu items.
 	 */
-	public function build_menu( $menu, $menu_items, $parent_id = 0 ) {
+	public function build_menu( $menu, $menu_items, $parent_id = 0 ) : array {
 		// Loop through all menu items.
 		foreach ( (array) $menu_items as $key => $menu_item ) {
 

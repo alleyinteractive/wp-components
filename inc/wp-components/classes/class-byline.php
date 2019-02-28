@@ -28,7 +28,7 @@ class Byline extends Component {
 	 *
 	 * @return array Default config.
 	 */
-	public function default_config() {
+	public function default_config() : array {
 		return [
 			'link' => '',
 			'name' => '',
@@ -42,7 +42,7 @@ class Byline extends Component {
 	 *                                   WP_Post object.
 	 * @return array Byline components.
 	 */
-	public static function get_post_bylines( $post_id = null ) {
+	public static function get_post_bylines( $post_id = null ) : array {
 
 		// Use global $post object.
 		if ( is_null( $post_id ) ) {
@@ -88,17 +88,23 @@ class Byline extends Component {
 
 	/**
 	 * Handling for WP_User objects.
+	 *
+	 * @return self
 	 */
-	public function user_has_set() {
+	public function user_has_set() : self {
 		$this->set_config( 'name', $this->user->data->display_name ?? '' );
 		$this->set_config( 'link', get_author_posts_url( $this->user->data->ID, $this->user->data->user_nicename ) );
+		return $this;
 	}
 
 	/**
 	 * Handling for Co-Authors Plus guest author objects.
+	 *
+	 * @return self
 	 */
-	public function guest_author_has_set() {
+	public function guest_author_has_set() : self {
 		$this->set_config( 'name', $this->guest_author->display_name ?? '' );
 		$this->set_config( 'link', get_author_posts_url( $this->guest_author->ID, $this->guest_author->user_nicename ) );
+		return $this;
 	}
 }

@@ -26,7 +26,7 @@ class Term extends Component {
 	 *
 	 * @return array Default config.
 	 */
-	public function default_config() {
+	public function default_config() : array {
 		return [
 			'id'   => 0,
 			'link' => '',
@@ -37,11 +37,14 @@ class Term extends Component {
 
 	/**
 	 * Fires after the term object has been set on this class.
+	 *
+	 * @return self
 	 */
-	public function term_has_set() {
+	public function term_has_set() : self {
 		$this->wp_term_set_name();
 		$this->wp_term_set_id();
 		$this->wp_term_set_slug();
 		$this->wp_term_set_link();
+		return $this;
 	}
 }

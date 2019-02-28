@@ -24,7 +24,7 @@ trait Guest_Author {
 	 *
 	 * @return int
 	 */
-	public function get_guest_author_id() {
+	public function get_guest_author_id() : int {
 		return absint( $this->guest_author->ID ?? 0 );
 	}
 
@@ -34,8 +34,9 @@ trait Guest_Author {
 	 * @todo Finish implementing this trait setter.
 	 *
 	 * @param \WP_Post|null $guest_author Guest Author post.
+	 * @return object Instance of the class this trait is implemented on.
 	 */
-	public function set_guest_author( $guest_author = null ) {
+	public function set_guest_author( $guest_author = null ) : self {
 
 		// Post was passed.
 		if ( 'guest-author' === ( $guest_author->post_type ?? '' ) ) {
@@ -51,9 +52,11 @@ trait Guest_Author {
 
 	/**
 	 * Callback function for classes to override.
+	 *
+	 * @return object Instance of the class this trait is implemented on.
 	 */
-	public function guest_author_has_set() {
-		// Silence is golden.
+	public function guest_author_has_set() : self {
+		return $this;
 	}
 
 	/**
@@ -62,7 +65,7 @@ trait Guest_Author {
 	 * @todo Add a fallback image.
 	 *
 	 * @param string $size Image size to use for child image component.
-	 * @return self
+	 * @return object Instance of the class this trait is implemented on.
 	 */
 	public function guest_author_set_avatar( $size = 'full' ) : self {
 		$this->append_child(

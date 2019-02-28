@@ -44,7 +44,7 @@ class Image extends Component {
 	 *
 	 * @return array Default config.
 	 */
-	public function default_config() {
+	public function default_config() : array {
 		return [
 			'aspect_ratio'       => 9 / 16,
 			'attachment_id'      => 0,

@@ -3,6 +3,9 @@
  * Trait that handles logic handling between WP_User objects and guest author
  * objects.
  *
+ * Use this when you're not sure if the object will be a User or a CAP Guest
+ * Author.
+ *
  * @package WP_Components
  */
 
@@ -18,7 +21,7 @@ trait Author {
 	 *
 	 * @return string
 	 */
-	public function get_author_type() {
+	public function get_author_type() : string {
 		if ( ! is_null( $this->user ?? null ) ) {
 			return 'wp_user';
 		}
@@ -35,7 +38,7 @@ trait Author {
 	 *
 	 * @return int
 	 */
-	public function get_author_id() {
+	public function get_author_id() : int {
 		$id = 0;
 
 		switch ( $this->get_author_type() ) {
@@ -56,7 +59,7 @@ trait Author {
 	 *
 	 * @return string
 	 */
-	public function get_author_display_name() {
+	public function get_author_display_name() : string {
 		$display_name = '';
 
 		switch ( $this->get_author_type() ) {
@@ -76,8 +79,9 @@ trait Author {
 	 * Set the author using either a WP_User or Guest Author post object.
 	 *
 	 * @param mixed $author The author.
+	 * @return object Instance of the class this trait is implemented on.
 	 */
-	public function set_author( $author = null ) {
+	public function set_author( $author = null ) : self {
 
 		// Use \WP_User object.
 		if ( $author instanceof \WP_User ) {
@@ -96,14 +100,16 @@ trait Author {
 		}
 
 		// Something else went wrong.
-		// @todo determine how to handle error messages.
+		$this->has_error( __( 'Author was not an instance of \WP_User, or a Guest Author post type.', 'wp-components' ) );
 		return $this;
 	}
 
 	/**
 	 * Callback function for classes to override.
+	 *
+	 * @return object Instance of the class this trait is implemented on.
 	 */
-	public function author_has_set() {
-		// Silence is golden.
+	public function author_has_set() : self {
+		return $this;
 	}
 }

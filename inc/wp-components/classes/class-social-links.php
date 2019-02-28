@@ -24,7 +24,7 @@ class Social_Links extends Component {
 	 *
 	 * @return array Default config.
 	 */
-	public function default_config() {
+	public function default_config() : array {
 		return [
 			'services'      => [],
 			'display_icons' => true,
@@ -35,9 +35,9 @@ class Social_Links extends Component {
 	 * Retrieve service labels for use in custom fields.
 	 *
 	 * @param  array $link_configs Array of configs to use for creating new social item components.
-	 * @return array Array of services with labels.
+	 * @return self
 	 */
-	public function create_link_components( $link_configs ) {
+	public function create_link_components( $link_configs ) : self {
 		foreach ( $this->config['services'] as $service => $enabled ) {
 			if ( (bool) $enabled && ! empty( $link_configs[ $service ] ) ) {
 				$this->append_child( ( new Social_Item() )->merge_config( $link_configs[ $service ] ) );

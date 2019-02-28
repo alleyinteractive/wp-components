@@ -24,7 +24,7 @@ class Pagination_Item extends Component {
 	 *
 	 * @return array Default config.
 	 */
-	public function default_config() {
+	public function default_config() : array {
 		return [
 			'current' => false,
 			'text'    => '',
@@ -36,9 +36,9 @@ class Pagination_Item extends Component {
 	 * Map the raw html of a paginated_links() item to a pagination-link component.
 	 *
 	 * @param string $link A paginated_links() generated html link item.
-	 * @return \WP_Components\Pagination_Item
+	 * @return self
 	 */
-	public function set_from_html( string $link ) {
+	public function set_from_html( string $link ) : self {
 
 		// Use DOMDocument to parse markup.
 		$doc = new \DOMDocument();
@@ -69,9 +69,9 @@ class Pagination_Item extends Component {
 	 * Remove one or more url parameter from the item url.
 	 *
 	 * @param array $params URL parameters.
-	 * @return \WP_Components\Pagination_Item
+	 * @return self
 	 */
-	public function remove_url_params( array $params = [] ) {
+	public function remove_url_params( array $params = [] ) : self {
 
 		// If URL isn't empty.
 		if ( ! empty( $this->get_config( 'url' ) ) ) {

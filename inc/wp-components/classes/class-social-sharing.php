@@ -26,7 +26,7 @@ class Social_Sharing extends Component {
 	 *
 	 * @return array Default config.
 	 */
-	public function default_config() {
+	public function default_config() : array {
 		return [
 			'services'      => [],
 			'display_icons' => true,
@@ -35,8 +35,10 @@ class Social_Sharing extends Component {
 
 	/**
 	 * Hook into post being set.
+	 *
+	 * @return self
 	 */
-	public function post_has_set() {
+	public function post_has_set() : self {
 		foreach ( $this->config['services'] as $service => $enabled ) {
 			if ( (bool) $enabled && method_exists( $this, "get_{$service}_component" ) ) {
 				$this->append_child( call_user_func( [ $this, "get_{$service}_component" ] ) );
@@ -50,7 +52,7 @@ class Social_Sharing extends Component {
 	 *
 	 * @return \WP_Components\Social_item
 	 */
-	public function get_facebook_component() {
+	public function get_facebook_component() : Social_Item {
 		return ( new Social_Item() )
 			->merge_config(
 				[
@@ -71,7 +73,7 @@ class Social_Sharing extends Component {
 	 *
 	 * @return \WP_Components\Social_item
 	 */
-	public function get_twitter_component() {
+	public function get_twitter_component() : Social_Item {
 		return ( new Social_Item() )
 			->merge_config(
 				[
@@ -93,7 +95,7 @@ class Social_Sharing extends Component {
 	 *
 	 * @return \WP_Components\Social_item
 	 */
-	public function get_whatsapp_component() {
+	public function get_whatsapp_component() : Social_Item {
 		return ( new Social_Item() )
 			->merge_config(
 				[
@@ -121,7 +123,7 @@ class Social_Sharing extends Component {
 	 *
 	 * @return \WP_Components\Social_item
 	 */
-	public function get_linkedin_component() {
+	public function get_linkedin_component() : Social_Item {
 		return ( new Social_Item() )
 			->merge_config(
 				[
@@ -144,7 +146,7 @@ class Social_Sharing extends Component {
 	 *
 	 * @return \WP_Components\Social_item
 	 */
-	public function get_pinterest_component() {
+	public function get_pinterest_component() : Social_Item {
 		return ( new Social_Item() )
 			->merge_config(
 				[
@@ -167,7 +169,7 @@ class Social_Sharing extends Component {
 	 *
 	 * @return \WP_Components\Social_item
 	 */
-	public function get_email_component() {
+	public function get_email_component() : Social_Item {
 		return ( new Social_Item() )
 			->merge_config(
 				[
@@ -190,7 +192,7 @@ class Social_Sharing extends Component {
 	 *
 	 * @return string
 	 */
-	public function get_url() {
+	public function get_url() : string {
 		return rawurlencode( $this->wp_post_get_permalink() );
 	}
 
@@ -199,7 +201,7 @@ class Social_Sharing extends Component {
 	 *
 	 * @return string
 	 */
-	public function get_title() {
+	public function get_title() : string {
 		return rawurlencode( $this->wp_post_get_title() );
 	}
 
@@ -208,7 +210,7 @@ class Social_Sharing extends Component {
 	 *
 	 * @return string
 	 */
-	public function get_excerpt() {
+	public function get_excerpt() : string {
 		return rawurlencode( $this->wp_post_get_excerpt() );
 	}
 
@@ -217,7 +219,7 @@ class Social_Sharing extends Component {
 	 *
 	 * @return string
 	 */
-	public function get_featured_image_url() {
+	public function get_featured_image_url() : string {
 		return rawurlencode( get_the_post_thumbnail_url( $this->post, 'full' ) );
 	}
 }

@@ -22,16 +22,16 @@ trait WP_Query {
 	/**
 	 * Get the query posts.
 	 *
-	 * @return int
+	 * @return array
 	 */
-	public function get_posts() {
+	public function get_posts() : array {
 		return $this->query->posts ?? [];
 	}
 
 	/**
 	 * Get the queried object.
 	 *
-	 * @return mixed
+	 * @return object
 	 */
 	public function get_queried_object() {
 		return $this->query->get_queried_object();
@@ -42,7 +42,7 @@ trait WP_Query {
 	 *
 	 * @return int
 	 */
-	public function get_queried_object_id() {
+	public function get_queried_object_id() : int {
 		return absint( $this->query->get_queried_object_id() ?? 0 );
 	}
 
@@ -51,8 +51,9 @@ trait WP_Query {
 	 *
 	 * @param mixed $wp_query \WP_Query object, or null to use global $wp_query
 	 *                        object.
+	 * @return object Instance of the class this trait is implemented on.
 	 */
-	public function set_query( $wp_query = null ) {
+	public function set_query( $wp_query = null ) : self {
 
 		// WP_Query object was passed.
 		if ( $wp_query instanceof \WP_Query ) {
@@ -76,8 +77,10 @@ trait WP_Query {
 
 	/**
 	 * Callback function for classes to override.
+	 *
+	 * @return object Instance of the class this trait is implemented on.
 	 */
-	public function query_has_set() {
-		// Silence is golden.
+	public function query_has_set() : self {
+		return $this;
 	}
 }

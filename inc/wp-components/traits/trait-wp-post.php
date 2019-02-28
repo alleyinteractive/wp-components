@@ -33,8 +33,9 @@ trait WP_Post {
 	 *
 	 * @param mixed $post Post object, post ID, or null to use global $post
 	 *                    object.
+	 * @return object Instance of the class this trait is implemented on.
 	 */
-	public function set_post( $post = null ) {
+	public function set_post( $post = null ) : self {
 
 		// Post was passed.
 		if ( $post instanceof \WP_Post ) {
@@ -65,10 +66,9 @@ trait WP_Post {
 	/**
 	 * Callback function for classes to override.
 	 *
-	 * @return mixed An instance of the class.
+	 * @return object Instance of the class this trait is implemented on.
 	 */
-	public function post_has_set() {
-		// Silence is golden.
+	public function post_has_set() : self {
 		return $this;
 	}
 
@@ -89,7 +89,7 @@ trait WP_Post {
 	 *
 	 * @return int
 	 */
-	public function wp_post_get_id() {
+	public function wp_post_get_id() : int {
 		$post_id = $this->post->ID ?? 0;
 		return absint( $post_id );
 	}
@@ -97,9 +97,9 @@ trait WP_Post {
 	/**
 	 * Set the `id` config to the post ID.
 	 *
-	 * @return mixed An instance of the class.
+	 * @return object Instance of the class this trait is implemented on.
 	 */
-	public function wp_post_set_id() {
+	public function wp_post_set_id() : self {
 		$this->set_config( 'id', $this->wp_post_get_id() );
 		return $this;
 	}
@@ -109,16 +109,16 @@ trait WP_Post {
 	 *
 	 * @return string
 	 */
-	public function wp_post_get_title() {
+	public function wp_post_get_title() : string {
 		return html_entity_decode( get_the_title( $this->post ) );
 	}
 
 	/**
 	 * Set the `title` config to the post title.
 	 *
-	 * @return mixed An instance of the class.
+	 * @return object Instance of the class this trait is implemented on.
 	 */
-	public function wp_post_set_title() {
+	public function wp_post_set_title() : self {
 		$this->set_config( 'title', $this->wp_post_get_title() );
 		return $this;
 	}
@@ -128,7 +128,7 @@ trait WP_Post {
 	 *
 	 * @return string
 	 */
-	public function wp_post_get_permalink() {
+	public function wp_post_get_permalink() : string {
 		if ( $this->is_valid_post() ) {
 			return get_permalink( $this->post );
 		}
@@ -138,9 +138,9 @@ trait WP_Post {
 	/**
 	 * Set the `permalink` config to the post permalink.
 	 *
-	 * @return mixed An instance of the class.
+	 * @return object Instance of the class this trait is implemented on.
 	 */
-	public function wp_post_set_permalink() {
+	public function wp_post_set_permalink() : self {
 		$this->set_config( 'permalink', $this->wp_post_get_permalink() );
 		return $this;
 	}
@@ -150,7 +150,7 @@ trait WP_Post {
 	 *
 	 * @return string
 	 */
-	public function wp_post_get_excerpt() {
+	public function wp_post_get_excerpt() : string {
 
 		// Modify global state.
 		global $post;
@@ -176,9 +176,9 @@ trait WP_Post {
 	/**
 	 * Set the `expert` config to the post excerpt.
 	 *
-	 * @return mixed An instance of the class.
+	 * @return object Instance of the class this trait is implemented on.
 	 */
-	public function wp_post_set_excerpt() {
+	public function wp_post_set_excerpt() : self {
 		$this->set_config( 'excerpt', $this->wp_post_get_excerpt() );
 		return $this;
 	}
@@ -187,9 +187,10 @@ trait WP_Post {
 	 * Create Image component and append to children.
 	 *
 	 * @param string $size Image size to use for child image component.
+	 * @return object Instance of the class this trait is implemented on.
 	 */
-	public function wp_post_set_featured_image( $size = 'full' ) {
-		$this->append_children(
+	public function wp_post_set_featured_image( $size = 'full' ) : self {
+		return $this->append_children(
 			[
 				( new \WP_Components\Image() )
 					->set_post_id( $this->get_post_id() )
