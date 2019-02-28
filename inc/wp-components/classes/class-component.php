@@ -182,6 +182,9 @@ class Component implements \JsonSerializable {
 	 */
 	public function append_child( $child ) {
 		if ( ! empty( $child ) ) {
+			if ( is_array( $child ) ) {
+				$child = $child[0];
+			}
 			array_push( $this->children, $child );
 		}
 		return $this;
@@ -195,6 +198,9 @@ class Component implements \JsonSerializable {
 	 */
 	public function prepend_child( $child ) {
 		if ( ! empty( $child ) ) {
+			if ( is_array( $child ) ) {
+				$child = $child[0];
+			}
 			array_unshift( $this->children, $child );
 		}
 		return $this;
