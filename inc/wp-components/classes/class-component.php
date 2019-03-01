@@ -277,23 +277,33 @@ class Component implements \JsonSerializable {
 	}
 
 	/**
+	 * Helper to set theme on this component
+	 *
+	 * @param string $theme_name Name of theme to set.
+	 * @return self
+	 */
+	public function set_theme( $theme_name ) {
+		$this->set_config( 'theme_name', $theme_name );
+		return $this;
+	}
+
+	/**
 	 * Helper to recursively set themes on child components.
 	 *
 	 * @param array $theme_mapping Array in which keys are component $name properties and values are the theme to use for that component.
 	 * @return self
 	 */
-	public function set_themes( $theme_mapping ) {
+	public function set_child_themes( $theme_mapping ) {
 		$component_names = array_keys( $theme_mapping );
-
-		// Set theme for this component.
-		if ( ! empty( $theme_mapping[ $this->name ] ) ) {
-			$this->set_config( 'theme', $theme_mapping[ $this->name ] );
-		}
 
 		// Recursively set themes for children.
 		if ( ! empty( $this->children ) ) {
 			foreach ( $this->children as $child ) {
-				$child->set_themes( $theme_mapping );
+				if ( ! empty( $theme_mapping[ $child->name ] ) ) {
+					$this->set_config( 'theme_name', $theme_mapping[ $child->name ] );
+				}
+
+				$child->set_child_themes( $theme_mapping );
 			}
 		}
 
