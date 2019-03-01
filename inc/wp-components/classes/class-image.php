@@ -58,6 +58,7 @@ class Image extends Component {
 			'lqip_src'           => 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7',
 			'post_id'            => 0,
 			'retina'             => true,
+			'show_caption'       => false,
 			'sources'            => [],
 			'source_tags'        => [],
 			'src'                => '',
