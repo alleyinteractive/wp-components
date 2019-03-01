@@ -300,7 +300,7 @@ class Component implements \JsonSerializable {
 		if ( ! empty( $this->children ) ) {
 			foreach ( $this->children as $child ) {
 				if ( ! empty( $theme_mapping[ $child->name ] ) ) {
-					$this->set_config( 'theme_name', $theme_mapping[ $child->name ] );
+					$child->set_config( 'theme_name', $theme_mapping[ $child->name ] );
 				}
 
 				$child->set_child_themes( $theme_mapping );
