@@ -187,14 +187,16 @@ trait WP_Post {
 	 * Create Image component and append to children.
 	 *
 	 * @param string $size Image size to use for child image component.
+	 * @param array  $config Additional config for Image component.
 	 * @return object Instance of the class this trait is implemented on.
 	 */
-	public function wp_post_set_featured_image( $size = 'full' ) : self {
+	public function wp_post_set_featured_image( $size = 'full', $config = [] ) : self {
 		return $this->append_children(
 			[
 				( new \WP_Components\Image() )
 					->set_post_id( $this->get_post_id() )
-					->set_config_for_size( $size ),
+					->set_config_for_size( $size )
+					->merge_config( $config ),
 			]
 		);
 	}
