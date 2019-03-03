@@ -293,7 +293,7 @@ class Component implements \JsonSerializable {
 	 * @param array $theme_mapping Array in which keys are component $name properties and values are the theme to use for that component.
 	 * @return self
 	 */
-	public function set_child_themes( $theme_mapping ) {
+	public function set_child_themes( $theme_mapping ) : self {
 		$component_names = array_keys( $theme_mapping );
 
 		// Recursively set themes for children.
