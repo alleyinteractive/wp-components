@@ -282,7 +282,7 @@ class Component implements \JsonSerializable {
 	 * @param string $theme_name Name of theme to set.
 	 * @return self
 	 */
-	public function set_theme( $theme_name ) {
+	public function set_theme( $theme_name ) : self {
 		$this->set_config( 'theme_name', $theme_name );
 		return $this;
 	}
