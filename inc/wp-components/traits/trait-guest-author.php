@@ -45,6 +45,13 @@ trait Guest_Author {
 			return $this;
 		}
 
+		// Object was passed.
+		if ( 'guest-author' === ( $guest_author->type ?? '' ) ) {
+			$this->guest_author = $guest_author;
+			$this->guest_author_has_set();
+			return $this;
+		}
+
 		// Something else went wrong.
 		// @todo determine how to handle error messages.
 		return $this;

@@ -68,7 +68,7 @@ trait Author {
 				break;
 
 			case 'guest_author':
-				$display_name = $this->display_name;
+				$display_name = $this->guest_author->display_name;
 				break;
 		}
 
@@ -83,6 +83,15 @@ trait Author {
 	 */
 	public function set_author( $author = null ) : self {
 
+		global $coauthors_plus;
+
+		// User login.
+		if ( is_string( $author ) ) {
+			$coauthor = $coauthors_plus->get_coauthor_by( 'user_login', $author );
+			$this->set_author( $coauthor );
+			return $this;
+		}
+
 		// Use \WP_User object.
 		if ( $author instanceof \WP_User ) {
 			$this->set_user( $author );
@@ -90,9 +99,20 @@ trait Author {
 			return $this;
 		}
 
+		// Guest author post.
 		if (
 			$author instanceof \WP_Post
 			&& 'guest-author' === ( $author->post_type ?? '' )
+		) {
+			$this->set_guest_author( $author );
+			$this->author_has_set();
+			return $this;
+		}
+
+		// Guest author object.
+		if (
+			is_object( $author )
+			&& 'guest-author' === ( $author->type ?? '' )
 		) {
 			$this->set_guest_author( $author );
 			$this->author_has_set();
