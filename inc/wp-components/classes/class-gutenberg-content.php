@@ -81,7 +81,7 @@ class Gutenberg_Content extends Component {
 
 		// The presence of html means this is a non dynamic block.
 		if ( ! empty( $block['innerHTML'] ) ) {
-			$content = $this->get_block_html_content( $block );
+			$content = $this->get_static_block_html_content( $block );
 			$last_block = end( $blocks );
 
 			// Merge non-dynamic block content into a single HTML component.
@@ -120,7 +120,7 @@ class Gutenberg_Content extends Component {
 	 * @param array $block Gutenberg block from which to retrieve HTMl content.
 	 * @return string HTMl content of gutenberg block.
 	 */
-	public function get_block_html_content( $block ) : string {
+	public function get_static_block_html_content( $block ) : string {
 		$content = '';
 		$inner_blocks = $block['innerBlocks'];
 
