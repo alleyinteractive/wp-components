@@ -64,14 +64,25 @@ class Gutenberg_Content extends Component {
 	/**
 	 * Map a block array to a Component instance.
 	 *
-	 * @todo: Create "columns" and "column" components that can handle placing child blocks within the wrapping markup.
-	 *
 	 * @param array $blocks         Accumulated array of blocks.
 	 * @param array $current_block  Current block.
 	 * @return object Component instance
 	 */
 	private function convert_block_to_component( $blocks, $current_block ) : array {
 		$block = (array) $current_block;
+		/**
+		 * Filters array of non-dynamic blocks for which you'd like to bypass the render step (and any core markup)
+		 * and render your own markup in React instead.
+		 *
+		 * @param array $exceptions Array of block render excepctions.
+		 */
+		$block_render_exceptions = apply_filters(
+			'wp_components_block_render_exception',
+			[
+				'core/columns',
+				'core/column',
+			]
+		);
 
 		// Handle gutenberg embeds.
 		if ( strpos( $block['blockName'] ?? '', 'core-embed' ) === 0 ) {
@@ -79,12 +90,15 @@ class Gutenberg_Content extends Component {
 			return $blocks;
 		}
 
-		// The presence of html means this is a non dynamic block.
-		if ( ! empty( $block['innerHTML'] ) ) {
-			$content = $this->get_static_block_html_content( $block );
+		// The presence of html means this is a non-dynamic block.
+		if ( ! empty( $block['innerHTML'] ) && ! in_array( $block['blockName'], $block_render_exceptions, true ) ) {
 			$last_block = end( $blocks );
 
-			// Merge non-dynamic block content into a single HTML component.
+			// Render block and clean up extraneous whitespace characters.
+			$content = render_block( $block );
+			$content = preg_replace( '/[\r\n\t\f\v]/', '', $content );
+
+			// Merge rendered static blocks into a single HTML component.
 			if ( $last_block instanceof HTML ) {
 				$last_block->set_config(
 					'content',
@@ -98,54 +112,19 @@ class Gutenberg_Content extends Component {
 		}
 
 		// Handle nested blocks.
-		$children_blocks_as_components = array_map(
+		$children_blocks_as_components = array_reduce(
+			(array) ( $block['innerBlocks'] ?? [] ),
 			[ $this, 'convert_block_to_component' ],
-			(array) ( $block['innerBlocks'] ?? [] )
+			[]
 		);
 
 		// A dynamic block. All attributes will be available.
+		// @todo perhaps eventually allow dynamic creation of a block-specific class with a "prepare_config" function or something.
 		$blocks[] = ( new Component() )
 			->set_name( $block['blockName'] ?? '' )
 			->merge_config( $block['attrs'] ?? [] )
 			->append_children( $children_blocks_as_components );
 
 		return $blocks;
-	}
-
-	/**
-	 * Map a block array to a Component instance.
-	 *
-	 * @todo: Create "columns" and "column" components that can handle placing child blocks within the wrapping markup.
-	 *
-	 * @param array $block Gutenberg block from which to retrieve HTMl content.
-	 * @return string HTMl content of gutenberg block.
-	 */
-	public function get_static_block_html_content( $block ) : string {
-		$content = '';
-		$inner_blocks = $block['innerBlocks'];
-
-		// Loop through inner content if it's not empty.
-		if ( ! empty( $block['innerContent'] ) ) {
-			foreach ( $block['innerContent'] as $inner_content ) {
-				// Add inner content item if it's not empty, otherwise add content of inner blocks.
-				if ( ! empty( $inner_content ) ) {
-					$content .= $inner_content;
-				} else if ( ! empty( $inner_blocks ) ) {
-					$content .= $this->get_block_html_content( array_shift( $inner_blocks ) );
-				}
-			}
-		} else {
-			$content = $block['innerHTML'];
-		}
-
-		// Missing blockName means it's a "classic" block, run the_content.
-		if ( empty( $block['blockName'] ) ) {
-			$content = apply_filters( 'the_content', $content );
-		}
-
-		// Clean up extraneous whitespace characters.
-		$content = preg_replace( '/[\r\n\t\f\v]/', '', $content );
-
-		return $content;
 	}
 }
