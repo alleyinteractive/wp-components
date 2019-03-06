@@ -10,7 +10,7 @@ namespace WP_Components\Integrations;
 /**
  * Disqus.
  */
-class Disqus extends Component {
+class Disqus extends \WP_Components\Component {
 
 	use \WP_Components\WP_Post;
 
@@ -40,8 +40,13 @@ class Disqus extends Component {
 	 * @return self
 	 */
 	public function post_has_set() : self {
-		$this->set_config( 'page_url', get_the_permalink( $this->post ) );
-		$this->set_config( 'page_identifier', $this->post->ID . ' ' . $this->post->guid );
+		$this->merge_config(
+			[
+				'page_url'        => get_the_permalink( $this->post ),
+				'page_identifier' => $this->post->ID . ' ' . $this->post->guid,
+			]
+		);
+
 		return $this;
 	}
 }
