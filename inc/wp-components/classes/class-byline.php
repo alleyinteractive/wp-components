@@ -52,7 +52,7 @@ class Byline extends Component {
 
 		// Use WP_Post object.
 		if ( $post_id instanceof \WP_Post ) {
-			$post_id = $post->ID;
+			$post_id = $post_id->ID;
 		}
 
 		// Handle users.
@@ -74,15 +74,18 @@ class Byline extends Component {
 
 		// Loop through coauthors, creating new byline objects as needed.
 		foreach ( $coauthors as $coauthor ) {
+			// if ($post_id === 2547854) {
+			// 	print_r($coauthors);
+			// 	die();
+			// }
 			$byline = new Byline();
 			if ( $coauthor instanceof \WP_User ) {
 				$byline->set_user( $coauthor );
-			} elseif ( 'guest-author' === ( $coauthor->data['type'] ?? '' ) ) {
+			} elseif ( 'guest-author' === ( $coauthor->type ?? '' ) ) {
 				$byline->set_guest_author( $coauthor );
 			}
 			$bylines[] = $byline;
 		}
-
 		return array_filter( $bylines );
 	}
 
