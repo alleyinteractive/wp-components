@@ -92,6 +92,6 @@ class Pagination extends Component {
 		// phpcs:ignore WordPress.WP.GlobalVariablesOverride
 		$wp_query = $current_global_wp_query;
 
-		return $links;
+		return (array) $links;
 	}
 }
