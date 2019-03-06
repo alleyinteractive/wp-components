@@ -74,10 +74,6 @@ class Byline extends Component {
 
 		// Loop through coauthors, creating new byline objects as needed.
 		foreach ( $coauthors as $coauthor ) {
-			// if ($post_id === 2547854) {
-			// 	print_r($coauthors);
-			// 	die();
-			// }
 			$byline = new Byline();
 			if ( $coauthor instanceof \WP_User ) {
 				$byline->set_user( $coauthor );
@@ -86,6 +82,7 @@ class Byline extends Component {
 			}
 			$bylines[] = $byline;
 		}
+
 		return array_filter( $bylines );
 	}
 
