@@ -102,7 +102,8 @@ trait WP_Menu {
 			if ( $menu_item_parent_id === $parent_id ) {
 
 				// Get menu_item_class config and fall back to WP Components menu item.
-				$menu_item_class = $this->get_config( 'menu_item_class' ) ?? '\WP_Components\Menu_Item';
+				$menu_item_class = ! empty( $this->get_config( 'menu_item_class' ) ) ?
+					$this->get_config( 'menu_item_class' ) : '\WP_Components\Menu_Item';
 
 				if ( ! class_exists( $menu_item_class ) ) {
 					return [];
