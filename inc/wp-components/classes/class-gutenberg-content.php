@@ -39,7 +39,6 @@ class Gutenberg_Content extends Component {
 						apply_filters( 'the_content', $this->post->post_content ?? '' )
 					)
 			);
-
 		} else {
 			$blocks = (array) parse_blocks( $this->post->post_content ?? '' );
 
@@ -55,65 +54,77 @@ class Gutenberg_Content extends Component {
 				)
 			);
 
-			$blocks_as_components = array_map( [ $this, 'convert_block_to_component' ], $blocks );
+			$blocks_as_components = array_reduce( $blocks, [ $this, 'convert_block_to_component' ], [] );
 			$this->append_children( $blocks_as_components );
 		}
 
 		return $this;
 	}
 
-
 	/**
 	 * Map a block array to a Component instance.
 	 *
-	 * @todo: Create "columns" and "column" components that can handle placing child blocks within the wrapping markup.
-	 *
-	 * @param array $block A parsed block associative array.
+	 * @param array $blocks         Accumulated array of blocks.
+	 * @param array $current_block  Current block.
 	 * @return object Component instance
 	 */
-	private function convert_block_to_component( $block ) : object {
-
-		$block = (array) $block;
+	private function convert_block_to_component( $blocks, $current_block ) : array {
+		$block = (array) $current_block;
+		/**
+		 * Filters array of non-dynamic blocks for which you'd like to bypass the render step (and any core markup)
+		 * and render your own markup in React instead.
+		 *
+		 * @param array $exceptions Array of block render excepctions.
+		 */
+		$block_render_exceptions = apply_filters(
+			'wp_components_block_render_exception',
+			[
+				'core/columns',
+				'core/column',
+			]
+		);
 
 		// Handle gutenberg embeds.
 		if ( strpos( $block['blockName'] ?? '', 'core-embed' ) === 0 ) {
-			return ( new Blocks\Core_Embed() )->set_from_block( $block );
+			$blocks[] = ( new Blocks\Core_Embed() )->set_from_block( $block );
+			return $blocks;
 		}
 
-		// The presence of html means this is a non dynamic block.
-		if ( ! empty( $block['innerHTML'] ) ) {
-			$content = $block['innerHTML'];
+		// The presence of html means this is a non-dynamic block.
+		if ( ! empty( $block['innerHTML'] ) && ! in_array( $block['blockName'], $block_render_exceptions, true ) ) {
+			$last_block = end( $blocks );
 
-			// Missing blockName means it's a "classic" block, run the_content.
-			if ( empty( $block['blockName'] ) ) {
-				$content = apply_filters( 'the_content', $content );
-			}
-
-			// Clean up extraneous whitespace characters.
+			// Render block and clean up extraneous whitespace characters.
+			$content = render_block( $block );
 			$content = preg_replace( '/[\r\n\t\f\v]/', '', $content );
 
-			// Handle nested blocks.
-			$children_blocks_as_components = array_map(
-				[ $this, 'convert_block_to_component' ],
-				(array) ( $block['innerBlocks'] ?? [] )
-			);
+			// Merge rendered static blocks into a single HTML component.
+			if ( $last_block instanceof HTML ) {
+				$last_block->set_config(
+					'content',
+					$last_block->get_config( 'content' ) . $content
+				);
+			} else {
+				$blocks[] = ( new HTML() )->set_config( 'content', $content );
+			}
 
-			return ( new HTML() )
-				->merge_config( $block['attrs'] ?? [] )
-				->set_config( 'content', $content )
-				->append_children( $children_blocks_as_components );
+			return $blocks;
 		}
 
 		// Handle nested blocks.
-		$children_blocks_as_components = array_map(
+		$children_blocks_as_components = array_reduce(
+			(array) ( $block['innerBlocks'] ?? [] ),
 			[ $this, 'convert_block_to_component' ],
-			(array) ( $block['innerBlocks'] ?? [] )
+			[]
 		);
 
 		// A dynamic block. All attributes will be available.
-		( new Component() )
+		// @todo perhaps eventually allow dynamic creation of a block-specific class with a "prepare_config" function or something.
+		$blocks[] = ( new Component() )
 			->set_name( $block['blockName'] ?? '' )
 			->merge_config( $block['attrs'] ?? [] )
 			->append_children( $children_blocks_as_components );
+
+		return $blocks;
 	}
 }
