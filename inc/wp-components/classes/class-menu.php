@@ -31,6 +31,7 @@ class Menu extends Component {
 			'location'        => '',
 			'title'           => '',
 			'menu_item_class' => '',
+			'theme_name'      => '',
 		];
 	}
 }
