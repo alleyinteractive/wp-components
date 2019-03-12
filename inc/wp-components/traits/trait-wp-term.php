@@ -25,7 +25,7 @@ trait WP_Term {
 	 * @return int
 	 */
 	public function get_term_id() : int {
-		return absint( $this->term->ID ?? 0 );
+		return absint( $this->term->term_id ?? 0 );
 	}
 
 	/**
