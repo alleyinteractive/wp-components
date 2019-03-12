@@ -142,4 +142,23 @@ trait WP_Menu {
 
 		return (array) $menu;
 	}
+
+	/**
+	 * Get the menu title.
+	 *
+	 * @return string
+	 */
+	public function wp_menu_get_title() : string {
+		return $this->menu->name ?? '';
+	}
+
+	/**
+	 * Set the `title` config to the menu title.
+	 *
+	 * @return object Instance of the class this trait is implemented on.
+	 */
+	public function wp_menu_set_title() : self {
+		$this->set_config( 'title', $this->wp_menu_get_title() );
+		return $this;
+	}
 }
