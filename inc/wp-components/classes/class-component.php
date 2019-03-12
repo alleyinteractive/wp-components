@@ -316,6 +316,16 @@ class Component implements \JsonSerializable {
 	 * @return array
 	 */
 	public function to_array() : array {
+
+		// For invalid components, append `-invalid` to the name to indicate
+		// that there was a fatal error and it should not be rendered. This
+		// approach allows us to still see the data in the endpoint for
+		// debugging purposes (and even create a fallback compopnent if
+		// desired).
+		if ( ! $this->is_valid ) {
+			$this->name = $this->name . '-invalid';
+		}
+
 		return [
 			'name'     => $this->name,
 			'config'   => (object) $this->camel_case_keys( $this->config ),
