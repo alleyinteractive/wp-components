@@ -320,7 +320,7 @@ class Component implements \JsonSerializable {
 		// For invalid components, append `-invalid` to the name to indicate
 		// that there was a fatal error and it should not be rendered. This
 		// approach allows us to still see the data in the endpoint for
-		// debugging purposes (and even create a fallback compopnent if
+		// debugging purposes (and even create a fallback component if
 		// desired).
 		if ( ! $this->is_valid ) {
 			$this->name = $this->name . '-invalid';
