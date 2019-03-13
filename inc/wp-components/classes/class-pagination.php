@@ -29,6 +29,9 @@ class Pagination extends Component {
 	public function default_config() : array {
 		return [
 			'base_url'             => '',
+			'range_end'            => 0,
+			'range_start'          => 0,
+			'total'                => 0,
 			'url_params_to_remove' => [],
 		];
 	}
@@ -60,6 +63,25 @@ class Pagination extends Component {
 						(array) $this->get_config( 'url_params_to_remove' )
 					)
 			);
+		}
+
+		// Figure out the search result meta info.
+		$posts_per_page = absint( $this->query->get( 'posts_per_page' ) );
+		$page = absint( $this->query->get( 'paged' ) );
+		if ( $page < 1 ) {
+			$page = 1;
+		}
+
+		$this->set_config( 'range_end', $page * $posts_per_page );
+		$this->set_config(
+			'range_start',
+			( $this->get_config( 'range_end' ) - $posts_per_page + 1 )
+		);
+		$this->set_config( 'total', absint( $this->query->found_posts ?? 0 ) );
+
+		// Ensure the range isn't larger than the total.
+		if ( $this->get_config( 'range_end' ) > $this->get_config( 'total' ) ) {
+			$this->set_config( 'range_end', absint( $this->get_config( 'total' ) ) );
 		}
 
 		return $this;
