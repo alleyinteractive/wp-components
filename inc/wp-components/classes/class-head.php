@@ -61,6 +61,7 @@ class Head extends Component {
 				$this->set_author( $this->query->get( 'author_name' ) );
 				$this->set_title(
 					sprintf(
+						/* translators: author display name */
 						__( 'Articles by %s', 'wp-components' ),
 						$this->get_author_display_name()
 					)
@@ -102,7 +103,7 @@ class Head extends Component {
 		// exist since it's a default child).
 		foreach ( $this->children as &$child ) {
 			if ( 'title' === $child->name ) {
-				$child->children[ 0 ] = html_entity_decode( $value );
+				$child->children[0] = html_entity_decode( $value );
 			}
 		}
 
