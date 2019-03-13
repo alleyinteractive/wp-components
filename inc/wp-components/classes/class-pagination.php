@@ -46,24 +46,23 @@ class Pagination extends Component {
 		// Get the pagination links for the query.
 		$pagination_links = $this->get_pagination_links();
 
-		// Validate result.
-		if ( empty( $pagination_links ) ) {
-			return $this;
-		}
-
 		// Convert each HTML link to a Pagination_Item.
-		foreach ( $pagination_links as $link_html ) {
-			$this->append_child(
+		if ( ! empty( $pagination_links ) ) {
 
-				// Create a new pagination item using anchor HTML, and remove
-				// various url params.
-				( new Pagination_Item() )
-					->set_from_html( $link_html )
-					->remove_url_params(
-						(array) $this->get_config( 'url_params_to_remove' )
-					)
-			);
+			foreach ( $pagination_links as $link_html ) {
+				$this->append_child(
+
+					// Create a new pagination item using anchor HTML, and remove
+					// various url params.
+					( new Pagination_Item() )
+						->set_from_html( $link_html )
+						->remove_url_params(
+							(array) $this->get_config( 'url_params_to_remove' )
+						)
+				);
+			}
 		}
+
 
 		// Figure out the search result meta info.
 		$posts_per_page = absint( $this->query->get( 'posts_per_page' ) );
