@@ -30,6 +30,8 @@ class Menu extends Component {
 		return [
 			'location'        => '',
 			'title'           => '',
+			'title_link'      => '',
+			'display_title'   => false,
 			'menu_item_class' => '',
 			'theme_name'      => '',
 		];
