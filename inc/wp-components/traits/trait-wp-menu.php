@@ -86,9 +86,9 @@ trait WP_Menu {
 	 * @param  Menu    $menu Instance of menu class.
 	 * @param  array   $menu_items Menu items.
 	 * @param  integer $parent_id  Parent menu ID.
-	 * @return array All menu items.
+	 * @return self
 	 */
-	public function build_menu( $menu, $menu_items, $parent_id = 0 ) : array {
+	public function build_menu( $menu, $menu_items, $parent_id = 0 ) : self {
 		// Loop through all menu items.
 		foreach ( (array) $menu_items as $key => $menu_item ) {
 
@@ -140,7 +140,7 @@ trait WP_Menu {
 			}
 		}
 
-		return (array) $menu;
+		return $menu;
 	}
 
 	/**
