@@ -63,7 +63,6 @@ class Pagination extends Component {
 			}
 		}
 
-
 		// Figure out the search result meta info.
 		$posts_per_page = absint( $this->query->get( 'posts_per_page' ) );
 		$page = absint( $this->query->get( 'paged' ) );
