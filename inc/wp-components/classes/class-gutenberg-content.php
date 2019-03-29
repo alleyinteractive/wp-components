@@ -36,6 +36,7 @@ class Gutenberg_Content extends Component {
 				( new HTML() )
 					->set_config(
 						'content',
+						// phpcs:ignore
 						apply_filters( 'the_content', $this->post->post_content ?? '' )
 					)
 			);
@@ -84,6 +85,11 @@ class Gutenberg_Content extends Component {
 			]
 		);
 
+		if ( empty( $block['blockName'] ) && ! empty( $block['innerHTML'] ) ) {
+				// phpcs:ignore
+				$blocks[] = apply_filters( 'the_content', $block['innerHTML'] );
+				return $blocks;
+		}
 		// Handle gutenberg embeds.
 		if ( strpos( $block['blockName'] ?? '', 'core-embed' ) === 0 ) {
 			$blocks[] = ( new Blocks\Core_Embed() )->set_from_block( $block );
