@@ -87,7 +87,7 @@ class Gutenberg_Content extends Component {
 
 		if ( empty( $block['blockName'] ) && ! empty( $block['innerHTML'] ) ) {
 				// phpcs:ignore
-				$blocks[] = apply_filters( 'the_content', $block['innerHTML'] );
+				$blocks[] = ( new HTML() )->set_config( 'content', apply_filters( 'the_content', $block['innerHTML'] ) );
 				return $blocks;
 		}
 		// Handle gutenberg embeds.
