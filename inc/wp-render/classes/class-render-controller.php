@@ -5,7 +5,7 @@
  * @package WP_Component
  */
 
-namespace Render_WP;
+namespace WP_Render;
 
 /**
  * Render Controller.
@@ -134,14 +134,27 @@ class Render_Controller {
 	 */
 	public function render_instance( $component_instance, $return ) {
 		$name = $component_instance->name;
+
+		/**
+		 * Filter the name for this component pre-render.
+		 *
+		 * @var string
+		 */
+		$old_name = apply_filters( 'wp_render_pre_component_render', $component_instance );
+
 		$this->push( new Renderable( $component_instance, $return ) );
 
 		// Render component markup and assets.
 		$this->current_renderable->render_css();
 		$this->current_renderable->render_js();
 		$results = $this->current_renderable->render();
-
 		$this->pop();
+
+		/**
+		 * Action post-render.
+		 */
+		do_action( 'wp_render_post_component_render', $component_instance, $old_name );
+
 		return $results;
 	}
 

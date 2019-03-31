@@ -5,7 +5,7 @@
  * @package WP_Component
  */
 
-namespace Render_WP;
+namespace WP_Render;
 
 /**
  * Renderable.
@@ -77,7 +77,6 @@ class Renderable {
 	 */
 	public function require_partial() {
 		$partial = $this->locate_component_partial();
-
 		if ( ! empty( $partial ) ) {
 			require $partial;
 		}
@@ -89,16 +88,32 @@ class Renderable {
 	 * @return string
 	 */
 	public function locate_component_partial() {
-		$theme_components_path  = apply_filters(
-			'wp_components_php_component_path',
-			get_stylesheet_directory() . '/inc'
-		);
-		$component_partial_path = '/components/' . $this->component_instance->name . '/template-parts/' . $this->template_slug . '.php';
 
-		if ( defined( 'WP_COMPONENTS_PATH' ) && file_exists( WP_COMPONENTS_PATH . $component_partial_path ) ) {
-			return WP_COMPONENTS_PATH . $component_partial_path;
-		} elseif ( file_exists( $theme_components_path . $component_partial_path ) ) {
-			return $theme_components_path . $component_partial_path;
+		// Get the namespace to build the path.
+		$namespace = get_class( $this->component_instance );
+
+		// Explode to modify individual parts.
+		$directory_parts = explode( '\\', $namespace );
+
+		// Remove project namespace.
+		array_shift( $directory_parts );
+
+		// Lowercase all parts.
+		$directory_parts = array_map( 'strtolower', $directory_parts );
+
+		// Replace underscores with dashes
+		$directory_parts = array_map(
+			function( $directory_part ) {
+				return str_replace( '_', '-', $directory_part);
+			},
+			$directory_parts
+		);
+
+		$file = array_pop( $directory_parts );
+
+		$path = get_template_directory() . '/' . implode( '/', $directory_parts ) . "/template-parts/index.php";
+		if ( file_exists( $path ) ) {
+			return $path;
 		}
 	}
 
@@ -108,7 +123,7 @@ class Renderable {
 	public function render_css() {
 		$name         = $this->component_instance->name;
 		$default_path = WP_COMPONENTS_PHP_ASSET_PATH . '/' . $name . '.css';
-		$css          = apply_filters( 'wp_components_php_resolve_asset', $default_path, $name, 'css' );
+		$css          = apply_filters( 'wp_render_asset_path', $default_path, $name, 'css' );
 
 		if ( $name !== $css ) {
 			printf(

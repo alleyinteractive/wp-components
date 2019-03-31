@@ -5,7 +5,7 @@
  * @package WP_Components
  */
 
-namespace Render_WP;
+namespace WP_Render;
 
 /**
  * Helper for rendering a component.
