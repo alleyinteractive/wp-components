@@ -73,6 +73,12 @@ class Render_Controller {
 	 *                                                    passing an array with 'key' and/or 'ttl' keys.
 	 */
 	public function render( $component_instance, $return = false, $cache = false ) {
+
+		// Only render valid components.
+		if ( ! $component_instance->is_valid ) {
+			return;
+		}
+
 		if ( $cache ) {
 			if ( is_bool( $cache ) ) {
 				$cache = array();
