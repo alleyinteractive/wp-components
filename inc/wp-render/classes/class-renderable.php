@@ -83,38 +83,73 @@ class Renderable {
 	}
 
 	/**
-	 * Return the partial, instead of outputting it.
+	 * Get the pathe for a component's template part. This will assume the same
+	 * folder structure as WP Components, but can be filtered to modify the
+	 * logic.
 	 *
 	 * @return string
 	 */
 	public function locate_component_partial() {
 
 		// Get the namespace to build the path.
-		$namespace = get_class( $this->component_instance );
+		$namespace_parts = self::explode_namespace( get_class( $this->component_instance ) );
 
-		// Explode to modify individual parts.
-		$directory_parts = explode( '\\', $namespace );
+		// Duplicate to directory parts so we can modify those values and still
+		// have access to the full path for the filter.
+		$directory_parts = $namespace_parts;
 
-		// Remove project namespace.
+		// Remove the first namespace value.
 		array_shift( $directory_parts );
 
-		// Lowercase all parts.
-		$directory_parts = array_map( 'strtolower', $directory_parts );
+		// This is a WP Component, so modify the path a bit.
+		if ( 'wp-components' === $namespace_parts[0] ) {
+			array_unshift( $directory_parts, 'components' );
+		} else {
+			// Remove the last value, which is the file name.
+			array_pop( $directory_parts );
+		}
 
-		// Replace underscores with dashes
-		$directory_parts = array_map(
-			function( $directory_part ) {
-				return str_replace( '_', '-', $directory_part);
-			},
-			$directory_parts
-		);
+		// Use default structure.
+		$path = get_template_directory() . '/' . implode( '/', $directory_parts ) . '/template-parts/index.php';
 
-		$file = array_pop( $directory_parts );
-
-		$path = get_template_directory() . '/' . implode( '/', $directory_parts ) . "/template-parts/index.php";
+		/**
+		 * Modify the path to the component template part.
+		 *
+		 * @param string $path               Default path.
+		 * @param array  $namespace_parts    The exploded namespace ready for
+		 *                                   conversion to a filepath.
+		 * @param object $component_instance The component object.
+		 */
+		$path = apply_filters( 'wp_render_component_template_part_path', $path, $namespace_parts, $this->component_instance );
 		if ( file_exists( $path ) ) {
 			return $path;
 		}
+	}
+
+	/**
+	 * Return the namespace as an array of parts that can be used to build a
+	 * filepath.
+	 *
+	 * @param string $namespace Class namespace.
+	 * @return array
+	 */
+	public static function explode_namespace( string $namespace ) {
+
+		// Explode to modify individual parts.
+		$namespace_parts = explode( '\\', $namespace );
+
+		// Lowercase all parts.
+		$namespace_parts = array_map( 'strtolower', $namespace_parts );
+
+		// Replace underscores with dashes.
+		$namespace_parts = array_map(
+			function( $namespace_part ) {
+				return str_replace( '_', '-', $namespace_part );
+			},
+			$namespace_parts
+		);
+
+		return $namespace_parts;
 	}
 
 	/**

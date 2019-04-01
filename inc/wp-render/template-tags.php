@@ -84,7 +84,9 @@ function filter_children( $key, $value ) {
 		array_filter(
 			get_children(),
 			function( $child ) use ( $key, $value ) {
-				return $value === $child->get_config( $key );
+				if ( method_exists( $child, 'get_config' ) ) {
+					return $value === $child->get_config( $key );
+				}
 			}
 		)
 	);
