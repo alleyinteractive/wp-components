@@ -83,7 +83,7 @@ class Renderable {
 	}
 
 	/**
-	 * Get the pathe for a component's template part. This will assume the same
+	 * Get the path for a component's template part. This will assume the same
 	 * folder structure as WP Components, but can be filtered to modify the
 	 * logic.
 	 *
