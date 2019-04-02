@@ -5,7 +5,7 @@
  * @package WP_Component
  */
 
-namespace Render_WP;
+namespace WP_Render;
 
 /**
  * Renderable.
@@ -77,29 +77,79 @@ class Renderable {
 	 */
 	public function require_partial() {
 		$partial = $this->locate_component_partial();
-
 		if ( ! empty( $partial ) ) {
 			require $partial;
 		}
 	}
 
 	/**
-	 * Return the partial, instead of outputting it.
+	 * Get the path for a component's template part. This will assume the same
+	 * folder structure as WP Components, but can be filtered to modify the
+	 * logic.
 	 *
 	 * @return string
 	 */
 	public function locate_component_partial() {
-		$theme_components_path  = apply_filters(
-			'wp_components_php_component_path',
-			get_stylesheet_directory() . '/inc'
-		);
-		$component_partial_path = '/components/' . $this->component_instance->name . '/template-parts/' . $this->template_slug . '.php';
 
-		if ( defined( 'WP_COMPONENTS_PATH' ) && file_exists( WP_COMPONENTS_PATH . $component_partial_path ) ) {
-			return WP_COMPONENTS_PATH . $component_partial_path;
-		} elseif ( file_exists( $theme_components_path . $component_partial_path ) ) {
-			return $theme_components_path . $component_partial_path;
+		// Get the namespace to build the path.
+		$namespace_parts = self::explode_namespace( get_class( $this->component_instance ) );
+
+		// Duplicate to directory parts so we can modify those values and still
+		// have access to the full path for the filter.
+		$directory_parts = $namespace_parts;
+
+		// Remove the first namespace value.
+		array_shift( $directory_parts );
+
+		// This is a WP Component, so modify the path a bit.
+		if ( 'wp-components' === $namespace_parts[0] ) {
+			array_unshift( $directory_parts, 'components' );
+		} else {
+			// Remove the last value, which is the file name.
+			array_pop( $directory_parts );
 		}
+
+		// Use default structure.
+		$path = get_template_directory() . '/' . implode( '/', $directory_parts ) . '/template-parts/index.php';
+
+		/**
+		 * Modify the path to the component template part.
+		 *
+		 * @param string $path               Default path.
+		 * @param array  $namespace_parts    The exploded namespace ready for
+		 *                                   conversion to a filepath.
+		 * @param object $component_instance The component object.
+		 */
+		$path = apply_filters( 'wp_render_component_template_part_path', $path, $namespace_parts, $this->component_instance );
+		if ( file_exists( $path ) ) {
+			return $path;
+		}
+	}
+
+	/**
+	 * Return the namespace as an array of parts that can be used to build a
+	 * filepath.
+	 *
+	 * @param string $namespace Class namespace.
+	 * @return array
+	 */
+	public static function explode_namespace( string $namespace ) {
+
+		// Explode to modify individual parts.
+		$namespace_parts = explode( '\\', $namespace );
+
+		// Lowercase all parts.
+		$namespace_parts = array_map( 'strtolower', $namespace_parts );
+
+		// Replace underscores with dashes.
+		$namespace_parts = array_map(
+			function( $namespace_part ) {
+				return str_replace( '_', '-', $namespace_part );
+			},
+			$namespace_parts
+		);
+
+		return $namespace_parts;
 	}
 
 	/**
@@ -108,7 +158,7 @@ class Renderable {
 	public function render_css() {
 		$name         = $this->component_instance->name;
 		$default_path = WP_COMPONENTS_PHP_ASSET_PATH . '/' . $name . '.css';
-		$css          = apply_filters( 'wp_components_php_resolve_asset', $default_path, $name, 'css' );
+		$css          = apply_filters( 'wp_render_asset_path', $default_path, $name, 'css' );
 
 		if ( $name !== $css ) {
 			printf(

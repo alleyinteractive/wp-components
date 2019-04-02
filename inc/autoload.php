@@ -104,6 +104,7 @@ spl_autoload_register(
 
 		// Is this under the WP_Render namespace?
 		if ( false !== strpos( $object, 'WP_Render' ) ) {
+
 			/**
 			 * Strip the namespace, replace underscores with dashes, and lowercase.
 			 *
