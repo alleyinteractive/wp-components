@@ -90,7 +90,7 @@ spl_autoload_register(
 			$path     = get_template_directory() . '/components/' . implode( '/', $dirs ) . "/class-{$filename}.php";
 
 			// Filter if needed.
-			$path = apply_filters( 'wp_components_theme_components_path', $path, $class, $dirs );
+			$path = apply_filters( 'wp_components_theme_components_path', $path, $class, $dirs, $filename );
 			if ( file_exists( $path ) ) {
 				require_once $path;
 			}
