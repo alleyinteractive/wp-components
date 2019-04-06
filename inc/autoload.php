@@ -8,7 +8,7 @@
 namespace WP_Components;
 
 /**
- * Autoloader for WP_Components.
+ * Autoloader for components in the WP_Components plugin.
  */
 spl_autoload_register(
 	function( $object ) {
@@ -51,6 +51,7 @@ spl_autoload_register(
 		}
 	}
 );
+
 /**
  * Autoloader for components in a theme.
  */
@@ -83,9 +84,13 @@ spl_autoload_register(
 				)
 			);
 
-			$dirs  = explode( '\\', $class );
-			$class = array_pop( $dirs );
-			$path  = apply_filters( 'wp_components_theme_components_path', $class, $dirs );
+			// Attempt to guess the path.
+			$dirs     = explode( '\\', ltrim( $class, '\\' ) );
+			$filename = end( $dirs );
+			$path     = get_template_directory() . '/components/' . implode( '/', $dirs ) . "/class-{$filename}.php";
+
+			// Filter if needed.
+			$path = apply_filters( 'wp_components_theme_components_path', $path, $class, $dirs, $filename );
 			if ( file_exists( $path ) ) {
 				require_once $path;
 			}
@@ -94,7 +99,7 @@ spl_autoload_register(
 );
 
 /**
- * Autoloader for WP_Render.
+ * Autoloader for WP_Render template files.
  */
 spl_autoload_register(
 	function( $object ) {
