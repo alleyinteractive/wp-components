@@ -104,9 +104,6 @@ class Renderable {
 		// This is a WP Component, so modify the path a bit.
 		if ( 'wp-components' === $namespace_parts[0] ) {
 			array_unshift( $directory_parts, 'components' );
-		} else {
-			// Remove the last value, which is the file name.
-			array_pop( $directory_parts );
 		}
 
 		// Use default structure.
