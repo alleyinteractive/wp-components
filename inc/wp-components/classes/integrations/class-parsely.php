@@ -10,7 +10,7 @@ namespace WP_Components\Integrations;
 /**
  * Parsely.
  */
-class Parsely extends Component {
+class Parsely extends \WP_Components\Component {
 
 	use \WP_Components\WP_Post;
 
