@@ -10,7 +10,7 @@ namespace WP_Components\Integrations;
 /**
  * Google Analytics.
  */
-class Google_Analytics extends Component {
+class Google_Analytics extends \WP_Components\Component {
 
 	/**
 	 * Unique component slug.

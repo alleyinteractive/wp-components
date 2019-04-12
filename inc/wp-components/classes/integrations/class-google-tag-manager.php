@@ -10,7 +10,7 @@ namespace WP_Components\Integrations;
 /**
  * Google Tag Manager.
  */
-class Google_Tag_Manager extends Component {
+class Google_Tag_Manager extends \WP_Components\Component {
 
 	/**
 	 * Unique component slug.
