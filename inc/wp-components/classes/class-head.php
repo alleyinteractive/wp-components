@@ -99,7 +99,7 @@ class Head extends Component {
 	 */
 	public function set_title( $value ) : self {
 
-		// Loop though children and update the title component (which should
+		// Loop through children and update the title component (which should
 		// exist since it's a default child).
 		foreach ( $this->children as &$child ) {
 			if ( 'title' === $child->name ) {
