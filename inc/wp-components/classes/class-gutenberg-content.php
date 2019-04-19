@@ -102,6 +102,7 @@ class Gutenberg_Content extends Component {
 
 			// Render block and clean up extraneous whitespace characters.
 			$content = render_block( $block );
+			$content = do_shortcode( $content );
 			$content = preg_replace( '/[\r\n\t\f\v]/', '', $content );
 
 			// Merge rendered static blocks into a single HTML component.
