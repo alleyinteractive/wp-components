@@ -157,6 +157,12 @@ class Renderable {
 		$default_path = WP_COMPONENTS_PHP_ASSET_PATH . '/' . $name . '.css';
 		$css          = apply_filters( 'wp_render_asset_path', $default_path, $name, 'css' );
 
+		// Only enqueue the CSS if the file exists.
+		// @todo ensure this file only loads once for all components rendered.
+		if ( ! file_exists( $css ) ) {
+			return;
+		}
+
 		if ( $name !== $css ) {
 			printf(
 				'<link rel="stylesheet" href="%1$s" class="%2$s" />', // phpcs:ignore WordPress.WP.EnqueuedResources.NonEnqueuedStylesheet
@@ -173,6 +179,12 @@ class Renderable {
 		$name         = $this->component_instance->name;
 		$default_path = WP_COMPONENTS_PHP_ASSET_PATH . '/' . $name . '.js';
 		$javascript   = apply_filters( 'wp_components_php_resolve_asset', $default_path, $name, 'js' );
+
+		// Only enqueue the JS if the file exists.
+		// @todo ensure this file only loads once for all components rendered.
+		if ( ! file_exists( $javascript ) ) {
+			return;
+		}
 
 		if ( $name !== $javascript ) {
 			printf(
