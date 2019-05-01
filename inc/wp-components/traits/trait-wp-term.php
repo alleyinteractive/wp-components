@@ -132,6 +132,21 @@ trait WP_Term {
 	}
 
 	/**
+	 * Get the term taxonomy slug, with any rewrites applied.
+	 *
+	 * @return string
+	 */
+	public function wp_term_get_taxonomy_slug() : string {
+		if ( empty( $this->wp_term_get_taxonomy() ) ) {
+			return '';
+		}
+
+		$taxonomy = get_taxonomy( $this->wp_term_get_taxonomy() );
+
+		return $taxonomy->rewrite['slug'];
+	}
+
+	/**
 	 * Set the `taxonomy` config to the term taxonomy.
 	 *
 	 * @return object Instance of the class this trait is implemented on.
