@@ -47,7 +47,7 @@ trait Author {
 				break;
 
 			case 'guest_author':
-				$id = $this->ID;
+				$id = $this->guest_author->ID;
 				break;
 		}
 
