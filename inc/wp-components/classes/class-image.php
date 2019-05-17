@@ -152,15 +152,7 @@ class Image extends Component {
 	 * @return Component Current instance of this class.
 	 */
 	public function set_attachment_id( $attachment_id ) {
-		$attachment_url = strtok( wp_get_attachment_image_url( absint( $attachment_id ), 'full' ), '?' );
-		$url            = ! empty( $attachment_url ) ? $attachment_url : $this->get_config( 'fallback_image_url' );
-
-		$this->merge_config(
-			[
-				'attachment_id' => $attachment_id,
-				'url'           => $url,
-			]
-		);
+		$this->set_config( 'attachment_id', absint( $attachment_id ) );
 
 		// Get crops from post meta.
 		$crops = (array) get_post_meta( $attachment_id, 'wpcom_thumbnail_edit', true );
@@ -208,13 +200,19 @@ class Image extends Component {
 			$this->config['src'] = $this->config['url'];
 			return $this;
 		} else {
-			$size_config = $sizes[ $image_size ];
+			$size_config        = $sizes[ $image_size ];
+			$fallback_image_url = $size_config['fallback_image_url'] ?? $this->config['fallback_image_url'];
+			$attachment_url     = strtok( wp_get_attachment_image_url( $this->get_config( 'attachment_id' ), 'full' ), '?' );
+			$url                = ! empty( $attachment_url ) ? $attachment_url : $fallback_image_url;
+
 			$this->merge_config(
 				[
-					'image_size' => $image_size,
-					'sources'    => $size_config['sources'],
-					'retina'     => $size_config['retina'] ?? $this->config['retina'],
-					'lazyload'   => $size_config['lazyload'] ?? $this->config['lazyload'],
+					'image_size'         => $image_size,
+					'sources'            => $size_config['sources'],
+					'retina'             => $size_config['retina'] ?? $this->config['retina'],
+					'lazyload'           => $size_config['lazyload'] ?? $this->config['lazyload'],
+					'fallback_image_url' => $fallback_image_url,
+					'url'                => $url,
 				]
 			);
 		}
