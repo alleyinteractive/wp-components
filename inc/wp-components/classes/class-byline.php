@@ -61,7 +61,7 @@ class Byline extends Component {
 			// Setup byline using post author.
 			$post_object = get_post( $post_id );
 			if ( $post_object instanceof \WP_Post ) {
-				$byline = new Byline();
+				$byline = new static();
 				$byline->set_user( $post_object->post_author );
 				return [ $byline ];
 			}
@@ -74,7 +74,7 @@ class Byline extends Component {
 
 		// Loop through coauthors, creating new byline objects as needed.
 		foreach ( $coauthors as $coauthor ) {
-			$byline = new Byline();
+			$byline = new static();
 			if ( $coauthor instanceof \WP_User ) {
 				$byline->set_user( $coauthor );
 			} elseif ( 'guest-author' === ( $coauthor->type ?? '' ) ) {
