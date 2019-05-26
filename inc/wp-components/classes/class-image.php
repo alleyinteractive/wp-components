@@ -430,7 +430,7 @@ class Image extends Component {
 			$src_url    = $this->apply_transforms( $params['transforms'] );
 
 			// Get descriptor.
-			$descriptor = $params['descriptor'];
+			$descriptor = $params['descriptor'] ?? 0;
 
 			// Add retina source to srcset, if applicable.
 			if ( is_numeric( $descriptor ) ) {
@@ -465,7 +465,7 @@ class Image extends Component {
 		}
 
 		foreach ( $sources as $params ) {
-			if ( is_numeric( $params['descriptor'] ) ) {
+			if ( is_numeric( $params['descriptor'] ?? 0 ) ) {
 				if ( ! empty( $params['default'] ) ) {
 					$default = "{$params['descriptor']}px";
 					continue;
