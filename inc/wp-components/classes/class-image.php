@@ -465,7 +465,13 @@ class Image extends Component {
 		}
 
 		foreach ( $sources as $params ) {
-			if ( is_numeric( $params['descriptor'] ?? 0 ) ) {
+
+			// Ensure descriptor is set.
+			if ( ! isset( $params['descriptor'] ) ) {
+				$params['descriptor'] = 0;
+			}
+
+			if ( is_numeric( $params['descriptor'] ) ) {
 				if ( ! empty( $params['default'] ) ) {
 					$default = "{$params['descriptor']}px";
 					continue;
