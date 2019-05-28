@@ -468,7 +468,7 @@ class Image extends Component {
 
 			// Ensure descriptor is set.
 			if ( ! isset( $params['descriptor'] ) ) {
-				$params['descriptor'] = 0;
+				continue;
 			}
 
 			if ( is_numeric( $params['descriptor'] ) ) {
