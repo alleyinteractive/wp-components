@@ -104,7 +104,7 @@ class Head extends Component {
 	 * @return self
 	 */
 	public function post_has_set() : self {
-		$this->set_title( $this->wp_post_get_title() . get_trailing_title() );
+		$this->set_title( $this->wp_post_get_title() . $this->get_trailing_title() );
 		return $this;
 	}
 
