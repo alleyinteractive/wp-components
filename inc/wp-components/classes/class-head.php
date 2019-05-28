@@ -78,6 +78,12 @@ class Head extends Component {
 			case $this->query->is_404():
 				$this->set_title( __( '404 - Page not found', 'wp-components' ) . $this->get_trailing_title() );
 				break;
+
+			case $this->query->is_post_type_archive():
+				$post_type   = $this->query->get( 'post_type' );
+				$post_object = get_post_type_object( $post_type );
+				$this->set_title( $post_object->label . $this->get_trailing_title() );
+				break;
 		}
 
 		return $this;
@@ -98,7 +104,7 @@ class Head extends Component {
 	 * @return self
 	 */
 	public function post_has_set() : self {
-		$this->set_title( $this->wp_post_get_title() );
+		$this->set_title( $this->wp_post_get_title() . get_trailing_title() );
 		return $this;
 	}
 
