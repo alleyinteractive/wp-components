@@ -53,7 +53,7 @@ class Head extends Component {
 						/* translators: search term */
 						__( 'Search results: %s', 'wp-components' ),
 						$this->query->get( 's' )
-					)
+					) . $this->get_trailing_title()
 				);
 				break;
 
@@ -64,21 +64,32 @@ class Head extends Component {
 						/* translators: author display name */
 						__( 'Articles by %s', 'wp-components' ),
 						$this->get_author_display_name()
-					)
+					) . $this->get_trailing_title()
 				);
 				break;
 
+			case $this->query->is_category():
+			case $this->query->is_tag():
 			case $this->query->is_tax():
 				$this->set_term( $this->query->get_queried_object() );
-				$this->set_title( $this->wp_term_get_name() );
+				$this->set_title( $this->wp_term_get_name() . $this->get_trailing_title() );
 				break;
 
 			case $this->query->is_404():
-				$this->set_title( __( '404 - Page not found', 'wp-components' ) );
+				$this->set_title( __( '404 - Page not found', 'wp-components' ) . $this->get_trailing_title() );
 				break;
 		}
 
 		return $this;
+	}
+
+	/**
+	 * Get the trailing title.
+	 *
+	 * @return string
+	 */
+	public function get_trailing_title() {
+		return ' | ' . get_bloginfo( 'name' );
 	}
 
 	/**
