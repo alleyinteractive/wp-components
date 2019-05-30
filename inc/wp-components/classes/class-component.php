@@ -62,6 +62,14 @@ class Component implements \JsonSerializable {
 	public $is_valid = true;
 
 	/**
+	 * Available themes for this component. If you attempt to set a theme that is
+	 * not in this array, it will fail (and fall back to 'default').
+	 *
+	 * @var array
+	 */
+	public $themes = [ 'default' ];
+
+	/**
 	 * Component constructor.
 	 */
 	public function __construct() {
@@ -283,14 +291,18 @@ class Component implements \JsonSerializable {
 	}
 
 	/**
-	 * Helper to set theme on this component
+	 * Helper to set theme on this component.
 	 *
 	 * @param string $theme_name Name of theme to set.
 	 * @return self
 	 */
 	public function set_theme( $theme_name ) : self {
-		$this->set_config( 'theme_name', $theme_name );
-		return $this;
+		if ( in_array( $theme_name, $this->themes, true ) ) {
+			return $this->set_config( 'theme_name', $theme_name );
+		}
+
+		// Set theme to 'default' if the theme is not configured.
+		return $this->set_config( 'theme_name', 'default' );
 	}
 
 	/**
@@ -306,7 +318,7 @@ class Component implements \JsonSerializable {
 		if ( ! empty( $this->children ) ) {
 			foreach ( $this->children as $child ) {
 				if ( ! empty( $theme_mapping[ $child->name ] ) ) {
-					$child->set_config( 'theme_name', $theme_mapping[ $child->name ] );
+					$child->set_theme( $theme_mapping[ $child->name ] );
 				}
 
 				$child->set_child_themes( $theme_mapping );
