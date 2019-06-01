@@ -155,7 +155,7 @@ trait Content_List {
 	 * Wrapper method for executing a backfill query. Allows for easy
 	 * overriding.
 	 *
-	 * @param array $args \WP_Query args.
+	 * @param array $backfill_args \WP_Query args.
 	 * @return mixed WP_Query object (or something that works like WP_Query).
 	 */
 	public function get_backfill_wp_query( $backfill_args ) {
