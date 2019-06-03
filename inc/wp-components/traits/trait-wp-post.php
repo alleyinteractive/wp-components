@@ -174,7 +174,7 @@ trait WP_Post {
 	}
 
 	/**
-	 * Set the `expert` config to the post excerpt.
+	 * Set the `excerpt` config to the post excerpt.
 	 *
 	 * @return object Instance of the class this trait is implemented on.
 	 */

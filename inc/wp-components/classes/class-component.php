@@ -112,7 +112,7 @@ class Component implements \JsonSerializable {
 	}
 
 	/**
-	 * Helper to set a top level config value.
+	 * Helper to get a top level config value.
 	 *
 	 * @param string $key Config key.
 	 * @return mixed Config value or null.
