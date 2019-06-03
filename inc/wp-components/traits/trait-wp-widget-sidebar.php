@@ -21,7 +21,7 @@ trait WP_Widget_Sidebar {
 
 	/**
 	 * Set and render the sidebar.
-	 * 
+	 *
 	 * @param int|string $index Optional, default is 1. Index, name or ID of dynamic sidebar.
 	 * @return self
 	 */
@@ -34,7 +34,7 @@ trait WP_Widget_Sidebar {
 
 	/**
 	 * Create a Component for a widget.
-	 * 
+	 *
 	 * @param array     $instance The current widget instance's settings.
 	 * @param WP_Widget $widget   The current widget instance.
 	 * @param array     $args     An array of default widget arguments.
