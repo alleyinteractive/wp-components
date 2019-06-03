@@ -13,13 +13,6 @@ namespace WP_Components;
 trait WP_Widget_Sidebar {
 
 	/**
-	 * Mapping of widgets to their handlers.
-	 *
-	 * @var array
-	 */
-	public $sidebar_widget_mapping = [];
-
-	/**
 	 * Set and render the sidebar.
 	 *
 	 * @param int|string $index Optional, default is 1. Index, name or ID of dynamic sidebar.
@@ -47,8 +40,8 @@ trait WP_Widget_Sidebar {
 		if ( method_exists( $widget, 'create_component' ) ) {
 			$child = $widget->create_component( $args, $instance );
 			$this->append_child( $child );
-		} elseif ( ! empty( $this->sidebar_widget_mapping[ get_class( $widget ) ] ) ) {
-			$callback = $this->sidebar_widget_mapping[ get_class( $widget ) ];
+		} elseif ( ! empty( $this->wp_widget_sidebar_get_mapping()[ get_class( $widget ) ] ) ) {
+			$callback = $this->wp_widget_sidebar_get_mapping()[ get_class( $widget ) ];
 			$child    = call_user_func( [ $this, $callback ], $args, $instance );
 			$this->append_child( $child );
 		} else {
@@ -66,42 +59,16 @@ trait WP_Widget_Sidebar {
 	}
 
 	/**
-	 * Helper to add a widget handler to the mapping.
-	 *
-	 * @param array|string $widget_class Widget class or entire mapping array.
-	 * @param null|string  $callback     Callback function for widget class.
-	 * @return self
-	 */
-	public function wp_widget_sidebar_set_mapping( $widget_class, $callback = null ) : self {
-		if ( is_array( $widget_class ) && is_null( $callback ) ) {
-			$this->sidebar_widget_mapping = $widget_class;
-		} else {
-			$this->sidebar_widget_mapping[ $widget_class ] = $callback;
-		}
-
-		return $this;
-	}
-
-	/**
-	 * Merge new values into the current mapping.
-	 *
-	 * @param array $new_mapping Array of [ `widget_class` => `callback` ] to merge in.
-	 * @return self
-	 */
-	public function merge_widget_sidebar_mapping( array $new_mapping ) : self {
-		$this->sidebar_widget_mapping = wp_parse_args(
-			$new_mapping,
-			$this->sidebar_widget_mapping
-		);
-		return $this;
-	}
-
-	/**
 	 * Get the sidebar widget mapping.
 	 *
 	 * @return array
 	 */
 	public function wp_widget_sidebar_get_mapping() : array {
-		return $this->sidebar_widget_mapping;
+		/**
+		 * Filter the mapping of widget classes to their callbacks.
+		 *
+		 * @param array Array of [ `widget_class` => `callback` ]
+		 */
+		return apply_filters( 'wp_components_widget_sidebar_mapping', [] );
 	}
 }
