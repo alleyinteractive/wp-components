@@ -50,7 +50,8 @@ trait WP_Widget_Sidebar {
 			$content = ob_get_clean();
 			$this->append_child(
 				( new \WP_Components\HTML() )
-					->set_config( 'content', $content )
+					->set_config( 'content', $content ?? '' )
+					->set_config( 'title', $instance['title'] ?? '' )
 			);
 		}
 
