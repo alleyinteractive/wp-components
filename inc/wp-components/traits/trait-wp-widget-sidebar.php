@@ -45,12 +45,18 @@ trait WP_Widget_Sidebar {
 			$child    = call_user_func( [ $this, $callback ], $args, $instance );
 			$this->append_child( $child );
 		} else {
+			// Get title.
+			$title = $instance['title'];
+			unset( $instance['title'] );
+
+			// Get the, HTML, content only.
 			ob_start();
 			$widget->widget( $args, $instance );
 			$content = ob_get_clean();
 			$this->append_child(
 				( new \WP_Components\HTML() )
-					->set_config( 'content', $content )
+					->set_config( 'content', $content ?? '' )
+					->set_config( 'title', $title ?? '' )
 			);
 		}
 
