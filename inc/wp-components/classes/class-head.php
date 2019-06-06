@@ -231,7 +231,7 @@ class Head extends Component {
 		}
 
 		// Filter the meta key where this is stored.
-		$meta_key = apply_filters( 'wp_components_head_meta_title_key', '_meta_keywords' );
+		$meta_key = apply_filters( 'wp_components_head_meta_keywords_key', '_meta_keywords' );
 
 		$meta_keywords = (string) get_post_meta( $this->post->ID, $meta_key, true );
 		if ( ! empty( $meta_keywords ) ) {
@@ -242,6 +242,15 @@ class Head extends Component {
 					'content' => esc_attr( $meta_keywords ),
 				]
 			);
+		}
+
+
+		// Canoncial url.
+		$meta_key = apply_filters( 'wp_components_head_canonical_url_key', '_canonical_url' );
+
+		$canonical_url = (string) get_post_meta( $this->post->ID, $meta_key, true );
+		if ( ! empty( $canonical_url ) ) {
+			$this->set_canonical_url( $canonical_url );
 		}
 	}
 
@@ -344,7 +353,7 @@ class Head extends Component {
 	public function get_meta_description() : string {
 
 		// Filter the meta key where this is stored.
-		$meta_key = apply_filters( 'wp_components_head_social_title_key', '_meta_description' );
+		$meta_key = apply_filters( 'wp_components_head_meta_description_key', '_meta_description' );
 
 		$meta_description = (string) get_post_meta( $this->post->ID, $meta_key, true );
 		if ( ! empty( $meta_description ) ) {
@@ -367,7 +376,7 @@ class Head extends Component {
 	public function get_social_description() : string {
 
 		// Filter the meta key where this is stored.
-		$meta_key = apply_filters( 'wp_components_head_social_title_key', '_social_description' );
+		$meta_key = apply_filters( 'wp_components_head_social_description_key', '_social_description' );
 
 		$social_description = (string) get_post_meta( $this->post->ID, $meta_key, true );
 		if ( ! empty( $social_description ) ) {
