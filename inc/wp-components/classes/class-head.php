@@ -244,13 +244,23 @@ class Head extends Component {
 			);
 		}
 
-
 		// Canoncial url.
 		$meta_key = apply_filters( 'wp_components_head_canonical_url_key', '_canonical_url' );
 
 		$canonical_url = (string) get_post_meta( $this->post->ID, $meta_key, true );
 		if ( ! empty( $canonical_url ) ) {
 			$this->set_canonical_url( $canonical_url );
+		}
+
+		// Deindex URL.
+		if ( apply_filters( 'wp_components_head_deindex', '__return_false' ) ) {
+			$this->add_tag(
+				'meta',
+				[
+					'name'    => 'robots',
+					'content' => 'noindex',
+				]
+			);
 		}
 	}
 
