@@ -202,6 +202,8 @@ class Head extends Component {
 				$post_object = get_post_type_object( $post_type );
 				return $post_object->label;
 		}
+
+		return get_bloginfo( 'name' );
 	}
 
 	/**
