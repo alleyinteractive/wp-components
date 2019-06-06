@@ -154,7 +154,6 @@ class Head extends Component {
 	 * @return self
 	 */
 	public function post_has_set() : self {
-		print_r($this->post); die();
 
 		$this->set_title( $this->get_meta_title() . $this->get_trailing_title() );
 		$this->set_open_graph_meta();
