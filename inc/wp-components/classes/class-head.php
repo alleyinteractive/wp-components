@@ -40,75 +40,6 @@ class Head extends Component {
 	}
 
 	/**
-	 * Hook into post being set.
-	 *
-	 * @return self
-	 */
-	public function query_has_set() : self {
-
-		switch ( true ) {
-			case $this->query->is_search():
-				$this->set_title(
-					sprintf(
-						/* translators: search term */
-						__( 'Search results: %s', 'wp-components' ),
-						$this->query->get( 's' )
-					) . $this->get_trailing_title()
-				);
-				break;
-
-			case $this->query->is_author():
-				$this->set_author( $this->query->get( 'author_name' ) );
-				$this->set_title(
-					sprintf(
-						/* translators: author display name */
-						__( 'Articles by %s', 'wp-components' ),
-						$this->get_author_display_name()
-					) . $this->get_trailing_title()
-				);
-				break;
-
-			case $this->query->is_category():
-			case $this->query->is_tag():
-			case $this->query->is_tax():
-				$this->set_term( $this->query->get_queried_object() );
-				$this->set_title( $this->wp_term_get_name() . $this->get_trailing_title() );
-				break;
-
-			case $this->query->is_404():
-				$this->set_title( __( '404 - Page not found', 'wp-components' ) . $this->get_trailing_title() );
-				break;
-
-			case $this->query->is_post_type_archive():
-				$post_type   = $this->query->get( 'post_type' );
-				$post_object = get_post_type_object( $post_type );
-				$this->set_title( $post_object->label . $this->get_trailing_title() );
-				break;
-		}
-
-		return $this;
-	}
-
-	/**
-	 * Get the trailing title.
-	 *
-	 * @return string
-	 */
-	public function get_trailing_title() {
-		return ' | ' . get_bloginfo( 'name' );
-	}
-
-	/**
-	 * Hook into post being set.
-	 *
-	 * @return self
-	 */
-	public function post_has_set() : self {
-		$this->set_title( $this->wp_post_get_title() . $this->get_trailing_title() );
-		return $this;
-	}
-
-	/**
 	 * Set the title tag.
 	 *
 	 * @param string $value The title value.
@@ -144,7 +75,7 @@ class Head extends Component {
 	 * @param string $content  Content value.
 	 * @return self
 	 */
-	public function add_meta( $property, $content ) : self {
+	public function add_meta( string $property, string $content ) : self {
 		return $this->add_tag(
 			'meta',
 			[
@@ -207,4 +138,268 @@ class Head extends Component {
 		return $this->append_child( $component );
 	}
 
+	/**
+	 * Hook into post being set.
+	 *
+	 * @return self
+	 */
+	public function query_has_set() : self {
+		$this->set_title( $this->get_the_head_title() . $this->get_trailing_title() );
+		return $this;
+	}
+
+	/**
+	 * Hook into post being set.
+	 *
+	 * @return self
+	 */
+	public function post_has_set() : self {
+
+		$this->set_title( $this->get_meta_title() . $this->get_trailing_title() );
+		$this->set_open_graph_meta();
+
+		return $this;
+	}
+
+	/**
+	 * Get the head title based on the query set.
+	 *
+	 * @return string
+	 */
+	public function get_the_head_title() : string {
+		switch ( true ) {
+			// Search results.
+			case $this->query->is_search():
+				return sprintf(
+					/* translators: search term */
+					__( 'Search results: %s', 'wp-components' ),
+					$this->query->get( 's' )
+				);
+
+			// Author archive.
+			case $this->query->is_author():
+				$this->set_author( $this->query->get( 'author_name' ) );
+				return sprintf(
+					/* translators: author display name */
+					__( 'Articles by %s', 'wp-components' ),
+					$this->get_author_display_name()
+				);
+
+			// Term archives.
+			case $this->query->is_category():
+			case $this->query->is_tag():
+			case $this->query->is_tax():
+				$this->set_term( $this->query->get_queried_object() );
+				return $this->wp_term_get_name();
+
+			// Generic 404.
+			case $this->query->is_404():
+				return __( '404 - Page not found', 'wp-components' );
+
+			// Post type archives.
+			case $this->query->is_post_type_archive():
+				$post_type   = $this->query->get( 'post_type' );
+				$post_object = get_post_type_object( $post_type );
+				return $post_object->label;
+		}
+	}
+
+	/**
+	 * Get the trailing title.
+	 *
+	 * @return string
+	 */
+	public function get_trailing_title() {
+		return ' | ' . get_bloginfo( 'name' );
+	}
+
+	/**
+	 * Apply basic meta tags.
+	 */
+	public function set_standard_meta() {
+
+		// Meta description.
+		$meta_description = $this->get_meta_description();
+		if ( ! empty( $meta_description ) ) {
+			$this->add_tag(
+				'meta',
+				[
+					'name'    => 'description',
+					'content' => esc_attr( $meta_description ),
+				]
+			);
+		}
+
+		// Filter the meta key where this is stored.
+		$meta_key = apply_filters( 'wp_components_head_meta_title_key', '_meta_keywords' );
+
+		$meta_keywords = (string) get_post_meta( $this->post->ID, $meta_key, true );
+		if ( ! empty( $meta_keywords ) ) {
+			$this->add_tag(
+				'meta',
+				[
+					'name'    => 'keywords',
+					'content' => esc_attr( $meta_keywords ),
+				]
+			);
+		}
+	}
+
+	/**
+	 * Add basic open graph tags.
+	 */
+	public function set_open_graph_meta() {
+
+		// Open graph meta.
+		$this->add_meta( 'og:url', $this->wp_post_get_permalink() );
+		$this->add_meta( 'og:type', 'article' );
+		$this->add_meta( 'og:title', $this->get_social_title() );
+		$this->add_meta( 'og:description', $this->get_social_description() );
+
+		// Optional meta.
+		$image_url = $this->get_image_src();
+		if ( ! empty( $image_url ) ) {
+			$this->add_meta( 'og:image', $image_url );
+		}
+
+		// Twitter specific meta.
+		$twitter_meta = [
+			'twitter:card'        => 'summary_large_image',
+			'twitter:title'       => $this->get_social_title(),
+			'twitter:description' => $this->get_social_description(),
+			'twitter:image'       => $image_url,
+		];
+
+		// Add Twitter tags.
+		foreach ( $twitter_meta as $name => $content ) {
+			if ( empty( $content ) ) {
+				return;
+			}
+
+			$this->add_tag(
+				'meta',
+				[
+					'name'    => $name,
+					'content' => $content,
+				]
+			);
+		}
+	}
+
+	/**
+	 * Get the title used by the head tag.
+	 *
+	 * Priorities are,
+	 *  1. Meta key `_meta_title` (key filterable).
+	 *  3. Post title.
+	 *
+	 * @return string
+	 */
+	public function get_meta_title() : string {
+
+		// Filter the meta key where this is stored.
+		$meta_key = apply_filters( 'wp_components_head_meta_title_key', '_meta_title' );
+
+		$meta_title = (string) get_post_meta( $this->post->ID, $meta_key, true );
+		if ( ! empty( $meta_title ) ) {
+			return $meta_title;
+		}
+
+		return $this->post->wp_post_get_title();
+	}
+
+	/**
+	 * Get the title used by open graph tags/social.
+	 *
+	 * Priorities are,
+	 *  1. Meta key `_social_title` (key filterable).
+	 *  2. Meta key `_meta_title` (key filterable).
+	 *  3. Post title.
+	 *
+	 * @return string
+	 */
+	public function get_social_title() : string {
+
+		// Filter the meta key where this is stored.
+		$meta_key = apply_filters( 'wp_components_head_social_title_key', '_social_title' );
+
+		$social_title = get_post_meta( $this->post->ID, $meta_key, true );
+		if ( ! empty( $social_title ) ) {
+			return $social_title;
+		}
+
+		return $this->get_meta_title();
+	}
+
+
+	/**
+	 * Get the meta description used by the head tag.
+	 *
+	 * Priorities are,
+	 *  1. Meta key `_meta_description` (key filterable).
+	 *  2. Post excerpt.
+	 *
+	 * @return string
+	 */
+	public function get_meta_description() : string {
+
+		// Filter the meta key where this is stored.
+		$meta_key = apply_filters( 'wp_components_head_social_title_key', '_meta_description' );
+
+		$meta_description = (string) get_post_meta( $this->post->ID, $meta_key, true );
+		if ( ! empty( $meta_description ) ) {
+			return $meta_description;
+		}
+
+		return get_the_excerpt( $this->post->ID );
+	}
+
+	/**
+	 * Get the meta description used by open graph tags/social.
+	 *
+	 * Priorities are,
+	 *  1. Meta key `_social_description` (key filterable).
+	 *  2. Meta key `_meta_description` (key filterable).
+	 *  3. Post excerpt.
+	 *
+	 * @return string
+	 */
+	public function get_social_description() : string {
+
+		// Filter the meta key where this is stored.
+		$meta_key = apply_filters( 'wp_components_head_social_title_key', '_social_description' );
+
+		$social_description = (string) get_post_meta( $this->post->ID, $meta_key, true );
+		if ( ! empty( $social_description ) ) {
+			return $social_description;
+		}
+
+		return $this->get_meta_description();
+	}
+
+	/**
+	 * Get image source with its info.
+	 *
+	 * @return array
+	 */
+	protected function get_image_src() : string {
+
+		// Get image url.
+		$image_id = absint( get_post_meta( $this->post->ID, '_social_image_id', true ) );
+		$image    = wp_get_attachment_image_src( $image_id, 'full' );
+
+		// Fallback to featured image.
+		if ( empty( $image ) ) {
+			$image = wp_get_attachment_image_src( get_post_thumbnail_id( $this->post->ID ), 'full' );
+		}
+
+		// Fallback.
+		if ( empty( $image ) ) {
+			return '';
+		}
+
+		// Remove query string from url.
+		$image[0] = strtok( $image[0], '?' );
+		return $image[0] . '?resize=1200,1200';
+	}
 }
