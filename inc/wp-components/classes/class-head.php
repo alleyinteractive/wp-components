@@ -156,6 +156,7 @@ class Head extends Component {
 	public function post_has_set() : self {
 
 		$this->set_title( $this->get_meta_title() . $this->get_trailing_title() );
+		$this->set_standard_meta();
 		$this->set_open_graph_meta();
 
 		return $this;
@@ -255,7 +256,9 @@ class Head extends Component {
 		}
 
 		// Deindex URL.
-		if ( apply_filters( 'wp_components_head_deindex', '__return_false' ) ) {
+		$meta_key = apply_filters( 'wp_components_head_deindex_url_key', '_deindex_google' );
+
+		if ( absint( get_post_meta( $this->post->ID, $meta_key, true ) ) ) {
 			$this->add_tag(
 				'meta',
 				[
@@ -271,25 +274,42 @@ class Head extends Component {
 	 */
 	public function set_open_graph_meta() {
 
-		// Open graph meta.
-		$this->add_meta( 'og:url', $this->wp_post_get_permalink() );
-		$this->add_meta( 'og:type', 'article' );
-		$this->add_meta( 'og:title', $this->get_social_title() );
-		$this->add_meta( 'og:description', $this->get_social_description() );
+		// Define values that are used multiple times.
+		$description  = $this->get_social_description();
+		$image_source = $this->get_image_source();
+		$image_url    = '';
+		$permalink    = $this->wp_post_get_permalink();
+		$title        = $this->get_social_title();
 
-		// Optional meta.
-		$image_url = $this->get_image_src();
-		if ( ! empty( $image_url ) ) {
-			$this->add_meta( 'og:image', $image_url );
+		// Open graph meta.
+		$this->add_meta( 'og:url', $permalink );
+		$this->add_meta( 'og:type', 'article' );
+		$this->add_meta( 'og:title', $title );
+		$this->add_meta( 'og:description', $description );
+		$this->add_meta( 'og:site_name', get_bloginfo( 'name' ) );
+
+		// Images.
+		if ( ! empty( $image_source ) ) {
+			$image_url = $image_source[0];
+			$this->add_meta( 'og:image', $image_source[0] );
+			$this->add_meta( 'og:width', $image_source[1] );
+			$this->add_meta( 'og:height', $image_source[2] );
 		}
 
-		// Twitter specific meta.
+		// Property specific meta.
 		$twitter_meta = [
-			'twitter:card'        => 'summary_large_image',
-			'twitter:title'       => $this->get_social_title(),
-			'twitter:description' => $this->get_social_description(),
-			'twitter:image'       => $image_url,
+			'twitter:card'          => 'summary_large_image',
+			'twitter:title'         => $title,
+			'twitter:description'   => $description,
+			'twitter:image'         => $image_url,
+			'twitter:url'           => $permalink,
 		];
+
+		// Twitter account.
+		$twitter_account = apply_filters( 'wp_components_head_twitter_account', '' );
+		if ( ! empty( $twitter_account ) ) {
+			$twitter_meta['twitter:site'] = '@' . str_replace( '@', '', $twitter_account );
+		}
 
 		// Add Twitter tags.
 		foreach ( $twitter_meta as $name => $content ) {
@@ -403,24 +423,24 @@ class Head extends Component {
 	 *
 	 * @return array
 	 */
-	protected function get_image_src() : string {
+	protected function get_image_source() : array {
 
 		// Get image url.
 		$image_id = absint( get_post_meta( $this->post->ID, '_social_image_id', true ) );
-		$image    = wp_get_attachment_image_src( $image_id, 'full' );
+		$image_source    = wp_get_attachment_image_src( $image_id, 'full' );
 
 		// Fallback to featured image.
 		if ( empty( $image ) ) {
-			$image = wp_get_attachment_image_src( get_post_thumbnail_id( $this->post->ID ), 'full' );
+			$image_source = wp_get_attachment_image_src( get_post_thumbnail_id( $this->post->ID ), 'full' );
 		}
 
 		// Fallback.
-		if ( empty( $image ) ) {
-			return '';
+		if ( empty( $image_source ) ) {
+			return [];
 		}
 
 		// Remove query string from url.
-		$image[0] = strtok( $image[0], '?' );
-		return $image[0] . '?resize=1200,1200';
+		$image_source[0] = strtok( $image_source[0], '?' );
+		return $image_source[0] . '?resize=1200,1200';
 	}
 }
