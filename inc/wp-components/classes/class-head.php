@@ -440,7 +440,7 @@ class Head extends Component {
 		}
 
 		// Remove query string from url.
-		$image_source[0] = strtok( $image_source[0], '?' );
-		return $image_source[0] . '?resize=1200,1200';
+		$image_source[0] = strtok( $image_source[0], '?' ) . '?resize=1200,1200';
+		return $image_source;
 	}
 }
