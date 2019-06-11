@@ -392,7 +392,7 @@ class Head extends Component {
 			return $meta_description;
 		}
 
-		return get_the_excerpt( $this->post->ID );
+		return $this->wp_post_get_excerpt();
 	}
 
 	/**
