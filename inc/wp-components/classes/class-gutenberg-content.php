@@ -28,11 +28,10 @@ class Gutenberg_Content extends Component {
 	 */
 	public function post_has_set() : self {
 
-		// If gutenberg is not enabled return the post's content as raw HTML.
+		// If gutenberg is not enabled, return the post's content as a generic
+		// HTML component to deliver the post content.
 		if ( ! function_exists( 'parse_blocks' ) ) {
-
-			// Use a generic HTML component to deliver the post content.
-			$this->append_child(
+			return $this->append_child(
 				( new HTML() )
 					->set_config(
 						'content',
@@ -40,24 +39,32 @@ class Gutenberg_Content extends Component {
 						apply_filters( 'the_content', $this->post->post_content ?? '' )
 					)
 			);
-		} else {
-			$blocks = (array) parse_blocks( $this->post->post_content ?? '' );
-
-			// Filter any empty parsed blocks.
-			$blocks = array_values(
-				array_filter(
-					$blocks,
-					function ( $block ) {
-						$block = (array) $block;
-						// Check if innerHTML is only whitespace.
-						return ! preg_match( '/^\s+$/', $block['innerHTML'] );
-					}
-				)
-			);
-
-			$blocks_as_components = array_reduce( $blocks, [ $this, 'convert_block_to_component' ], [] );
-			$this->append_children( $blocks_as_components );
 		}
+
+		// Parse blocks.
+		$blocks = (array) parse_blocks( $this->post->post_content ?? '' );
+
+		// Filter any empty parsed blocks.
+		$blocks = array_values(
+			array_filter(
+				$blocks,
+				function ( $block ) {
+
+					$block = (array) $block;
+
+					// Validate if the innerBlocks are set.
+					if ( ! empty( $block['innerBlocks'] ) ) {
+						return true;
+					}
+
+					// Check if innerHTML is only whitespace.
+					return ! preg_match( '/^\s+$/', $block['innerHTML'] );
+				}
+			)
+		);
+
+		$blocks_as_components = array_reduce( $blocks, [ $this, 'convert_block_to_component' ], [] );
+		$this->append_children( $blocks_as_components );
 
 		return $this;
 	}
@@ -70,26 +77,39 @@ class Gutenberg_Content extends Component {
 	 * @return object Component instance
 	 */
 	private function convert_block_to_component( $blocks, $current_block ) : array {
+
 		$block = (array) $current_block;
+
 		/**
-		 * Filters array of non-dynamic blocks for which you'd like to bypass the render step (and any core markup)
-		 * and render your own markup in React instead.
+		 * Filters array of non-dynamic blocks for which you'd like to bypass
+		 * the render step (and any core markup) and render your own markup in
+		 * React instead.
 		 *
 		 * @param array $exceptions Array of block render excepctions.
 		 */
 		$block_render_exceptions = apply_filters(
-			'wp_components_block_render_exception',
+			'wp_components_block_render_exceptions',
 			[
 				'core/columns',
 				'core/column',
 			]
 		);
 
-		if ( empty( $block['blockName'] ) && ! empty( $block['innerHTML'] ) ) {
-				// phpcs:ignore
-				$blocks[] = ( new HTML() )->set_config( 'content', apply_filters( 'the_content', $block['innerHTML'] ) );
+		// If there's no block name, but there is innerHTML.
+		if (
+			empty( $block['blockName'] )
+			&& ! empty( $block['innerHTML'] )
+		) {
+				$blocks[] = ( new HTML() )
+					// phpcs:ignore
+					->set_config(
+						'content',
+						apply_filters( 'the_content', $block['innerHTML'] )
+					);
+
 				return $blocks;
 		}
+
 		// Handle gutenberg embeds.
 		if ( strpos( $block['blockName'] ?? '', 'core-embed' ) === 0 ) {
 			$blocks[] = ( new Blocks\Core_Embed() )->set_from_block( $block );
@@ -97,7 +117,10 @@ class Gutenberg_Content extends Component {
 		}
 
 		// The presence of html means this is a non-dynamic block.
-		if ( ! empty( $block['innerHTML'] ) && ! in_array( $block['blockName'], $block_render_exceptions, true ) ) {
+		if (
+			! empty( trim( $block['innerHTML'] ) )
+			&& ! in_array( $block['blockName'], $block_render_exceptions, true )
+		) {
 			$last_block = end( $blocks );
 
 			// Render block and clean up extraneous whitespace characters.
@@ -126,11 +149,12 @@ class Gutenberg_Content extends Component {
 		);
 
 		// A dynamic block. All attributes will be available.
-		// @todo perhaps eventually allow dynamic creation of a block-specific class with a "prepare_config" function or something.
-		$blocks[] = ( new Component() )
+		$component = ( new Component() )
 			->set_name( $block['blockName'] ?? '' )
 			->merge_config( $block['attrs'] ?? [] )
 			->append_children( $children_blocks_as_components );
+
+		$blocks[] = apply_filters( 'wp_components_dynamic_block', $component, $block, $blocks, $this );
 
 		return $blocks;
 	}
