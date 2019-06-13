@@ -149,14 +149,12 @@ class Gutenberg_Content extends Component {
 		);
 
 		// A dynamic block. All attributes will be available.
-		// @todo perhaps eventually allow dynamic creation of a block-specific class with a "prepare_config" function or something.
-		$blocks[] = ( new Component() )
+		$component = ( new Component() )
 			->set_name( $block['blockName'] ?? '' )
 			->merge_config( $block['attrs'] ?? [] )
-			->append_child(
-				( new \WP_Components\Gutenberg_Content() )
-					->append_children( $children_blocks_as_components )
-			);
+			->append_children( $children_blocks_as_components );
+
+		$blocks[] = apply_filters( 'wp_components_dynamic_block', $component, $block, $blocks, $this );
 
 		return $blocks;
 	}
