@@ -363,7 +363,7 @@ class Component implements \JsonSerializable {
 	 * @param array $array        Array to convert.
 	 * @return array Updated array with camel-cased keys.
 	 */
-	public function camel_case_keys( $array, $array_holder = [] ) : array {
+	public function camel_case_keys( $array ) : array {
 		// Setup for recursion.
 		$camel_case_array = [];
 
