@@ -262,6 +262,24 @@ class Component implements \JsonSerializable {
 	}
 
 	/**
+	 * Helper to set this component's is_valid flag to false.
+	 *
+	 * @return self
+	 */
+	public function is_invalid() : self {
+		return $this->set_invalid();
+	}
+
+	/**
+	 * Helper to set this component's is_valid flag to true.
+	 *
+	 * @return self
+	 */
+	public function is_valid() : self {
+		return $this->set_valid();
+	}
+
+	/**
 	 * Trigger a fatal error on this component and log a message.
 	 *
 	 * @param string $error_message Optional error message.
