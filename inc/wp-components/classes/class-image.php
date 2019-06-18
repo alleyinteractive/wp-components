@@ -293,13 +293,13 @@ class Image extends Component {
 		$this->merge_config(
 			[
 				'alt'         => $this->get_alt_text(),
-				'caption'     => ! empty( $this->config['attachment_id'] ) ? wp_get_attachment_caption( $this->config['attachment_id'] ): '',
+				'caption'     => ! empty( $this->config['attachment_id'] ) ? wp_get_attachment_caption( $this->config['attachment_id'] ) : '',
 				'height'      => $image_meta['height'] ?? 0,
 				'lqip_src'    => $this->get_lqip_src(),
 				'url'         => $this->get_config( 'url' ),
 				'picture'     => $picture,
 				'sizes'       => $this->get_sizes(),
-				'source_tags' => $picture ? $this->get_source_tags()                                                                    : [],
+				'source_tags' => $picture ? $this->get_source_tags() : [],
 				'src'         => $this->get_src(),
 				'srcset'      => $this->get_srcset(),
 				'width'       => $image_meta['width'] ?? 0,
