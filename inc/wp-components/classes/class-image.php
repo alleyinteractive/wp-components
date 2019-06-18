@@ -40,33 +40,39 @@ class Image extends Component {
 	public static $crop_sizes = [];
 
 	/**
+	 * Global fallback image URL, will be used if a size-specific fallback is not configured.
+	 *
+	 * @var string
+	 */
+	public static $fallback_image_url = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
+
+	/**
 	 * Define the default config of an image.
 	 *
 	 * @return array Default config.
 	 */
 	public function default_config() : array {
 		return [
-			'aspect_ratio'       => 9 / 16,
-			'attachment_id'      => 0,
-			'alt'                => '',
-			'caption'            => '',
-			'crops'              => '',
-			'fallback_image_url' => 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7',
-			'height'             => 0,
-			'image_size'         => 'full',
-			'lazyload'           => true,
-			'lqip_src'           => 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7',
-			'post_id'            => 0,
-			'retina'             => true,
-			'show_caption'       => false,
-			'sources'            => [],
-			'source_tags'        => [],
-			'src'                => '',
-			'srcset'             => '',
-			'url'                => '',
-			'use_basic_img'      => false,
-			'using_fallback'     => false,
-			'width'              => 0,
+			'aspect_ratio'        => 9 / 16,
+			'attachment_id'       => 0,
+			'alt'                 => '',
+			'caption'             => '',
+			'crops'               => '',
+			'height'              => 0,
+			'image_size'          => 'full',
+			'lazyload'            => true,
+			'lqip_src'            => 'data: image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7',
+			'post_id'             => 0,
+			'retina'              => true,
+			'show_caption'        => false,
+			'sources'             => [],
+			'source_tags'         => [],
+			'src'                 => '',
+			'srcset'              => '',
+			'url'                 => '',
+			'use_basic_img'       => false,
+			'using_data_fallback' => false,
+			'width'               => 0,
 		];
 	}
 
@@ -89,9 +95,30 @@ class Image extends Component {
 	}
 
 	/**
+	 * Register fallback image URL.
+	 *
+	 * @param string|number $fallback_image Array of breakpoints.
+	 */
+	public static function register_fallback_image( $fallback_image ) {
+		if ( is_numeric( $fallback_image ) ) {
+			// Treat a number as an attachment ID.
+			$url = wp_get_attachment_image_url( $fallback_image );
+
+			if ( ! empty( $attachment_url ) ) {
+				$url = $attachment_url;
+			}
+		} else {
+			// Treat anything else as a URL.
+			$url = $fallback_image;
+		}
+
+		self::$fallback_image_url = $url;
+	}
+
+	/**
 	 * Register crops for WPCOM Thumbnail Editor.
 	 *
-	 * @param  array $crop_sizes Array of crop sizes.
+	 * @param array $crop_sizes Array of crop sizes.
 	 */
 	public static function register_crop_sizes( array $crop_sizes ) {
 		self::$crop_sizes = array_merge( self::$crop_sizes, $crop_sizes );
@@ -201,7 +228,7 @@ class Image extends Component {
 			return $this;
 		} else {
 			$size_config        = $sizes[ $image_size ];
-			$fallback_image_url = $size_config['fallback_image_url'] ?? $this->config['fallback_image_url'];
+			$fallback_image_url = $size_config['fallback_image_url'] ?? self::$fallback_image_url;
 			$attachment_url     = strtok( wp_get_attachment_image_url( $this->get_config( 'attachment_id' ), 'full' ), '?' );
 			$url                = ! empty( $attachment_url ) ? $attachment_url : $fallback_image_url;
 
@@ -257,25 +284,25 @@ class Image extends Component {
 		// Set flags for using a basic <img> tag or using the fallback URL.
 		$this->merge_config(
 			[
-				'use_basic_img'  => ( 1 === count( $this->get_config( 'sources' ) ) && ! $this->get_config( 'retina' ) ),
-				'using_fallback' => $this->get_config( 'fallback_image_url' ) === $this->get_config( 'url' ),
+				'use_basic_img'       => ( 1 === count( $this->get_config( 'sources' ) ) && ! $this->get_config( 'retina' ) ),
+				'using_data_fallback' => strstr( $this->get_config( 'url' ), 'data:' ),
 			]
 		);
 
 		// Set image config.
 		$this->merge_config(
 			[
-				'alt'            => $this->get_alt_text(),
-				'caption'        => ! empty( $this->config['attachment_id'] ) ? wp_get_attachment_caption( $this->config['attachment_id'] ) : '',
-				'height'         => $image_meta['height'] ?? 0,
-				'lqip_src'       => $this->get_lqip_src(),
-				'url'            => $this->get_config( 'url' ),
-				'picture'        => $picture,
-				'sizes'          => $this->get_sizes(),
-				'source_tags'    => $picture ? $this->get_source_tags() : [],
-				'src'            => $this->get_src(),
-				'srcset'         => $this->get_srcset(),
-				'width'          => $image_meta['width'] ?? 0,
+				'alt'         => $this->get_alt_text(),
+				'caption'     => ! empty( $this->config['attachment_id'] ) ? wp_get_attachment_caption( $this->config['attachment_id'] ): '',
+				'height'      => $image_meta['height'] ?? 0,
+				'lqip_src'    => $this->get_lqip_src(),
+				'url'         => $this->get_config( 'url' ),
+				'picture'     => $picture,
+				'sizes'       => $this->get_sizes(),
+				'source_tags' => $picture ? $this->get_source_tags()                                                                    : [],
+				'src'         => $this->get_src(),
+				'srcset'      => $this->get_srcset(),
+				'width'       => $image_meta['width'] ?? 0,
 			]
 		);
 
@@ -350,7 +377,7 @@ class Image extends Component {
 		$sources     = (array) $this->config['sources'];
 
 		// Don't set this if we're using a basic <img> tag or using the fallback image.
-		if ( $this->get_config( 'use_basic_img' ) || $this->get_config( 'using_fallback' ) ) {
+		if ( $this->get_config( 'use_basic_img' ) || $this->get_config( 'using_data_fallback' ) ) {
 			return [];
 		}
 
@@ -383,7 +410,7 @@ class Image extends Component {
 	 * @return string LQIP source URL
 	 */
 	public function get_src() : string {
-		if ( $this->get_config( 'using_fallback' ) || ! $this->get_config( 'use_basic_img' ) ) {
+		if ( $this->get_config( 'using_data_fallback' ) || ! $this->get_config( 'use_basic_img' ) ) {
 			return $this->get_config( 'url' );
 		}
 
@@ -421,13 +448,13 @@ class Image extends Component {
 		$sources = (array) $this->config['sources'];
 
 		// Don't set this if we're using a basic <img> tag or using the fallback image.
-		if ( $this->get_config( 'use_basic_img' ) || $this->get_config( 'using_fallback' ) ) {
+		if ( $this->get_config( 'use_basic_img' ) || $this->get_config( 'using_data_fallback' ) ) {
 			return '';
 		}
 
 		foreach ( $sources as $params ) {
 			// Get source URL.
-			$src_url    = $this->apply_transforms( $params['transforms'] );
+			$src_url = $this->apply_transforms( $params['transforms'] );
 
 			// Get descriptor.
 			$descriptor = $params['descriptor'] ?? 0;
@@ -460,7 +487,7 @@ class Image extends Component {
 		$default = false;
 
 		// Don't set this if we're using a basic <img> tag or using the fallback image.
-		if ( $this->get_config( 'use_basic_img' ) || $this->get_config( 'using_fallback' ) ) {
+		if ( $this->get_config( 'use_basic_img' ) || $this->get_config( 'using_data_fallback' ) ) {
 			return '';
 		}
 
