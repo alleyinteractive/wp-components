@@ -48,7 +48,9 @@ trait WP_Post {
 		if ( is_null( $post ) ) {
 			global $post;
 			$this->post = $post;
-			$this->post_has_set();
+			if ( $this->post instanceof \WP_Post ) {
+				$this->post_has_set();
+			}
 			return $this;
 		}
 
