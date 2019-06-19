@@ -231,6 +231,17 @@ class Component implements \JsonSerializable {
 	}
 
 	/**
+	 * Run a user callback on this class. This can be used to create a fork in
+	 * the method chain.
+	 *
+	 * @param callable $callable Callable.
+	 * @return function
+	 */
+	public function callback( $callable ) {
+		return call_user_func_array( $callable, [ &$this ] );
+	}
+
+	/**
 	 * Execute a function on each child of this component.
 	 *
 	 * @param callable $callback Callback function.
