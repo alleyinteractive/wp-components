@@ -92,8 +92,10 @@ class Component implements \JsonSerializable {
 	/**
 	 * Helper to set a top level config value.
 	 *
-	 * @param array|string $key   Config key or entire config array.
-	 * @param mixed        $value Config value.
+	 * @param array|string $key         Config key or entire config array.
+	 * @param mixed        $value       Config value.
+	 * @param bool         $do_callback Enable/disable the callback on this
+	 *                                  method.
 	 * @return self
 	 */
 	public function set_config( $key, $value = null, bool $do_callback = true ) : self {
