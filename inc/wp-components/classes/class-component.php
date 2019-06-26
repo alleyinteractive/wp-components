@@ -96,7 +96,7 @@ class Component implements \JsonSerializable {
 	 * @param mixed        $value Config value.
 	 * @return self
 	 */
-	public function set_config( $key, $value = null ) : self {
+	public function set_config( $key, $value = null, bool $do_callback = true ) : self {
 		if ( is_array( $key ) && is_null( $value ) ) {
 			$this->config = $key;
 		} else {
@@ -105,7 +105,7 @@ class Component implements \JsonSerializable {
 
 		// Allow hooking into a config being set.
 		$callback_method = "{$key}_config_has_set";
-		if ( method_exists( $this, $callback_method ) ) {
+		if ( method_exists( $this, $callback_method ) && $do_callback ) {
 			$this->$callback_method();
 		}
 		return $this;
