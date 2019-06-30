@@ -235,14 +235,18 @@ class Head extends Component {
 
 		// Filter the meta key where this is stored.
 		$meta_key = apply_filters( 'wp_components_head_meta_keywords_key', '_meta_keywords' );
+		$meta_keywords = apply_filters(
+			'wp_components_head_meta_keywords',
+			explode( ',', get_post_meta( $this->post->ID, $meta_key, true ) ),
+			$this->post
+		);
 
-		$meta_keywords = (string) get_post_meta( $this->post->ID, $meta_key, true );
 		if ( ! empty( $meta_keywords ) ) {
 			$this->add_tag(
 				'meta',
 				[
 					'name'    => 'keywords',
-					'content' => esc_attr( $meta_keywords ),
+					'content' => esc_attr( implode( ',', array_filter( $meta_keywords ) ) ),
 				]
 			);
 		}
