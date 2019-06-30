@@ -111,7 +111,10 @@ class Gutenberg_Content extends Component {
 		}
 
 		// Handle gutenberg embeds.
-		if ( strpos( $block['blockName'] ?? '', 'core-embed' ) === 0 ) {
+		if (
+			strpos( $block['blockName'] ?? '', 'core-embed' ) === 0
+			|| strpos( $block['blockName'] ?? '', 'core/embed' ) === 0
+		) {
 			$blocks[] = ( new Blocks\Core_Embed() )->set_from_block( $block );
 			return $blocks;
 		}
