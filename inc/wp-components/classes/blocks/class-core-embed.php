@@ -34,6 +34,7 @@ class Core_Embed extends \WP_Components\Component {
 	public function default_config() : array {
 		return [
 			'content'  => '',
+			'oembed'   => true,
 			'provider' => '',
 			'rich'     => true,
 		];
