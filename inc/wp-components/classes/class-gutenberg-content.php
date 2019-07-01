@@ -27,9 +27,9 @@ class Gutenberg_Content extends Component {
 	 * @return self
 	 */
 	public function post_has_set() : self {
-		$blocks_as_components = $this->parse_and_convert_block_content( $this->post->post_content ?? '' );
+		$components = $this->parse_and_convert_block_content( $this->post->post_content ?? '' );
 
-		return $this->append_children( $blocks_as_components );
+		return $this->append_children( $components );
 	}
 
 	/**
@@ -74,9 +74,9 @@ class Gutenberg_Content extends Component {
 			)
 		);
 
-		$blocks_as_components = array_reduce( $blocks, [ $this, 'convert_block_to_component' ], [] );
+		$components = array_reduce( $blocks, [ $this, 'convert_block_to_component' ], [] );
 
-		return $blocks_as_components ?? [];
+		return $components ?? [];
 	}
 
 	/**
