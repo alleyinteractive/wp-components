@@ -169,8 +169,8 @@ class Gutenberg_Content extends Component {
 	/**
 	 * Consolidate HTML components to prevent markup issues on the frontend.
 	 *
-	 * @param array  $blocks     Array of block components to merge new HTML component into.
-	 * @param string $content    HTML content to be rendered.
+	 * @param array  $blocks  Array of block components to merge new HTML component into.
+	 * @param string $content HTML content to be rendered.
 	 */
 	public function merge_or_create_html_block( $blocks, $content ) {
 		$last_block = end( $blocks );
