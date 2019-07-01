@@ -27,7 +27,19 @@ class Gutenberg_Content extends Component {
 	 * @return self
 	 */
 	public function post_has_set() : self {
+		$components = $this->parse_and_convert_block_content( $this->post->post_content ?? '' );
 
+		return $this->append_children( $components );
+	}
+
+	/**
+	 * Parse block content and return as components if Gutenberg is available,
+	 * otherwise return content as a single raw HTML block.
+	 *
+	 * @param {string} $post_content Post content to parse.
+	 * @return array
+	 */
+	public function parse_and_convert_block_content( $post_content ) : array {
 		// If gutenberg is not enabled, return the post's content as a generic
 		// HTML component to deliver the post content.
 		if ( ! function_exists( 'parse_blocks' ) ) {
@@ -36,20 +48,19 @@ class Gutenberg_Content extends Component {
 					->set_config(
 						'content',
 						// phpcs:ignore
-						apply_filters( 'the_content', $this->post->post_content ?? '' )
+						apply_filters( 'the_content', $post_content )
 					)
 			);
 		}
 
 		// Parse blocks.
-		$blocks = (array) parse_blocks( $this->post->post_content ?? '' );
+		$blocks = (array) parse_blocks( $post_content );
 
 		// Filter any empty parsed blocks.
 		$blocks = array_values(
 			array_filter(
 				$blocks,
 				function ( $block ) {
-
 					$block = (array) $block;
 
 					// Validate if the innerBlocks are set.
@@ -63,10 +74,9 @@ class Gutenberg_Content extends Component {
 			)
 		);
 
-		$blocks_as_components = array_reduce( $blocks, [ $this, 'convert_block_to_component' ], [] );
-		$this->append_children( $blocks_as_components );
+		$components = array_reduce( $blocks, [ $this, 'convert_block_to_component' ], [] );
 
-		return $this;
+		return $components ?? [];
 	}
 
 	/**
@@ -77,8 +87,7 @@ class Gutenberg_Content extends Component {
 	 * @return object Component instance
 	 */
 	private function convert_block_to_component( $blocks, $current_block ) : array {
-
-		$block = (array) $current_block;
+		$block      = (array) $current_block;
 
 		/**
 		 * Filters array of non-dynamic blocks for which you'd like to bypass
@@ -100,14 +109,7 @@ class Gutenberg_Content extends Component {
 			empty( $block['blockName'] )
 			&& ! empty( $block['innerHTML'] )
 		) {
-				$blocks[] = ( new HTML() )
-					// phpcs:ignore
-					->set_config(
-						'content',
-						apply_filters( 'the_content', $block['innerHTML'] )
-					);
-
-				return $blocks;
+			return $this->merge_or_create_html_block( $blocks, apply_filters( 'the_content', $block['innerHTML'] ) );
 		}
 
 		// Handle gutenberg embeds.
@@ -124,24 +126,26 @@ class Gutenberg_Content extends Component {
 			! empty( trim( $block['innerHTML'] ) )
 			&& ! in_array( $block['blockName'], $block_render_exceptions, true )
 		) {
-			$last_block = end( $blocks );
-
 			// Render block and clean up extraneous whitespace characters.
 			$content = render_block( $block );
 			$content = do_shortcode( $content );
 			$content = preg_replace( '/[\r\n\t\f\v]/', '', $content );
 
-			// Merge rendered static blocks into a single HTML component.
-			if ( $last_block instanceof HTML ) {
-				$last_block->set_config(
-					'content',
-					$last_block->get_config( 'content' ) . $content
-				);
-			} else {
-				$blocks[] = ( new HTML() )->set_config( 'content', $content );
-			}
+			return $this->merge_or_create_html_block( $blocks, $content );
+		}
 
-			return $blocks;
+		// Reusable blocks.
+		if ( ! empty( $block['attrs']['ref'] ) ) {
+			$ref_post = get_post( $block['attrs']['ref'] );
+
+			if ( ! empty( $ref_post ) && ! empty( $ref_post->post_content ) ) {
+				$blocks = array_merge(
+					$blocks,
+					$this->parse_and_convert_block_content( $ref_post->post_content )
+				);
+
+				return $blocks;
+			}
 		}
 
 		// Handle nested blocks.
@@ -158,6 +162,28 @@ class Gutenberg_Content extends Component {
 			->append_children( $children_blocks_as_components );
 
 		$blocks[] = apply_filters( 'wp_components_dynamic_block', $component, $block, $blocks, $this );
+
+		return $blocks;
+	}
+
+	/**
+	 * Consolidate HTML components to prevent markup issues on the frontend.
+	 *
+	 * @param array  $blocks  Array of block components to merge new HTML component into.
+	 * @param string $content HTML content to be rendered.
+	 */
+	public function merge_or_create_html_block( $blocks, $content ) {
+		$last_block = end( $blocks );
+
+		// Merge rendered static blocks into a single HTML component.
+		if ( $last_block instanceof HTML ) {
+			$last_block->set_config(
+				'content',
+				$last_block->get_config( 'content' ) . $content
+			);
+		} else {
+			$blocks[] = ( new HTML() )->set_config( 'content', $content );
+		}
 
 		return $blocks;
 	}
