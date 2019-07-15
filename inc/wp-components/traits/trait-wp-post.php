@@ -132,6 +132,12 @@ trait WP_Post {
 	 */
 	public function wp_post_get_permalink() : string {
 		if ( $this->is_valid_post() ) {
+
+			// Handle unpublished content.
+			if ( 'publish' !== $this->post->post_status ) {
+				return get_preview_post_link( $this->post );
+			}
+
 			return get_permalink( $this->post );
 		}
 		return '';
