@@ -163,18 +163,17 @@ trait WP_Post {
 		// Modify global state.
 		global $post;
 
-		// phpcs:ignore WordPress.WP.GlobalVariablesOverride.OverrideProhibited
 		$backup_post = $post;
 
 		// Setup post data for this item.
-		// phpcs:ignore WordPress.WP.GlobalVariablesOverride.OverrideProhibited
+		// phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited
 		$post = $this->post;
 		setup_postdata( $post );
 
 		$excerpt = get_the_excerpt();
 
 		// Undo global modification.
-		// phpcs:ignore WordPress.WP.GlobalVariablesOverride.OverrideProhibited
+		// phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited
 		$post = $backup_post;
 		setup_postdata( $post );
 
