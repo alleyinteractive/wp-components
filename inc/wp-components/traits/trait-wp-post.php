@@ -132,6 +132,12 @@ trait WP_Post {
 	 */
 	public function wp_post_get_permalink() : string {
 		if ( $this->is_valid_post() ) {
+
+			// Handle unpublished content.
+			if ( 'publish' !== $this->post->post_status ) {
+				return get_preview_post_link( $this->post );
+			}
+
 			return get_permalink( $this->post );
 		}
 		return '';
@@ -157,18 +163,17 @@ trait WP_Post {
 		// Modify global state.
 		global $post;
 
-		// phpcs:ignore WordPress.WP.GlobalVariablesOverride.OverrideProhibited
 		$backup_post = $post;
 
 		// Setup post data for this item.
-		// phpcs:ignore WordPress.WP.GlobalVariablesOverride.OverrideProhibited
+		// phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited
 		$post = $this->post;
 		setup_postdata( $post );
 
 		$excerpt = get_the_excerpt();
 
 		// Undo global modification.
-		// phpcs:ignore WordPress.WP.GlobalVariablesOverride.OverrideProhibited
+		// phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited
 		$post = $backup_post;
 		setup_postdata( $post );
 
