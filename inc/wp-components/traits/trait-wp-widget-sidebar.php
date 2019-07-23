@@ -21,6 +21,7 @@ trait WP_Widget_Sidebar {
 	public function set_sidebar( $index = 1 ) : self {
 		add_filter( 'widget_display_callback', [ $this, 'create_component_for_widget' ], 10, 3 );
 		dynamic_sidebar( $index );
+		$this->set_config( 'sidebar_id', is_numeric( $index ) ? 'dynamic-sidebar-' . $index : $index );
 		remove_filter( 'widget_display_callback', [ $this, 'create_component_for_widget' ] );
 		return $this;
 	}
