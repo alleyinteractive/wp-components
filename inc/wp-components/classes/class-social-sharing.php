@@ -166,6 +166,8 @@ class Social_Sharing extends Component {
 
 	/**
 	 * Get an Email Social_item component.
+	 * Sets the subject to the item's title, and
+	 * the email body to the URL of the item being shared
 	 *
 	 * @return \WP_Components\Social_item
 	 */
@@ -176,9 +178,8 @@ class Social_Sharing extends Component {
 					'type' => 'email',
 					'url'  => add_query_arg(
 						[
-							'url'         => $this->get_url(),
-							'media'       => $this->get_featured_image_url(),
-							'description' => $this->get_excerpt(),
+							'subject' => $this->get_title(),
+							'body'    => $this->get_url(),
 						],
 						'mailto:'
 					),
