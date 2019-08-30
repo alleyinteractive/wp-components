@@ -109,6 +109,7 @@ class Gutenberg_Content extends Component {
 			empty( $block['blockName'] )
 			&& ! empty( $block['innerHTML'] )
 		) {
+			// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
 			return $this->merge_or_create_html_block( $blocks, apply_filters( 'the_content', $block['innerHTML'] ) );
 		}
 
