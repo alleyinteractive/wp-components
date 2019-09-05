@@ -83,7 +83,7 @@ class Social_Sharing extends Component {
 							'text' => $this->get_title(),
 							'url'  => $this->get_url(),
 						],
-						'https://twitter.com/share/'
+						'https://twitter.com/intent/tweet'
 					),
 					'display_icon' => $this->get_config( 'display_icons' ),
 				]
