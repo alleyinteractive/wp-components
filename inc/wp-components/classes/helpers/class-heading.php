@@ -26,10 +26,10 @@ class Heading extends \WP_Components\Component {
 	 */
 	public function default_config() : array {
 		return [
-			'component'   => '',
 			'class_name'  => '',
 			'font_family' => '',
 			'link'        => '',
+			'tag'         => '',
 			'type_style'  => '',
 		];
 	}
