@@ -48,7 +48,7 @@ class Social_Sharing extends Component {
 	}
 
 	/**
-	 * Get a Facebook Social_item component.
+	 * Get a Facebook Social_Item component.
 	 *
 	 * @return \WP_Components\Social_item
 	 */
@@ -69,7 +69,7 @@ class Social_Sharing extends Component {
 	}
 
 	/**
-	 * Get a Twitter Social_item component.
+	 * Get a Twitter Social_Item component.
 	 *
 	 * @return \WP_Components\Social_item
 	 */
@@ -91,7 +91,7 @@ class Social_Sharing extends Component {
 	}
 
 	/**
-	 * Get a Whatsapp Social_item component.
+	 * Get a Whatsapp Social_Item component.
 	 *
 	 * @return \WP_Components\Social_item
 	 */
@@ -119,7 +119,7 @@ class Social_Sharing extends Component {
 	}
 
 	/**
-	 * Get a LinkedIn Social_item component.
+	 * Get a LinkedIn Social_Item component.
 	 *
 	 * @return \WP_Components\Social_item
 	 */
@@ -142,7 +142,7 @@ class Social_Sharing extends Component {
 	}
 
 	/**
-	 * Get a Pinterest Social_item component.
+	 * Get a Pinterest Social_Item component.
 	 *
 	 * @return \WP_Components\Social_item
 	 */
@@ -165,9 +165,9 @@ class Social_Sharing extends Component {
 	}
 
 	/**
-	 * Get an Email Social_item component.
+	 * Get an Email Social_Item component.
 	 * Sets the subject to the item's title, and
-	 * the email body to the URL of the item being shared
+	 * the email body to the URL of the item being shared.
 	 *
 	 * @return \WP_Components\Social_item
 	 */
@@ -189,8 +189,8 @@ class Social_Sharing extends Component {
 	}
 
 	/**
-	 * Get an Reddit Social_item component.
-	 * Sets reddit post title to the item's title
+	 * Get a Reddit Social_Item component.
+	 * Sets the Reddit post title to the item's title.
 	 *
 	 * @return \WP_Components\Social_item
 	 */
