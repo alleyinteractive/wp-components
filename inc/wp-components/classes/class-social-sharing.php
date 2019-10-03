@@ -189,6 +189,29 @@ class Social_Sharing extends Component {
 	}
 
 	/**
+	 * Get an Reddit Social_item component.
+	 * Sets reddit post title to the item's title
+	 *
+	 * @return \WP_Components\Social_item
+	 */
+	public function get_reddit_component() : Social_Item {
+		return ( new Social_Item() )
+			->merge_config(
+				[
+					'type' => 'reddit',
+					'url'  => add_query_arg(
+						[
+							'title' => $this->get_title(),
+							'url'   => $this->get_url(),
+						],
+						'http://www.reddit.com/submit'
+					),
+					'display_icon' => $this->get_config( 'display_icons' ),
+				]
+			);
+	}
+
+	/**
 	 * Helper for getting a url encoded url.
 	 *
 	 * @return string
