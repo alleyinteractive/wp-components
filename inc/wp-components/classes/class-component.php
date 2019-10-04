@@ -330,8 +330,7 @@ class Component implements \JsonSerializable {
 	 * @return self
 	 */
 	public function set_theme( $theme_name ) : self {
-		// Only set theme if it's configured in the themes property
-		// OR no other themes are configured (besides `default`) implicitly indicating theme validation should not be used.
+		// Only set theme if it's configured in the themes property OR no other themes are configured (besides `default`), implicitly indicating theme validation should not be used.
 		if (
 			in_array( $theme_name, $this->themes, true )
 			|| ( 1 === count( $this->themes ) && 'default' === $this->themes[0] )
