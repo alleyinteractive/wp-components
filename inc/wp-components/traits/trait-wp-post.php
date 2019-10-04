@@ -48,7 +48,9 @@ trait WP_Post {
 		if ( is_null( $post ) ) {
 			global $post;
 			$this->post = $post;
-			$this->post_has_set();
+			if ( $this->post instanceof \WP_Post ) {
+				$this->post_has_set();
+			}
 			return $this;
 		}
 
@@ -130,6 +132,12 @@ trait WP_Post {
 	 */
 	public function wp_post_get_permalink() : string {
 		if ( $this->is_valid_post() ) {
+
+			// Handle unpublished content.
+			if ( 'publish' !== $this->post->post_status ) {
+				return get_preview_post_link( $this->post );
+			}
+
 			return get_permalink( $this->post );
 		}
 		return '';
@@ -155,18 +163,17 @@ trait WP_Post {
 		// Modify global state.
 		global $post;
 
-		// phpcs:ignore WordPress.WP.GlobalVariablesOverride.OverrideProhibited
 		$backup_post = $post;
 
 		// Setup post data for this item.
-		// phpcs:ignore WordPress.WP.GlobalVariablesOverride.OverrideProhibited
+		// phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited
 		$post = $this->post;
 		setup_postdata( $post );
 
 		$excerpt = get_the_excerpt();
 
 		// Undo global modification.
-		// phpcs:ignore WordPress.WP.GlobalVariablesOverride.OverrideProhibited
+		// phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited
 		$post = $backup_post;
 		setup_postdata( $post );
 
@@ -174,7 +181,7 @@ trait WP_Post {
 	}
 
 	/**
-	 * Set the `expert` config to the post excerpt.
+	 * Set the `excerpt` config to the post excerpt.
 	 *
 	 * @return object Instance of the class this trait is implemented on.
 	 */
@@ -191,13 +198,17 @@ trait WP_Post {
 	 * @return object Instance of the class this trait is implemented on.
 	 */
 	public function wp_post_set_featured_image( $size = 'full', $config = [] ) : self {
-		return $this->append_children(
-			[
-				( new \WP_Components\Image() )
-					->set_post_id( $this->get_post_id() )
-					->set_config_for_size( $size )
-					->merge_config( $config ),
-			]
-		);
+		if ( has_post_thumbnail( $this->get_post_id() ) ) {
+			return $this->append_children(
+				[
+					( new \WP_Components\Image() )
+						->set_post_id( $this->get_post_id() )
+						->set_config_for_size( $size )
+						->merge_config( $config ),
+				]
+			);
+		}
+
+		return $this;
 	}
 }

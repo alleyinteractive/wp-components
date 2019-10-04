@@ -100,11 +100,13 @@ class Component implements \JsonSerializable {
 	/**
 	 * Helper to set a top level config value.
 	 *
-	 * @param array|string $key   Config key or entire config array.
-	 * @param mixed        $value Config value.
+	 * @param array|string $key         Config key or entire config array.
+	 * @param mixed        $value       Config value.
+	 * @param bool         $do_callback Enable/disable the callback on this
+	 *                                  method.
 	 * @return self
 	 */
-	public function set_config( $key, $value = null ) : self {
+	public function set_config( $key, $value = null, bool $do_callback = true ) : self {
 		if ( is_array( $key ) && is_null( $value ) ) {
 			$this->config = $key;
 		} else {
@@ -113,14 +115,14 @@ class Component implements \JsonSerializable {
 
 		// Allow hooking into a config being set.
 		$callback_method = "{$key}_config_has_set";
-		if ( method_exists( $this, $callback_method ) ) {
+		if ( method_exists( $this, $callback_method ) && $do_callback ) {
 			$this->$callback_method();
 		}
 		return $this;
 	}
 
 	/**
-	 * Helper to set a top level config value.
+	 * Helper to get a top level config value.
 	 *
 	 * @param string $key Config key.
 	 * @return mixed Config value or null.
@@ -139,7 +141,9 @@ class Component implements \JsonSerializable {
 	 * @return self
 	 */
 	public function merge_config( array $new_config ) : self {
-		$this->config = wp_parse_args( $new_config, $this->config );
+		foreach ( $new_config as $key => $value ) {
+			$this->set_config( $key, $value );
+		}
 		return $this;
 	}
 
@@ -239,6 +243,17 @@ class Component implements \JsonSerializable {
 	}
 
 	/**
+	 * Run a user callback on this class. This can be used to create a fork in
+	 * the method chain.
+	 *
+	 * @param callable $callable Callable.
+	 * @return function
+	 */
+	public function callback( $callable ) {
+		return call_user_func_array( $callable, [ &$this ] );
+	}
+
+	/**
 	 * Execute a function on each child of this component.
 	 *
 	 * @param callable $callback Callback function.
@@ -267,6 +282,24 @@ class Component implements \JsonSerializable {
 	public function set_valid() : self {
 		$this->is_valid = true;
 		return $this;
+	}
+
+	/**
+	 * Helper to set this component's is_valid flag to false.
+	 *
+	 * @return self
+	 */
+	public function is_invalid() : self {
+		return $this->set_invalid();
+	}
+
+	/**
+	 * Helper to set this component's is_valid flag to true.
+	 *
+	 * @return self
+	 */
+	public function is_valid() : self {
+		return $this->set_valid();
 	}
 
 	/**
@@ -355,13 +388,11 @@ class Component implements \JsonSerializable {
 	 * Convert all array keys to camel case.
 	 *
 	 * @param array $array        Array to convert.
-	 * @param array $array_holder Parent array holder for recursive array.
 	 * @return array Updated array with camel-cased keys.
 	 */
-	public function camel_case_keys( $array, $array_holder = [] ) : array {
-
+	public function camel_case_keys( $array ) : array {
 		// Setup for recursion.
-		$camel_case_array = ! empty( $array_holder ) ? $array_holder : [];
+		$camel_case_array = [];
 
 		// Loop through each key.
 		foreach ( $array as $key => $value ) {
@@ -401,7 +432,7 @@ class Component implements \JsonSerializable {
 				$camel_case_array[ $new_key ] = $value;
 			} else {
 				// Set new key value, but process the nested array.
-				$camel_case_array[ $new_key ] = $this->camel_case_keys( $value, $camel_case_array[ $new_key ] );
+				$camel_case_array[ $new_key ] = $this->camel_case_keys( $array[ $key ] );
 			}
 		}
 

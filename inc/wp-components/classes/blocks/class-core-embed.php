@@ -34,6 +34,7 @@ class Core_Embed extends \WP_Components\Component {
 	public function default_config() : array {
 		return [
 			'content'  => '',
+			'oembed'   => true,
 			'provider' => '',
 			'rich'     => true,
 		];
@@ -103,9 +104,6 @@ class Core_Embed extends \WP_Components\Component {
 					'async' => $script->hasAttribute( 'async' ),
 				]
 			);
-
-			// phpcs:ignore WordPress.NamingConventions.ValidVariableName.NotSnakeCaseMemberVar
-			$script->parentNode->removeChild( $script );
 		}
 		// phpcs:enable WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase
 		$content = str_replace( $block['attrs']['url'], $doc->saveHTML(), $block['innerHTML'] );
