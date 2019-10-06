@@ -84,7 +84,6 @@ class Byline_Wrapper extends Component {
 								return $byline->set_user( $coauthor );
 							}
 
-
 							return $byline;
 						}
 					);
@@ -104,7 +103,13 @@ class Byline_Wrapper extends Component {
 		];
 	}
 
+	/**
+	 * Return the byline component that should be used to populate this
+	 * wrapper.
+	 *
+	 * @return \Byline Byline component used in the wrapper.
+	 */
 	public function get_new_byline_component() {
-		return new Byline;
+		return new Byline();
 	}
 }
