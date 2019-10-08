@@ -145,6 +145,7 @@ class Head extends Component {
 	 */
 	public function query_has_set() : self {
 		$this->set_title( $this->get_the_head_title() . $this->get_trailing_title() );
+		$this->set_wordpress_seo_meta();
 		return $this;
 	}
 
@@ -156,6 +157,7 @@ class Head extends Component {
 	public function post_has_set() : self {
 
 		$this->set_title( $this->get_meta_title() . $this->get_trailing_title() );
+		$this->set_wordpress_seo_meta();
 		$this->set_standard_meta();
 		$this->set_open_graph_meta();
 
@@ -217,6 +219,33 @@ class Head extends Component {
 	}
 
 	/**
+	 * WordPress SEO Integration.
+	 */
+	public function set_wordpress_seo_meta() {
+
+		/**
+		 * Use this filter to add webmaster tools codes.
+		 * 
+		 * @param array $codes Array of name and content codes.
+		 */
+		$codes = apply_filters( 'wp_components_head_meta_webmaster_tools_codes', [] );
+
+		if ( ! empty( $codes ) && is_array( $codes ) ) {
+			foreach ( $codes as $key => $code ) {
+				if ( ! empty( $code ) ) {
+					$this->add_tag(
+						'meta',
+						[
+							'name'    => $key,
+							'content' => $code,
+						]
+					);
+				}
+			}
+		}
+	}
+
+	/**
 	 * Apply basic meta tags.
 	 */
 	public function set_standard_meta() {
@@ -234,7 +263,7 @@ class Head extends Component {
 		}
 
 		// Filter the meta key where this is stored.
-		$meta_key = apply_filters( 'wp_components_head_meta_keywords_key', '_meta_keywords' );
+		$meta_key      = apply_filters( 'wp_components_head_meta_keywords_key', '_meta_keywords' );
 		$meta_keywords = apply_filters(
 			'wp_components_head_meta_keywords',
 			explode( ',', get_post_meta( $this->post->ID, $meta_key, true ) ),
