@@ -225,7 +225,7 @@ class Head extends Component {
 
 		/**
 		 * Use this filter to add webmaster tools codes.
-		 * 
+		 *
 		 * @param array $codes Array of name and content codes.
 		 */
 		$codes = apply_filters( 'wp_components_head_meta_webmaster_tools_codes', [] );
