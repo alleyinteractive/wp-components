@@ -154,7 +154,6 @@ class Head extends Component {
 	 * @return self
 	 */
 	public function post_has_set() : self {
-
 		$this->set_title( $this->get_meta_title() . $this->get_trailing_title() );
 		$this->set_standard_meta();
 		$this->set_open_graph_meta();
@@ -262,7 +261,12 @@ class Head extends Component {
 		// Deindex URL.
 		$meta_key = apply_filters( 'wp_components_head_deindex_url_key', '_deindex_google' );
 
-		if ( absint( get_post_meta( $this->post->ID, $meta_key, true ) ) ) {
+		$deindex_url = apply_filters(
+			'wp_components_head_deindex_url',
+			get_post_meta( $this->post->ID, $meta_key, true )
+		);
+
+		if ( absint( $deindex_url ) ) {
 			$this->add_tag(
 				'meta',
 				[
@@ -346,11 +350,15 @@ class Head extends Component {
 		$meta_key = apply_filters( 'wp_components_head_meta_title_key', '_meta_title' );
 
 		$meta_title = (string) get_post_meta( $this->post->ID, $meta_key, true );
-		if ( ! empty( $meta_title ) ) {
-			return $meta_title;
+
+		if ( empty( $meta_title ) ) {
+			$meta_title = $this->wp_post_get_title();
 		}
 
-		return $this->wp_post_get_title();
+		// Allow the title to be filtered.
+		$meta_title = apply_filters( 'wp_components_head_meta_title', $meta_title );
+
+		return $meta_title;
 	}
 
 	/**
@@ -369,11 +377,15 @@ class Head extends Component {
 		$meta_key = apply_filters( 'wp_components_head_social_title_key', '_social_title' );
 
 		$social_title = get_post_meta( $this->post->ID, $meta_key, true );
-		if ( ! empty( $social_title ) ) {
-			return $social_title;
+
+		if ( empty( $social_title ) ) {
+			$social_title = $this->get_meta_title();
 		}
 
-		return $this->get_meta_title();
+		// Allow the social title to be filtered.
+		$social_title = apply_filters( 'wp_components_head_social_title', $social_title );
+
+		return $social_title;
 	}
 
 
@@ -392,11 +404,15 @@ class Head extends Component {
 		$meta_key = apply_filters( 'wp_components_head_meta_description_key', '_meta_description' );
 
 		$meta_description = (string) get_post_meta( $this->post->ID, $meta_key, true );
-		if ( ! empty( $meta_description ) ) {
-			return $meta_description;
+
+		if ( empty( $meta_description ) ) {
+			$meta_description = $this->wp_post_get_excerpt();
 		}
 
-		return $this->wp_post_get_excerpt();
+		// Allow the meta description to be filtered.
+		$meta_description = apply_filters( 'wp_components_head_meta_description', $meta_description );
+
+		return $meta_description;
 	}
 
 	/**
@@ -415,11 +431,15 @@ class Head extends Component {
 		$meta_key = apply_filters( 'wp_components_head_social_description_key', '_social_description' );
 
 		$social_description = (string) get_post_meta( $this->post->ID, $meta_key, true );
-		if ( ! empty( $social_description ) ) {
-			return $social_description;
+
+		if ( empty( $social_description ) ) {
+			$social_description = $this->get_meta_description();
 		}
 
-		return $this->get_meta_description();
+		// Allow the meta description to be filtered.
+		$social_description = apply_filters( 'wp_components_head_social_description', $social_description );
+
+		return $social_description;
 	}
 
 	/**
@@ -430,8 +450,15 @@ class Head extends Component {
 	protected function get_image_source() : array {
 
 		// Get image url.
-		$image_id = absint( get_post_meta( $this->post->ID, '_social_image_id', true ) );
-		$image_source    = wp_get_attachment_image_src( $image_id, 'full' );
+		$image_id = apply_filters(
+			'wp_components_head_image_id',
+			absint( get_post_meta( $this->post->ID, '_social_image_id', true ) )
+		);
+
+		$image_source = apply_filters(
+			'wp_components_head_image_source',
+			wp_get_attachment_image_src( $image_id, 'full' )
+		);
 
 		// Fallback to featured image.
 		if ( empty( $image ) ) {
