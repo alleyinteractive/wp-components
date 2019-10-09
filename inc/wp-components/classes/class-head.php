@@ -226,7 +226,7 @@ class Head extends Component {
 		/**
 		 * Use this filter to add additional meta tags.
 		 *
-		 * @param array $codes Array of name and content codes.
+		 * @param array $tags Array of name and content tags.
 		 */
 		$tags = apply_filters( 'wp_components_head_additional_meta_tags', [] );
 
