@@ -330,6 +330,10 @@ class Component implements \JsonSerializable {
 	 * @return self
 	 */
 	public function set_theme( $theme_name ) : self {
+
+		// Camel case the theme name, if it isn't already.
+		$theme_name = $this->camel_case_string( $theme_name );
+
 		// Only set theme if it's configured in the themes property OR no other themes are configured (besides `default`), implicitly indicating theme validation should not be used.
 		if (
 			in_array( $theme_name, $this->themes, true )
@@ -410,22 +414,8 @@ class Component implements \JsonSerializable {
 				continue;
 			}
 
-			// Explode each part by underscore.
-			$words = explode( '_', $key );
-
-			// Capitalize each key part.
-			array_walk(
-				$words,
-				function( &$word ) {
-					$word = ucwords( $word );
-				}
-			);
-
-			// Reassemble key.
-			$new_key = implode( '', $words );
-
-			// Lowercase the first character.
-			$new_key[0] = strtolower( $new_key[0] );
+			// Camel case the key.
+			$new_key = $this->camel_case_string( $key );
 
 			if (
 				! is_array( $value )
@@ -441,6 +431,37 @@ class Component implements \JsonSerializable {
 		}
 
 		return $camel_case_array;
+	}
+
+	/**
+	 * Convert a string to camel case.
+	 *
+	 * @param string $string String to convert.
+	 * @return string
+	 */
+	public function camel_case_string( $string ): string {
+
+		// Replace any dashes with underscores.
+		$string = str_replace( '-', '_', $string );
+
+		// Explode each part by underscore.
+		$words = explode( '_', $string );
+
+		// Capitalize each key part.
+		array_walk(
+			$words,
+			function( &$word ) {
+				$word = ucwords( $word );
+			}
+		);
+
+		// Reassemble string.
+		$string = implode( '', $words );
+
+		// Lowercase the first character.
+		$string[0] = strtolower( $string[0] );
+
+		return $string;
 	}
 
 	/**
