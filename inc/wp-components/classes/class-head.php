@@ -290,27 +290,51 @@ class Head extends Component {
 		$title        = $this->get_social_title();
 
 		// Open graph meta.
-		$this->add_meta( 'og:url', $permalink );
-		$this->add_meta( 'og:type', 'article' );
-		$this->add_meta( 'og:title', $title );
-		$this->add_meta( 'og:description', $description );
-		$this->add_meta( 'og:site_name', get_bloginfo( 'name' ) );
+		$this->add_meta(
+			'og:url',
+			apply_filters( 'wp_components_head_og_url', $permalink, $this->post->ID )
+		);
+		$this->add_meta(
+			'og:type',
+			apply_filters( 'wp_components_head_og_type', 'article', $this->post->ID )
+		);
+		$this->add_meta(
+			'og:title',
+			apply_filters( 'wp_components_head_og_title', $title, $this->post->ID )
+		);
+		$this->add_meta(
+			'og:description',
+			apply_filters( 'wp_components_head_og_description', $description, $this->post->ID )
+		);
+		$this->add_meta(
+			'og:site_name',
+			apply_filters( 'wp_components_head_og_site_name', get_bloginfo( 'name' ), $this->post->ID )
+		);
 
 		// Images.
 		if ( ! empty( $image_source ) ) {
 			$image_url = $image_source[0];
-			$this->add_meta( 'og:image', $image_source[0] );
-			$this->add_meta( 'og:width', $image_source[1] );
-			$this->add_meta( 'og:height', $image_source[2] );
+			$this->add_meta(
+				'og:image',
+				apply_filters( 'wp_components_head_og_image', $image_source[0], $this->post->ID )
+			);
+			$this->add_meta(
+				'og:width',
+				apply_filters( 'wp_components_head_og_image_width', $image_source[1], $this->post->ID )
+			);
+			$this->add_meta(
+				'og:height',
+				apply_filters( 'wp_components_head_og_image_height', $image_source[2], $this->post->ID )
+			);
 		}
 
 		// Property specific meta.
 		$twitter_meta = [
-			'twitter:card'          => 'summary_large_image',
-			'twitter:title'         => $title,
-			'twitter:description'   => $description,
-			'twitter:image'         => $image_url,
-			'twitter:url'           => $permalink,
+			'twitter:card'        => 'summary_large_image',
+			'twitter:title'       => apply_filters( 'wp_components_head_twitter_title', $title, $this->post->ID ),
+			'twitter:description' => apply_filters( 'wp_components_head_twitter_description', $description, $this->post->ID ),
+			'twitter:image'       => apply_filters( 'wp_components_head_twitter_image_url', $image_url, $this->post->ID ),
+			'twitter:url'         => apply_filters( 'wp_components_head_twitter_url', $permalink, $this->post->ID ),
 		];
 
 		// Twitter account.
