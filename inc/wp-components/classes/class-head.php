@@ -145,7 +145,7 @@ class Head extends Component {
 	 */
 	public function query_has_set() : self {
 		$this->set_title( $this->get_the_head_title() . $this->get_trailing_title() );
-		$this->set_wordpress_seo_meta();
+		$this->set_additional_meta_tags();
 		return $this;
 	}
 
@@ -157,7 +157,7 @@ class Head extends Component {
 	public function post_has_set() : self {
 
 		$this->set_title( $this->get_meta_title() . $this->get_trailing_title() );
-		$this->set_wordpress_seo_meta();
+		$this->set_additional_meta_tags();
 		$this->set_standard_meta();
 		$this->set_open_graph_meta();
 
@@ -219,25 +219,25 @@ class Head extends Component {
 	}
 
 	/**
-	 * WordPress SEO Integration.
+	 * Apply default, additional, meta tags.
 	 */
-	public function set_wordpress_seo_meta() {
+	public function set_additional_meta_tags() {
 
 		/**
-		 * Use this filter to add webmaster tools codes.
+		 * Use this filter to add additional meta tags.
 		 *
 		 * @param array $codes Array of name and content codes.
 		 */
-		$codes = apply_filters( 'wp_components_head_meta_webmaster_tools_codes', [] );
+		$tags = apply_filters( 'wp_components_head_additional_meta_tags', [] );
 
-		if ( ! empty( $codes ) && is_array( $codes ) ) {
-			foreach ( $codes as $key => $code ) {
-				if ( ! empty( $code ) ) {
+		if ( ! empty( $tags ) && is_array( $tags ) ) {
+			foreach ( $tags as $name => $content ) {
+				if ( ! empty( $content ) ) {
 					$this->add_tag(
 						'meta',
 						[
-							'name'    => $key,
-							'content' => $code,
+							'name'    => $name,
+							'content' => $content,
 						]
 					);
 				}
