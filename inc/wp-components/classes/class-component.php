@@ -73,7 +73,12 @@ class Component implements \JsonSerializable {
 	 * Component constructor.
 	 */
 	public function __construct() {
-		$this->config   = $this->default_config();
+
+		// Set default configs using set_config to ensure callbacks fire.
+		foreach ( $this->default_config() as $key => $value ) {
+			$this->set_config( $key, $value );
+		}
+
 		$this->children = $this->default_children();
 	}
 
@@ -118,6 +123,7 @@ class Component implements \JsonSerializable {
 		if ( method_exists( $this, $callback_method ) && $do_callback ) {
 			$this->$callback_method();
 		}
+
 		return $this;
 	}
 
