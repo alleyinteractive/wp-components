@@ -284,6 +284,10 @@ class Head extends Component {
 		$meta_key = apply_filters( 'wp_components_head_canonical_url_key', '_canonical_url' );
 
 		$canonical_url = (string) get_post_meta( $this->post->ID, $meta_key, true );
+		if ( empty( $canonical_url ) ) {
+			$canonical_url = wp_get_canonical_url( $this->post->ID );
+		}
+
 		if ( ! empty( $canonical_url ) ) {
 			$this->set_canonical_url( $canonical_url );
 		}
