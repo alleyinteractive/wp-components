@@ -101,7 +101,7 @@ class Google_Tag_Manager extends \WP_Components\Component {
 	public function get_tags() : array {
 		// Single article.
 		if ( $this->query->is_single() ) {
-			$tags = wp_get_post_tags( $this->query->queried_object->ID ?? 0 );
+			$tags = wp_get_post_tags( $this->query->post->ID ?? 0 );
 
 			return array_map(
 				function( $tag ) {
