@@ -72,12 +72,12 @@ class Google_Tag_Manager extends \WP_Components\Component {
 	 *
 	 * @return string
 	 */
-	public function get_post_type() : ?string {
+	public function get_post_type() : string {
 		if ( $this->query->is_single() ) {
 			return $this->query->post->post_type;
 		}
 
-		return null;
+		return '';
 	}
 
 	/**
@@ -85,12 +85,12 @@ class Google_Tag_Manager extends \WP_Components\Component {
 	 *
 	 * @return string
 	 */
-	public function get_post_id() : ?string {
+	public function get_post_id() : string {
 		if ( $this->query->is_single() ) {
 			return $this->query->post->ID;
 		}
 
-		return null;
+		return '';
 	}
 
 	/**
@@ -124,11 +124,11 @@ class Google_Tag_Manager extends \WP_Components\Component {
 	 *
 	 * @return string
 	 */
-	public function get_title() : ?string {
+	public function get_title() : string {
 		if ( $this->query->is_single() ) {
 			return $this->query->post->post_title ?? '';
 		}
 
-		return null;
+		return '';
 	}
 }
