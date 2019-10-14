@@ -51,9 +51,9 @@ class Google_Tag_Manager extends \WP_Components\Component {
 	 *
 	 * @return string
 	 */
-	public function get_authors() : ?array {
+	public function get_authors() : array {
 		if ( $this->query->is_single() ) {
-			$bylines = ( new \WP_Components\Byline_Wrapper )->set_post( $this->query->ID );
+			$bylines = ( new \WP_Components\Byline_Wrapper() )->set_post( $this->query->ID );
 
 			// Return array of author names.
 			return array_map(
@@ -64,7 +64,7 @@ class Google_Tag_Manager extends \WP_Components\Component {
 			);
 		}
 
-		return null;
+		return [];
 	}
 
 	/**
