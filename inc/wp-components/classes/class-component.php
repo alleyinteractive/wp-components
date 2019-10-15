@@ -116,12 +116,12 @@ class Component implements \JsonSerializable {
 			$this->config = $key;
 		} else {
 			$this->config[ $key ] = $value;
-		}
 
-		// Allow hooking into a config being set.
-		$callback_method = "{$key}_config_has_set";
-		if ( method_exists( $this, $callback_method ) && $do_callback ) {
-			$this->$callback_method();
+			// Allow hooking into a config being set.
+			$callback_method = "{$key}_config_has_set";
+			if ( method_exists( $this, $callback_method ) && $do_callback ) {
+				$this->$callback_method();
+			}
 		}
 
 		return $this;
