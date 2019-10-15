@@ -61,8 +61,7 @@ trait WP_Post {
 		}
 
 		// Something else went wrong.
-		// @todo determine how to handle error messages.
-		return $this;
+		return $this->set_invalid();
 	}
 
 	/**
