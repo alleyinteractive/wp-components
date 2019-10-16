@@ -11,6 +11,9 @@ namespace WP_Components;
  * Image
  */
 class Image extends Component {
+
+	use Attachment;
+
 	/**
 	 * Unique component slug.
 	 *
@@ -54,7 +57,7 @@ class Image extends Component {
 	public function default_config() : array {
 		return [
 			'aspect_ratio'        => 9 / 16,
-			'attachment_id'       => 0,
+			'id'                  => 0,
 			'alt'                 => '',
 			'caption'             => '',
 			'crops'               => '',
@@ -95,7 +98,7 @@ class Image extends Component {
 	}
 
 	/**
-	 * Register fallback image URL.
+	 * Register global fallback image URL.
 	 *
 	 * @param string|number $fallback_image Array of breakpoints.
 	 */
@@ -158,38 +161,19 @@ class Image extends Component {
 		);
 	}
 
-	/**
-	 * Setup this component using a post.
-	 *
-	 * @param int $post_id Post ID.
-	 * @return Component Current instance of this class.
-	 */
-	public function set_post_id( $post_id ) {
-		// Get the URL.
-		$attachment_id = get_post_thumbnail_id( $post_id );
-		$this->set_config( 'post_id', $post_id );
-
-		return $this->set_attachment_id( $attachment_id );
-	}
-
-	/**
-	 * Setup this component using an attachment.
-	 *
-	 * @param int $attachment_id Attachemnt ID.
-	 * @return Component Current instance of this class.
-	 */
-	public function set_attachment_id( $attachment_id ) {
-		$this->set_config( 'attachment_id', absint( $attachment_id ) );
-
+	public function attachment_has_set() {
 		// Get crops from post meta.
 		$crops = (array) get_post_meta( $attachment_id, 'wpcom_thumbnail_edit', true );
-		$this->set_config( 'crops', array_filter( $crops ) );
-
-		return $this;
+		$this->merge_config(
+			[
+				'crops' => array_filter( $crops ),
+				'id'    => $this->get_attachment_id(),
+			]
+		);
 	}
 
 	/**
-	 * Set the URL.
+	 * Set the URL to the original image.
 	 *
 	 * @param string $url Image URL.
 	 * @return Component Current instance of this class.
@@ -220,7 +204,7 @@ class Image extends Component {
 	public function set_config_for_size( string $image_size, $picture = false ) {
 		$sizes       = self::$sizes;
 		$size_config = [];
-		$crops       = $this->config['crops'];
+		$crops       = $this->get_config( 'crops' );
 
 		if ( empty( $sizes[ $image_size ] ) ) {
 			// Return empty component if missing image size or URL.
@@ -279,8 +263,6 @@ class Image extends Component {
 	 * @return Component Current instance of this class.
 	 */
 	public function configure( $picture ) {
-		$image_meta = wp_get_attachment_metadata( $this->config['attachment_id'] );
-
 		// Set flags for using a basic <img> tag or using the fallback URL.
 		$this->merge_config(
 			[
@@ -289,12 +271,16 @@ class Image extends Component {
 			]
 		);
 
+		// Set image alt text.
+		$this->set_alt_text();
+
+		// Set image dimensions.
+		$this->set_attachment_dimensions();
+
 		// Set image config.
 		$this->merge_config(
 			[
-				'alt'         => $this->get_alt_text(),
-				'caption'     => ! empty( $this->config['attachment_id'] ) ? wp_get_attachment_caption( $this->config['attachment_id'] ) : '',
-				'height'      => $image_meta['height'] ?? 0,
+				'caption'     => $this->get_attachment_caption(),
 				'lqip_src'    => $this->get_lqip_src(),
 				'url'         => $this->get_config( 'url' ),
 				'picture'     => $picture,
@@ -302,7 +288,6 @@ class Image extends Component {
 				'source_tags' => $picture ? $this->get_source_tags() : [],
 				'src'         => $this->get_src(),
 				'srcset'      => $this->get_srcset(),
-				'width'       => $image_meta['width'] ?? 0,
 			]
 		);
 
@@ -336,35 +321,8 @@ class Image extends Component {
 	 *
 	 * @return string
 	 */
-	public function get_alt_text() {
-		if ( ! empty( $this->config['alt'] ) ) {
-			return esc_attr( $this->config['alt'] );
-		}
-
-		$attachment_id = $this->config['attachment_id'];
-
-		if ( ! empty( $attachment_id ) ) {
-			// First check attachment alt text field.
-			$image_alt = get_post_meta( $attachment_id, '_wp_attachment_image_alt', true );
-			if ( ! empty( $image_alt ) ) {
-				return esc_attr( $image_alt );
-			}
-
-			// Use image caption as a fallback.
-			if ( ! empty( $this->config['caption'] ) ) {
-				return esc_attr( $this->config['caption'] );
-			}
-
-			// Use image description as final fallback.
-			$post = get_post( $attachment_id );
-			if ( $post ) {
-				// We can't rely on get_the_excerpt(), because it relies on The Loop
-				// global variables that are not correctly set within the Irving context.
-				return esc_attr( $post->post_excerpt );
-			}
-		}
-
-		return '';
+	public function set_alt_text() {
+		return $this->set_config( 'alt', $this->get_attachment_alt() );
 	}
 
 	/**
@@ -554,10 +512,10 @@ class Image extends Component {
 	}
 
 	/**
-	 * Disable lazyloading for this instance.
+	 * Shortcut for setting 'lazyload' config value.
 	 */
-	public function disable_lazyload() {
-		$this->set_config( 'lazyload', false );
+	public function lazyload( $value = true ) {
+		$this->set_config( 'lazyload', $value );
 		return $this;
 	}
 
