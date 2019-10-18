@@ -71,8 +71,7 @@ trait WP_Query {
 		}
 
 		// Something else went wrong.
-		// @todo determine how to handle error messages.
-		return $this;
+		return $this->has_error( __( 'Query was not an instance of \WP_Query', 'wp-components' ) );
 	}
 
 	/**
