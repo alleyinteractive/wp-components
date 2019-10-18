@@ -168,6 +168,7 @@ class Image extends Component {
 			[
 				'crops' => array_filter( $crops ),
 				'id'    => $this->get_attachment_id(),
+				'url'   => $this->get_attachment_ur( 'full' ),
 			]
 		);
 	}
@@ -199,9 +200,9 @@ class Image extends Component {
 	 *
 	 * @param string $image_size Key of the size.
 	 * @param bool   $picture Whether or not to use a <picture> element.
-	 * @return Component Current instance of this class.
+	 * @return \Wp_Components\Image Current instance of this class.
 	 */
-	public function set_config_for_size( string $image_size, $picture = false ) {
+	public function set_config_for_size( string $image_size, $picture = false ): self {
 		$sizes       = self::$sizes;
 		$size_config = [];
 		$crops       = $this->get_config( 'crops' );
@@ -213,8 +214,7 @@ class Image extends Component {
 		} else {
 			$size_config        = $sizes[ $image_size ];
 			$fallback_image_url = $size_config['fallback_image_url'] ?? self::$fallback_image_url;
-			$attachment_url     = strtok( wp_get_attachment_image_url( $this->get_config( 'attachment_id' ), 'full' ), '?' );
-			$url                = ! empty( $attachment_url ) ? $attachment_url : $fallback_image_url;
+			$url                = $this->get_config( 'url' ) ?? $fallback_image_url;
 
 			$this->merge_config(
 				[
@@ -223,7 +223,6 @@ class Image extends Component {
 					'retina'             => $size_config['retina'] ?? $this->config['retina'],
 					'lazyload'           => $size_config['lazyload'] ?? $this->config['lazyload'],
 					'fallback_image_url' => $fallback_image_url,
-					'url'                => $url,
 				]
 			);
 		}
