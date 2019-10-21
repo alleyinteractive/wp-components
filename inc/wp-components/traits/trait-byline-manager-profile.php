@@ -15,7 +15,7 @@ trait Byline_Manager_Profile {
 	/**
 	 * Byline Manager profile.
 	 *
-	 * @var null|\WP_Post
+	 * @var null|\Byline_Manager\Models\Profile
 	 */
 	public $byline_manager_profile = null;
 
