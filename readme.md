@@ -29,7 +29,7 @@ developing with components you'll cut time from your development cycle.
     * Google Analytics - Integrate with GA.
     * Google Tag Manager - Basic integration with GTM.
     * Parse.ly - Basic integration with Parse.ly.
-* Heleprs
+* Helpers
     * Button - Helper representing a reusable button component.
 * Blocks
     * Core OEmbed - Component for integrating with WordPress Core OEmbed functionality.

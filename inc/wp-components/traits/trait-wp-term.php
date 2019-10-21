@@ -59,8 +59,7 @@ trait WP_Term {
 		}
 
 		// Something else went wrong.
-		// @todo determine how to handle error messages.
-		return $this;
+		return $this->has_error( __( 'Term was not an instance of \WP_Term or valid term ID.', 'wp-components' ) );
 	}
 
 	/**

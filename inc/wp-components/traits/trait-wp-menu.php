@@ -127,8 +127,8 @@ trait WP_Menu {
 					$clean_menu_item->children[] = $this->build_menu(
 						( new $menu_class() )->merge_config(
 							[
-								'type'     => 'submenu',
-								'title'    => $menu_item->title,
+								'type'  => 'submenu',
+								'title' => $menu_item->title,
 							]
 						),
 						$menu_items,

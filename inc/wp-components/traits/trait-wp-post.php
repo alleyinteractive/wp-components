@@ -61,8 +61,7 @@ trait WP_Post {
 		}
 
 		// Something else went wrong.
-		// @todo determine how to handle error messages.
-		return $this;
+		return $this->has_error( __( 'Post was not an instance of \WP_Post or valid post ID.', 'wp-components' ) );
 	}
 
 	/**
@@ -198,13 +197,39 @@ trait WP_Post {
 	 * @return object Instance of the class this trait is implemented on.
 	 */
 	public function wp_post_set_featured_image( $size = 'full', $config = [] ) : self {
-		return $this->append_children(
-			[
-				( new \WP_Components\Image() )
-					->set_post_id( $this->get_post_id() )
-					->set_config_for_size( $size )
-					->merge_config( $config ),
-			]
-		);
+		if ( has_post_thumbnail( $this->get_post_id() ) ) {
+			return $this->append_children(
+				[
+					( new \WP_Components\Image() )
+						->set_post_id( $this->get_post_id() )
+						->set_config_for_size( $size )
+						->merge_config( $config ),
+				]
+			);
+		}
+
+		return $this;
+	}
+
+	/**
+	 * Get the published date.
+	 *
+	 * @param string $date_format PHP date format. Defaults to the date_format
+	 *                            option if not specified.
+	 * @return string
+	 */
+	public function wp_post_get_published_timestamp( string $date_format = 'F j, Y' ) : string {
+		return get_the_date( 'F j, Y', $this->get_post_id() );
+	}
+
+	/**
+	 * Set the `published_timestamp` config to the post title.
+	 *
+	 * @param string $date_format PHP date format. Defaults to the date_format
+	 *                            option if not specified.
+	 * @return object Instance of the class this trait is implemented on.
+	 */
+	public function wp_post_set_published_timestamp( string $date_format = 'F j, Y' ) : self {
+		return $this->set_config( 'published_timestamp', $this->wp_post_get_published_timestamp( $date_format ) );
 	}
 }

@@ -58,41 +58,68 @@ spl_autoload_register(
 spl_autoload_register(
 	function( $class ) {
 
-		// Filter to define the namespace.
-		$theme_component_namespace = apply_filters( 'wp_components_theme_components_namespace', '' );
-		if ( empty( $theme_component_namespace ) ) {
+		/**
+		 * Filter to define the namespace(s).
+		 *
+		 * @param string|array $namespaces The theme namespace(s) to use for autoloading components.
+		 */
+		$theme_component_namespaces = apply_filters( 'wp_components_theme_components_namespace', '' );
+
+		if ( empty( $theme_component_namespaces ) ) {
 			return;
+		}
+
+		// Convert to an array if needed.
+		if ( is_string( $theme_component_namespaces ) ) {
+			$theme_component_namespaces = [ $theme_component_namespaces ];
 		}
 
 		// Trim leading dashes.
 		$class = ltrim( $class, '\\' );
 
-		// Is this under the WP_Components namespace?
-		if ( false !== strpos( $class, $theme_component_namespace ) ) {
-			/**
-			 * Strip the namespace, replace underscores with dashes, and lowercase.
-			 *
-			 * `\WP_Components\Body`
-			 * becomes
-			 * `body`
-			 */
-			$class = strtolower(
-				str_replace(
-					[ $theme_component_namespace, '_' ],
-					[ '', '-' ],
-					$class
-				)
-			);
+		foreach ( $theme_component_namespaces as $theme_component_namespace ) {
+			// Is this under the WP_Components namespace?
+			if ( false !== strpos( $class, $theme_component_namespace ) ) {
+				/**
+				 * Strip the namespace, replace underscores with dashes, and lowercase.
+				 *
+				 * `\WP_Components\Body`
+				 * becomes
+				 * `body`
+				 */
+				$class = strtolower(
+					str_replace(
+						[ $theme_component_namespace, '_' ],
+						[ '', '-' ],
+						$class
+					)
+				);
 
-			// Attempt to guess the path.
-			$dirs     = explode( '\\', ltrim( $class, '\\' ) );
-			$filename = end( $dirs );
-			$path     = get_template_directory() . '/components/' . implode( '/', $dirs ) . "/class-{$filename}.php";
+				// Attempt to guess the path.
+				$dirs     = explode( '\\', ltrim( $class, '\\' ) );
+				$filename = end( $dirs );
+				$path     = get_stylesheet_directory() . '/components/' . implode( '/', $dirs ) . "/class-{$filename}.php";
 
-			// Filter if needed.
-			$path = apply_filters( 'wp_components_theme_components_path', $path, $class, $dirs, $filename );
-			if ( file_exists( $path ) ) {
-				require_once $path;
+				/**
+				 * Filter the path(s) in which to look for components.
+				 *
+				 * @param string|array $path   Path, or array of paths, where theme components are located.
+				 * @param string       $class  The class.
+				 * @param array        $dirs   Array of directories derived from the class.
+				 * @param $filename    $string The expected filename.
+				 */
+				$paths = apply_filters( 'wp_components_theme_components_path', $path, $class, $dirs, $filename );
+
+				// Convert to an array if needed.
+				if ( is_string( $paths ) ) {
+					$paths = [ $paths ];
+				}
+
+				foreach ( $paths as $path ) {
+					if ( file_exists( $path ) ) {
+						require_once $path;
+					}
+				}
 			}
 		}
 	}
