@@ -49,7 +49,6 @@ class Pagination extends Component {
 		if ( ! empty( $pagination_links ) ) {
 			foreach ( $pagination_links as $link_html ) {
 				$this->append_child(
-
 					// Create a new pagination item using anchor HTML, and remove// various url params.
 					( new Pagination_Item() )
 						->set_from_html( $link_html )
