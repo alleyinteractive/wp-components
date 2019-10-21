@@ -145,6 +145,7 @@ class Head extends Component {
 	 */
 	public function query_has_set() : self {
 		$this->set_title( $this->get_the_head_title() . $this->get_trailing_title() );
+		$this->set_additional_meta_tags();
 		return $this;
 	}
 
@@ -154,8 +155,8 @@ class Head extends Component {
 	 * @return self
 	 */
 	public function post_has_set() : self {
-
 		$this->set_title( $this->get_meta_title() . $this->get_trailing_title() );
+		$this->set_additional_meta_tags();
 		$this->set_standard_meta();
 		$this->set_open_graph_meta();
 
@@ -217,6 +218,33 @@ class Head extends Component {
 	}
 
 	/**
+	 * Apply default, additional, meta tags.
+	 */
+	public function set_additional_meta_tags() {
+
+		/**
+		 * Use this filter to add additional meta tags.
+		 *
+		 * @param array $tags Array of name and content tags.
+		 */
+		$tags = apply_filters( 'wp_components_head_additional_meta_tags', [] );
+
+		if ( ! empty( $tags ) && is_array( $tags ) ) {
+			foreach ( $tags as $name => $content ) {
+				if ( ! empty( $content ) ) {
+					$this->add_tag(
+						'meta',
+						[
+							'name'    => $name,
+							'content' => $content,
+						]
+					);
+				}
+			}
+		}
+	}
+
+	/**
 	 * Apply basic meta tags.
 	 */
 	public function set_standard_meta() {
@@ -234,7 +262,7 @@ class Head extends Component {
 		}
 
 		// Filter the meta key where this is stored.
-		$meta_key = apply_filters( 'wp_components_head_meta_keywords_key', '_meta_keywords' );
+		$meta_key      = apply_filters( 'wp_components_head_meta_keywords_key', '_meta_keywords' );
 		$meta_keywords = apply_filters(
 			'wp_components_head_meta_keywords',
 			explode( ',', get_post_meta( $this->post->ID, $meta_key, true ) ),
@@ -255,6 +283,10 @@ class Head extends Component {
 		$meta_key = apply_filters( 'wp_components_head_canonical_url_key', '_canonical_url' );
 
 		$canonical_url = (string) get_post_meta( $this->post->ID, $meta_key, true );
+		if ( empty( $canonical_url ) ) {
+			$canonical_url = wp_get_canonical_url( $this->post->ID );
+		}
+
 		if ( ! empty( $canonical_url ) ) {
 			$this->set_canonical_url( $canonical_url );
 		}
@@ -262,7 +294,12 @@ class Head extends Component {
 		// Deindex URL.
 		$meta_key = apply_filters( 'wp_components_head_deindex_url_key', '_deindex_google' );
 
-		if ( absint( get_post_meta( $this->post->ID, $meta_key, true ) ) ) {
+		$deindex_url = apply_filters(
+			'wp_components_head_deindex_url',
+			get_post_meta( $this->post->ID, $meta_key, true )
+		);
+
+		if ( absint( $deindex_url ) ) {
 			$this->add_tag(
 				'meta',
 				[
@@ -286,27 +323,51 @@ class Head extends Component {
 		$title        = $this->get_social_title();
 
 		// Open graph meta.
-		$this->add_meta( 'og:url', $permalink );
-		$this->add_meta( 'og:type', 'article' );
-		$this->add_meta( 'og:title', $title );
-		$this->add_meta( 'og:description', $description );
-		$this->add_meta( 'og:site_name', get_bloginfo( 'name' ) );
+		$this->add_meta(
+			'og:url',
+			apply_filters( 'wp_components_head_og_url', $permalink, $this->post->ID )
+		);
+		$this->add_meta(
+			'og:type',
+			apply_filters( 'wp_components_head_og_type', 'article', $this->post->ID )
+		);
+		$this->add_meta(
+			'og:title',
+			apply_filters( 'wp_components_head_og_title', $title, $this->post->ID )
+		);
+		$this->add_meta(
+			'og:description',
+			apply_filters( 'wp_components_head_og_description', $description, $this->post->ID )
+		);
+		$this->add_meta(
+			'og:site_name',
+			apply_filters( 'wp_components_head_og_site_name', get_bloginfo( 'name' ), $this->post->ID )
+		);
 
 		// Images.
 		if ( ! empty( $image_source ) ) {
 			$image_url = $image_source[0];
-			$this->add_meta( 'og:image', $image_source[0] );
-			$this->add_meta( 'og:width', $image_source[1] );
-			$this->add_meta( 'og:height', $image_source[2] );
+			$this->add_meta(
+				'og:image',
+				apply_filters( 'wp_components_head_og_image', $image_source[0], $this->post->ID )
+			);
+			$this->add_meta(
+				'og:width',
+				apply_filters( 'wp_components_head_og_image_width', $image_source[1], $this->post->ID )
+			);
+			$this->add_meta(
+				'og:height',
+				apply_filters( 'wp_components_head_og_image_height', $image_source[2], $this->post->ID )
+			);
 		}
 
 		// Property specific meta.
 		$twitter_meta = [
-			'twitter:card'          => 'summary_large_image',
-			'twitter:title'         => $title,
-			'twitter:description'   => $description,
-			'twitter:image'         => $image_url,
-			'twitter:url'           => $permalink,
+			'twitter:card'        => 'summary_large_image',
+			'twitter:title'       => apply_filters( 'wp_components_head_twitter_title', $title, $this->post->ID ),
+			'twitter:description' => apply_filters( 'wp_components_head_twitter_description', $description, $this->post->ID ),
+			'twitter:image'       => apply_filters( 'wp_components_head_twitter_image_url', $image_url, $this->post->ID ),
+			'twitter:url'         => apply_filters( 'wp_components_head_twitter_url', $permalink, $this->post->ID ),
 		];
 
 		// Twitter account.
@@ -346,11 +407,15 @@ class Head extends Component {
 		$meta_key = apply_filters( 'wp_components_head_meta_title_key', '_meta_title' );
 
 		$meta_title = (string) get_post_meta( $this->post->ID, $meta_key, true );
-		if ( ! empty( $meta_title ) ) {
-			return $meta_title;
+
+		if ( empty( $meta_title ) ) {
+			$meta_title = $this->wp_post_get_title();
 		}
 
-		return $this->wp_post_get_title();
+		// Allow the title to be filtered.
+		$meta_title = apply_filters( 'wp_components_head_meta_title', $meta_title );
+
+		return $meta_title;
 	}
 
 	/**
@@ -369,11 +434,15 @@ class Head extends Component {
 		$meta_key = apply_filters( 'wp_components_head_social_title_key', '_social_title' );
 
 		$social_title = get_post_meta( $this->post->ID, $meta_key, true );
-		if ( ! empty( $social_title ) ) {
-			return $social_title;
+
+		if ( empty( $social_title ) ) {
+			$social_title = $this->get_meta_title();
 		}
 
-		return $this->get_meta_title();
+		// Allow the social title to be filtered.
+		$social_title = apply_filters( 'wp_components_head_social_title', $social_title );
+
+		return $social_title;
 	}
 
 
@@ -392,11 +461,15 @@ class Head extends Component {
 		$meta_key = apply_filters( 'wp_components_head_meta_description_key', '_meta_description' );
 
 		$meta_description = (string) get_post_meta( $this->post->ID, $meta_key, true );
-		if ( ! empty( $meta_description ) ) {
-			return $meta_description;
+
+		if ( empty( $meta_description ) ) {
+			$meta_description = $this->wp_post_get_excerpt();
 		}
 
-		return $this->wp_post_get_excerpt();
+		// Allow the meta description to be filtered.
+		$meta_description = apply_filters( 'wp_components_head_meta_description', $meta_description );
+
+		return $meta_description;
 	}
 
 	/**
@@ -415,11 +488,15 @@ class Head extends Component {
 		$meta_key = apply_filters( 'wp_components_head_social_description_key', '_social_description' );
 
 		$social_description = (string) get_post_meta( $this->post->ID, $meta_key, true );
-		if ( ! empty( $social_description ) ) {
-			return $social_description;
+
+		if ( empty( $social_description ) ) {
+			$social_description = $this->get_meta_description();
 		}
 
-		return $this->get_meta_description();
+		// Allow the meta description to be filtered.
+		$social_description = apply_filters( 'wp_components_head_social_description', $social_description );
+
+		return $social_description;
 	}
 
 	/**
@@ -430,11 +507,18 @@ class Head extends Component {
 	protected function get_image_source() : array {
 
 		// Get image url.
-		$image_id = absint( get_post_meta( $this->post->ID, '_social_image_id', true ) );
-		$image_source    = wp_get_attachment_image_src( $image_id, 'full' );
+		$image_id = apply_filters(
+			'wp_components_head_image_id',
+			absint( get_post_meta( $this->post->ID, '_social_image_id', true ) )
+		);
+
+		$image_source = apply_filters(
+			'wp_components_head_image_source',
+			wp_get_attachment_image_src( $image_id, 'full' )
+		);
 
 		// Fallback to featured image.
-		if ( empty( $image ) ) {
+		if ( empty( $image_source ) ) {
 			$image_source = wp_get_attachment_image_src( get_post_thumbnail_id( $this->post->ID ), 'full' );
 		}
 

@@ -87,7 +87,7 @@ class Gutenberg_Content extends Component {
 	 * @return object Component instance
 	 */
 	private function convert_block_to_component( $blocks, $current_block ) : array {
-		$block      = (array) $current_block;
+		$block = (array) $current_block;
 
 		/**
 		 * Filters array of non-dynamic blocks for which you'd like to bypass
@@ -109,6 +109,7 @@ class Gutenberg_Content extends Component {
 			empty( $block['blockName'] )
 			&& ! empty( $block['innerHTML'] )
 		) {
+			// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
 			return $this->merge_or_create_html_block( $blocks, apply_filters( 'the_content', $block['innerHTML'] ) );
 		}
 
@@ -129,7 +130,7 @@ class Gutenberg_Content extends Component {
 			// Render block and clean up extraneous whitespace characters.
 			$content = render_block( $block );
 			$content = do_shortcode( $content );
-			$content = preg_replace( '/[\r\n\t\f\v]/', '', $content );
+			$content = preg_replace( '/[\n\r\t]/', ' ', $content );
 
 			return $this->merge_or_create_html_block( $blocks, $content );
 		}
@@ -155,11 +156,33 @@ class Gutenberg_Content extends Component {
 			[]
 		);
 
-		// A dynamic block. All attributes will be available.
-		$component = ( new Component() )
-			->set_name( $block['blockName'] ?? '' )
-			->merge_config( $block['attrs'] ?? [] )
-			->append_children( $children_blocks_as_components );
+		// Any custom blocks mapped to components.
+		/**
+		 * Map of Gutenberg block names to PHP class names of Irving components.
+		 *
+		 * Keys are the Gutenberg block names.
+		 *
+		 * @param array[string]string PHP class names.
+		 */
+		$blocks_to_components = apply_filters(
+			'wp_components_block_components',
+			[]
+		);
+
+		if (
+			isset( $block['blockName'] ) &&
+			! empty( $blocks_to_components[ $block['blockName'] ] )
+		) {
+			$component = ( new $blocks_to_components[ $block['blockName'] ]() )
+				->merge_config( $block['attrs'] ?? [] )
+				->append_children( $children_blocks_as_components );
+		} else {
+			// A dynamic block. All attributes will be available.
+			$component = ( new Component() )
+				->set_name( $block['blockName'] ?? '' )
+				->merge_config( $block['attrs'] ?? [] )
+				->append_children( $children_blocks_as_components );
+		}
 
 		$blocks[] = apply_filters( 'wp_components_dynamic_block', $component, $block, $blocks, $this );
 
