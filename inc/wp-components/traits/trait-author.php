@@ -3,8 +3,8 @@
  * Trait that handles logic handling between WP_User objects and guest author
  * objects.
  *
- * Use this when you're not sure if the object will be a User or a CAP Guest
- * Author.
+ * Use this when you're not sure if the object will be a User, CAP Guest
+ * Author, or Byline Manager profile.
  *
  * @package WP_Components
  */
@@ -17,7 +17,8 @@ namespace WP_Components;
 trait Author {
 
 	/**
-	 * Return 'wp_user' or 'guest_author' based on the objects set.
+	 * Return 'wp_user', 'guest_author', or 'byline_manager_profile' based on
+	 * the objects set.
 	 *
 	 * @return string
 	 */
@@ -28,6 +29,10 @@ trait Author {
 
 		if ( ! is_null( $this->guest_author ?? null ) ) {
 			return 'guest_author';
+		}
+
+		if ( ! is_null( $this->byline_manager_profile ?? null ) ) {
+			return 'byline_manager_profile';
 		}
 
 		return '';
@@ -48,6 +53,10 @@ trait Author {
 
 			case 'guest_author':
 				$id = $this->guest_author->ID;
+				break;
+
+			case 'byline_manager_profile':
+				$id = $this->byline_manager_profile->ID;
 				break;
 		}
 
@@ -70,6 +79,9 @@ trait Author {
 			case 'guest_author':
 				$display_name = $this->guest_author->display_name;
 				break;
+
+			case 'byline_manager_profile':
+				$display_name = $this->byline_manager_profile->post_title;
 		}
 
 		return $display_name;
@@ -82,11 +94,13 @@ trait Author {
 	 * @return object Instance of the class this trait is implemented on.
 	 */
 	public function set_author( $author = null ) : self {
-
 		global $coauthors_plus;
 
 		// User login.
-		if ( is_string( $author ) ) {
+		if (
+			function_exists( 'get_coauthors' ) &&
+			is_string( $author )
+		) {
 			$coauthor = $coauthors_plus->get_coauthor_by( 'user_login', $author );
 			$this->set_author( $coauthor );
 			return $this;
@@ -95,6 +109,16 @@ trait Author {
 		// Use \WP_User object.
 		if ( $author instanceof \WP_User ) {
 			$this->set_user( $author );
+			$this->author_has_set();
+			return $this;
+		}
+
+		// Byline Manager profile.
+		if (
+			$author instanceof \WP_Post
+			&& 'profile' === ( $author->post_type ?? '' )
+		) {
+			$this->set_byline_manager_profile( $author );
 			$this->author_has_set();
 			return $this;
 		}
