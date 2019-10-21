@@ -48,12 +48,10 @@ class Pagination extends Component {
 
 		// Convert each HTML link to a Pagination_Item.
 		if ( ! empty( $pagination_links ) ) {
-
 			foreach ( $pagination_links as $link_html ) {
+				// Create a new pagination item using anchor HTML, and remove
+				// various url params.
 				$this->append_child(
-
-					// Create a new pagination item using anchor HTML, and remove
-					// various url params.
 					( new Pagination_Item() )
 						->set_from_html( $link_html )
 						->remove_url_params(
@@ -65,7 +63,7 @@ class Pagination extends Component {
 
 		// Figure out the search result meta info.
 		$posts_per_page = absint( $this->query->get( 'posts_per_page' ) );
-		$page = absint( $this->query->get( 'paged' ) );
+		$page           = absint( $this->query->get( 'paged' ) );
 		if ( $page < 1 ) {
 			$page = 1;
 		}
