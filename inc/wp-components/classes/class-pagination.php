@@ -52,6 +52,7 @@ class Pagination extends Component {
 				// Create a new pagination item using anchor HTML, and remove
 				// various url params.
 				$this->append_child(
+					// Create a new pagination item using anchor HTML, and remove various url params.
 					( new Pagination_Item() )
 						->set_from_html( $link_html )
 						->remove_url_params(
