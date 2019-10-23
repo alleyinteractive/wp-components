@@ -44,7 +44,7 @@ class Byline_Wrapper extends Component {
 	public function post_has_set(): self {
 		$byline_components = [];
 
-		// Use guest authors, if Coauthors is enabled, or use
+		// Use guest authors if Coauthors is enabled, or use
 		// Bylines, if Byline Manager is enabled.
 		if ( function_exists( 'get_coauthors' ) ) {
 			$byline_components = $this->get_cap_authors_as_bylines();
