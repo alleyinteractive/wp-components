@@ -42,15 +42,17 @@ class Byline_Wrapper extends Component {
 	 * @return self
 	 */
 	public function post_has_set(): self {
-
 		$byline_components = [];
 
-		// Use guest author.
+		// Use guest authors if Coauthors is enabled, or use
+		// Bylines, if Byline Manager is enabled.
 		if ( function_exists( 'get_coauthors' ) ) {
 			$byline_components = $this->get_cap_authors_as_bylines();
+		} elseif ( class_exists( '\Byline_Manager\Models\Profile' ) ) {
+			$byline_components = $this->get_byline_manager_bylines();
 		}
 
-		// Use post author.
+		// Fall back to post author.
 		if ( empty( $byline_components ) ) {
 			$byline_components = $this->get_post_author_as_byline();
 		}
@@ -64,7 +66,7 @@ class Byline_Wrapper extends Component {
 	/**
 	 * Setup byline using guest authors.
 	 *
-	 * @return arry Byline components.
+	 * @return array Byline components.
 	 */
 	public function get_cap_authors_as_bylines() {
 		return array_map(
@@ -89,6 +91,33 @@ class Byline_Wrapper extends Component {
 					);
 			},
 			get_coauthors( $this->wp_post_get_id() )
+		);
+	}
+
+	/**
+	 * Setup byline using Byline Manager.
+	 *
+	 * @return array Byline components.
+	 */
+	public function get_byline_manager_bylines() {
+		return array_map(
+			function( $byline_entry ) {
+				return $this
+					->get_new_byline_component()
+					->callback(
+						function( $byline ) use ( $byline_entry ) {
+							// Post author byline.
+							if (
+								$byline_entry instanceof \Byline_Manager\Models\Profile
+							) {
+								return $byline->set_byline_manager_profile( $byline_entry->get_post() );
+							}
+
+							return $byline;
+						}
+					);
+			},
+			\Byline_Manager\Utils::get_byline_entries_for_post( $this->wp_post_get_id() )
 		);
 	}
 
