@@ -42,7 +42,6 @@ class Pagination extends Component {
 	 * @return self
 	 */
 	public function query_has_set() : self {
-
 		// Get the pagination links for the query.
 		$pagination_links = $this->get_pagination_links();
 
