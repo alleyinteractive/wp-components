@@ -128,7 +128,7 @@ class Byline_Wrapper extends Component {
 	 */
 	public function get_post_author_as_byline() {
 		return [
-			$this->get_new_byline_component()->set_user( $this->wp_post->post_author ),
+			$this->get_new_byline_component()->set_user( $this->post->post_author ),
 		];
 	}
 
