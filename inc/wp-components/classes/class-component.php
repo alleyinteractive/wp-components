@@ -336,16 +336,13 @@ class Component implements \JsonSerializable {
 	 * @return self
 	 */
 	public function set_theme( $theme_name ) : self {
-
-		// Camel case the theme name, if it isn't already.
-		$theme_name = $this->camel_case_string( $theme_name );
-
 		// Only set theme if it's configured in the themes property OR no other themes are configured (besides `default`), implicitly indicating theme validation should not be used.
 		if (
 			in_array( $theme_name, $this->themes, true )
 			|| ( 1 === count( $this->themes ) && 'default' === $this->themes[0] )
 		) {
-			return $this->set_config( 'theme_name', $theme_name );
+			// Return camel cased theme name, if it isn't camel cased already.
+			return $this->set_config( 'theme_name', $this->camel_case_string( $theme_name ) );
 		}
 
 		// Set theme to 'default' if the theme is not configured.
