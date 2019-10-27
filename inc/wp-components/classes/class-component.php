@@ -34,6 +34,13 @@ class Component implements \JsonSerializable {
 	public $children = [];
 
 	/**
+	 * Component groups.
+	 *
+	 * @var array
+	 */
+	public $component_groups = [];
+
+	/**
 	 * Determine which config keys should be passed into result.
 	 *
 	 * @var array
@@ -242,6 +249,39 @@ class Component implements \JsonSerializable {
 	}
 
 	/**
+	 * Append a component or components to a particular component group.
+	 *
+	 * @param string          $group Group or array of components.
+	 * @param array|Component $children Child component.
+	 * @return self
+	 */
+	public function append_to_group( $group, $children = [] ) : self {
+		if ( in_array( $group, $this->component_groups, true ) ) {
+			$children = ! is_array( $children ) ? [ $children ] : $children;
+			array_push( $this->component_groups[ $group ], $children );
+		}
+
+		return $this;
+	}
+
+	/**
+	 * Prepend a component or components to a particular component group.
+	 *
+	 * @param string          $group Group or array of components.
+	 * @param array|Component $children Child component.
+	 * @return self
+	 */
+	public function prepend_to_group( $group, $children ) : self {
+		// If group exists, add components to it.
+		if ( in_array( $group, $this->component_groups, true ) ) {
+			$children = ! is_array( $children ) ? [ $children ] : $children;
+			array_push( $children, $this->component_groups[ $group ] );
+		}
+
+		return $this;
+	}
+
+	/**
 	 * Render the frontend component.
 	 */
 	public function render() {
@@ -389,9 +429,15 @@ class Component implements \JsonSerializable {
 		}
 
 		return [
-			'name'     => $this->name,
-			'config'   => (object) $this->camel_case_keys( $this->config ),
-			'children' => array_filter( $this->children ),
+			'name'            => $this->name,
+			'config'          => (object) $this->camel_case_keys( $this->config ),
+			'children'        => array_filter( $this->children ),
+			'componentGroups' => array_map(
+				function ( $group ) {
+					return arra_filter( $group );
+				},
+				$this->component_groups
+			),
 		];
 	}
 
