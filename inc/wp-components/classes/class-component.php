@@ -110,6 +110,20 @@ class Component implements \JsonSerializable {
 	}
 
 	/**
+	 * Get a component group or return children.
+	 *
+	 * @param string $group Group to get.
+	 * @return array
+	 */
+	public function maybe_get_component_group( $group = '' ): array {
+		if ( ! empty( $this->component_groups[ $group ] ) ) {
+			return $this->component_groups[ $group ];
+		}
+
+		return $this->children;
+	}
+
+	/**
 	 * Helper to set a top level config value.
 	 *
 	 * @param array|string $key         Config key or entire config array.
@@ -303,10 +317,20 @@ class Component implements \JsonSerializable {
 	 * Execute a function on each child of this component.
 	 *
 	 * @param callable $callback Callback function.
+	 * @param string   $group Component group on which to call the callback.
 	 * @return self
 	 */
-	public function children_callback( $callback ) : self {
-		$this->children = array_map( $callback, $this->children );
+	public function children_callback( $callback, $group = '' ) : self {
+		$children = $this->maybe_get_component_group( $group );
+		$children = array_map( $callback, $children );
+
+		// Reset children post-callback.
+		if ( ! empty( $this->component_groups[ $group ] ) ) {
+			$this->component_groups[ $group ] = $children;
+		} else {
+			$this->children = $children;
+		}
+
 		return $this;
 	}
 
@@ -392,15 +416,16 @@ class Component implements \JsonSerializable {
 	/**
 	 * Helper to recursively set themes on child components.
 	 *
-	 * @param array $theme_mapping Array in which keys are component $name properties and values are the theme to use for that component.
+	 * @param array  $theme_mapping Array in which keys are component $name properties and values are the theme to use for that component.
+	 * @param string $group Group for which to set themes.
 	 * @return self
 	 */
-	public function set_child_themes( $theme_mapping ) : self {
-		$component_names = array_keys( $theme_mapping );
+	public function set_child_themes( $theme_mapping, $group = '' ) : self {
+		$children = $this->maybe_get_component_group( $group );
 
 		// Recursively set themes for children.
-		if ( ! empty( $this->children ) ) {
-			foreach ( $this->children as $child ) {
+		if ( ! empty( $children ) ) {
+			foreach ( $children as $child ) {
 				if ( ! empty( $theme_mapping[ $child->name ] ) ) {
 					$child->set_theme( $theme_mapping[ $child->name ] );
 				}
