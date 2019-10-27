@@ -38,7 +38,10 @@ class Component implements \JsonSerializable {
 	 *
 	 * @var array
 	 */
-	public $component_groups = [];
+	public $component_groups = [
+		// Add default to make sure it's sent over as a JSON object.
+		'default' => [],
+	];
 
 	/**
 	 * Determine which config keys should be passed into result.
@@ -270,9 +273,9 @@ class Component implements \JsonSerializable {
 	 * @return self
 	 */
 	public function append_to_group( $group, $children = [] ) : self {
-		if ( in_array( $group, $this->component_groups, true ) ) {
+		if ( in_array( $group, array_keys( $this->component_groups ), true ) ) {
 			$children = ! is_array( $children ) ? [ $children ] : $children;
-			array_push( $this->component_groups[ $group ], $children );
+			$this->component_groups[ $group ] = array_merge( $this->component_groups[ $group ], $children );
 		}
 
 		return $this;
@@ -289,7 +292,7 @@ class Component implements \JsonSerializable {
 		// If group exists, add components to it.
 		if ( in_array( $group, $this->component_groups, true ) ) {
 			$children = ! is_array( $children ) ? [ $children ] : $children;
-			array_push( $children, $this->component_groups[ $group ] );
+			$this->component_groups[ $group ] = array_merge( $children, $this->component_groups[ $group ] );
 		}
 
 		return $this;
@@ -459,7 +462,7 @@ class Component implements \JsonSerializable {
 			'children'        => array_filter( $this->children ),
 			'componentGroups' => array_map(
 				function ( $group ) {
-					return arra_filter( $group );
+					return array_filter( $group );
 				},
 				$this->component_groups
 			),
