@@ -115,7 +115,7 @@ class Component implements \JsonSerializable {
 	/**
 	 * Check if a provided component group is valid.
 	 *
-	 * @param mixed $group Group to get.
+	 * @param mixed $group Group to check.
 	 * @return bool
 	 */
 	public function is_valid_group( $group ): bool {
