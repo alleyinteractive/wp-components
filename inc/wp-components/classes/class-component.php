@@ -113,17 +113,52 @@ class Component implements \JsonSerializable {
 	}
 
 	/**
-	 * Get a component group or return children.
+	 * Check if a provided component group is valid.
 	 *
-	 * @param string $group Group to get.
-	 * @return array
+	 * @param mixed $group Group to get.
+	 * @return bool
 	 */
-	public function maybe_get_component_group( $group = '' ): array {
-		if ( ! empty( $this->component_groups[ $group ] ) ) {
-			return $this->component_groups[ $group ];
+	public function is_valid_group( $group ): bool {
+		if (
+			! is_array( $group )
+			&& ! $group instanceof Component
+			&& ! is_callable( $group )
+			&& in_array( $group, array_keys( $this->component_groups ), true )
+		) {
+			return true;
 		}
 
-		return $this->children;
+		return false;
+	}
+
+	/**
+	 * Check if a provided value is a component or array of components.
+	 *
+	 * @param mixed $components Components to check.
+	 * @return bool
+	 */
+	public function is_component( $components ): bool {
+		// Is it a component?
+		if ( $components instanceof Component ) {
+			return true;
+		}
+
+		// Is it an array of components?
+		if ( is_array( $components ) ) {
+			return array_reduce(
+				$components,
+				function ( $carry, $component ) {
+					if ( true === $carry && $component instanceof Component ) {
+						return true;
+					} else {
+						return false;
+					}
+				},
+				true
+			);
+		}
+
+		return false;
 	}
 
 	/**
@@ -206,93 +241,80 @@ class Component implements \JsonSerializable {
 	}
 
 	/**
-	 * Append an array of components to the children array.
+	 * Appen an array of components to the children array or component group.
 	 *
-	 * @param array $children Array of components.
+	 * @param string|array $group Group or array of components.
+	 * @param array        $children Child components.
 	 * @return self
 	 */
-	public function append_children( array $children ) : self {
-		if ( ! empty( $children ) ) {
-			$children = array_filter( $children );
-			$this->children = array_merge( $this->children, $children );
-		}
-		return $this;
-	}
-
-	/**
-	 * Prepend an array of components to the children array.
-	 *
-	 * @param array $children Array of components.
-	 * @return self
-	 */
-	public function prepend_children( array $children ) : self {
-		if ( ! empty( $children ) ) {
-			$children = array_filter( $children );
-			$this->children = array_merge( $children, $this->children );
-		}
-		return $this;
-	}
-
-	/**
-	 * Append a component to the children array.
-	 *
-	 * @param Component $child Child component.
-	 * @return self
-	 */
-	public function append_child( $child ) : self {
-		if ( ! empty( $child ) ) {
-			if ( is_array( $child ) ) {
-				$child = $child[0];
-			}
-			array_push( $this->children, $child );
-		}
-		return $this;
-	}
-
-	/**
-	 * Prepend a component to the children array.
-	 *
-	 * @param Component $child Child component.
-	 * @return self
-	 */
-	public function prepend_child( $child ) : self {
-		if ( ! empty( $child ) ) {
-			if ( is_array( $child ) ) {
-				$child = $child[0];
-			}
-			array_unshift( $this->children, $child );
-		}
-		return $this;
-	}
-
-	/**
-	 * Append a component or components to a particular component group.
-	 *
-	 * @param string          $group Group or array of components.
-	 * @param array|Component $children Child component.
-	 * @return self
-	 */
-	public function append_to_group( $group, $children = [] ) : self {
-		if ( in_array( $group, array_keys( $this->component_groups ), true ) ) {
-			$children = ! is_array( $children ) ? [ $children ] : $children;
-			$this->component_groups[ $group ] = array_merge( $this->component_groups[ $group ], $children );
+	public function append_children( $group, array $children = [] ) : self {
+		// Append to group if group is valid, otherwise prepend to children.
+		if ( $this->is_valid_group( $group ) && ! empty( $children ) ) {
+			$this->component_groups[ $group ] = array_merge( $this->component_groups[ $group ], array_filter( $children ) );
+		} elseif ( $this->is_component( $group ) ) {
+			$this->children = array_merge( $this->children, array_filter( $group ) );
 		}
 
 		return $this;
 	}
 
 	/**
-	 * Prepend a component or components to a particular component group.
+	 * Prepend an array of components to the children array or component group.
 	 *
-	 * @param string          $group Group or array of components.
-	 * @param array|Component $children Child component.
+	 * @param string|array $group Group or array of components.
+	 * @param array        $children Child components.
 	 * @return self
 	 */
-	public function prepend_to_group( $group, $children ) : self {
-		// If group exists, add components to it.
-		if ( in_array( $group, $this->component_groups, true ) ) {
-			$children = ! is_array( $children ) ? [ $children ] : $children;
-			$this->component_groups[ $group ] = array_merge( $children, $this->component_groups[ $group ] );
+	public function prepend_children( $group, array $children = [] ) : self {
+		// Prepend to group if group is valid, otherwise prepend to children.
+		if ( $this->is_valid_group( $group ) && ! empty( $children ) ) {
+			$this->component_groups[ $group ] = array_merge( array_filter( $children ), $this->component_groups[ $group ] );
+		} elseif ( $this->is_component( $group ) ) {
+			$this->children = array_merge( array_filter( $group ), $this->children );
+		}
+
+		return $this;
+	}
+
+	/**
+	 * Append a component to the children array or component group.
+	 *
+	 * @param string|Component $group Group or array of components.
+	 * @param bool|Component   $child Child component.
+	 * @return self
+	 */
+	public function append_child( $group, $child = false ) : self {
+		if ( is_array( $child ) ) {
+			$child = $child[0];
+		}
+
+		// Push to group if group is valid, otherwise push to children.
+		if ( $this->is_valid_group( $group ) && ! empty( $child ) ) {
+			array_push( $this->component_groups[ $group ], $child );
+		} elseif ( $this->is_component( $group ) ) {
+			array_push( $this->children, $group );
+		}
+
+		return $this;
+	}
+
+	/**
+	 * Prepend a component to the children array or component group.
+	 *
+	 * @param string|Component $group Group or array of components.
+	 * @param bool|Component   $child Child component.
+	 * @return self
+	 */
+	public function prepend_child( $group, $child = [] ) : self {
+		if ( is_array( $child ) ) {
+			$child = $child[0];
+		}
+
+		// Push to group if group is valid, otherwise push to children.
+		if ( $this->is_valid_group( $group ) && ! empty( $child ) ) {
+			array_unshift( $this->component_groups[ $group ], $child );
+		} elseif ( $this->is_component( $group ) ) {
+			array_unshift( $this->children, $group );
 		}
 
 		return $this;
@@ -319,19 +341,16 @@ class Component implements \JsonSerializable {
 	/**
 	 * Execute a function on each child of this component.
 	 *
-	 * @param callable $callback Callback function.
-	 * @param string   $group Component group on which to call the callback.
+	 * @param string        $group Component group on which to call the callback.
+	 * @param callable|bool $callback Callback function.
 	 * @return self
 	 */
-	public function children_callback( $callback, $group = '' ) : self {
-		$children = $this->maybe_get_component_group( $group );
-		$children = array_map( $callback, $children );
-
-		// Reset children post-callback.
-		if ( ! empty( $this->component_groups[ $group ] ) ) {
-			$this->component_groups[ $group ] = $children;
-		} else {
-			$this->children = $children;
+	public function children_callback( $group, $callback = false ) : self {
+		// If valid group, map over the group, otherwise map over children.
+		if ( $this->is_valid_group( $group ) ) {
+			$this->component_groups[ $group ] = array_map( $callback, $this->component_groups[ $group ] );
+		} elseif ( is_callable( $group ) ) {
+			$this->children = array_map( $group, $this->children );
 		}
 
 		return $this;
@@ -419,22 +438,25 @@ class Component implements \JsonSerializable {
 	/**
 	 * Helper to recursively set themes on child components.
 	 *
-	 * @param array  $theme_mapping Array in which keys are component $name properties and values are the theme to use for that component.
 	 * @param string $group Group for which to set themes.
+	 * @param array  $theme_mapping Array in which keys are component $name properties and values are the theme to use for that component.
 	 * @return self
 	 */
-	public function set_child_themes( $theme_mapping, $group = '' ) : self {
-		$children = $this->maybe_get_component_group( $group );
-
+	public function set_child_themes( $group, $theme_mapping = [] ) : self {
 		// Recursively set themes for children.
-		if ( ! empty( $children ) ) {
-			foreach ( $children as $child ) {
-				if ( ! empty( $theme_mapping[ $child->name ] ) ) {
-					$child->set_theme( $theme_mapping[ $child->name ] );
-				}
+		if ( $this->is_valid_group( $group ) ) {
+			$components = $this->component_groups[ $group ];
+		} else {
+			$components    = $this->children;
+			$theme_mapping = $group;
+		}
 
-				$child->set_child_themes( $theme_mapping );
+		foreach ( $components as $component ) {
+			if ( ! empty( $theme_mapping[ $component->name ] ) ) {
+				$component->set_theme( $theme_mapping[ $component->name ] );
 			}
+
+			$component->set_child_themes( $theme_mapping );
 		}
 
 		return $this;
