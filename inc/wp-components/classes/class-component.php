@@ -148,11 +148,7 @@ class Component implements \JsonSerializable {
 			return array_reduce(
 				$components,
 				function ( $carry, $component ) {
-					if ( true === $carry && $component instanceof Component ) {
-						return true;
-					} else {
-						return false;
-					}
+					return ! $carry ? $carry : $component instanceof Component;
 				},
 				true
 			);
@@ -241,7 +237,7 @@ class Component implements \JsonSerializable {
 	}
 
 	/**
-	 * Appen an array of components to the children array or component group.
+	 * Append an array of components to the children array or component group.
 	 *
 	 * @param string|array $group Group or array of components.
 	 * @param array        $children Child components.
@@ -310,7 +306,7 @@ class Component implements \JsonSerializable {
 			$child = $child[0];
 		}
 
-		// Push to group if group is valid, otherwise push to children.
+		// Unshift to group if group is valid, otherwise unshift to children.
 		if ( $this->is_valid_group( $group ) && ! empty( $child ) ) {
 			array_unshift( $this->component_groups[ $group ], $child );
 		} elseif ( $this->is_component( $group ) ) {
@@ -342,10 +338,10 @@ class Component implements \JsonSerializable {
 	 * Execute a function on each child of this component.
 	 *
 	 * @param string        $group Component group on which to call the callback.
-	 * @param callable|bool $callback Callback function.
+	 * @param callable|null $callback Callback function.
 	 * @return self
 	 */
-	public function children_callback( $group, $callback = false ) : self {
+	public function children_callback( $group, $callback = null ) : self {
 		// If valid group, map over the group, otherwise map over children.
 		if ( $this->is_valid_group( $group ) ) {
 			$this->component_groups[ $group ] = array_map( $callback, $this->component_groups[ $group ] );
