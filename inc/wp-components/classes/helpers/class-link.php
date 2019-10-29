@@ -17,7 +17,7 @@ class Link extends \WP_Components\Component {
 	 *
 	 * @var string
 	 */
-	public $name = 'link';
+	public $name = 'link-to';
 
 	/**
 	 * Define a default config.
@@ -26,7 +26,7 @@ class Link extends \WP_Components\Component {
 	 */
 	public function default_config(): array {
 		return [
-			'blank' => '',
+			'blank' => false,
 			'to'    => '',
 		];
 	}
