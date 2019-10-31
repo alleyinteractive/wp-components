@@ -95,6 +95,7 @@ class Gutenberg_Content extends Component {
 		 * React instead.
 		 *
 		 * @param array $exceptions Array of block render excepctions.
+		 * @param array $block      Current block.
 		 */
 		$block_render_exceptions = apply_filters(
 			'wp_components_block_render_exceptions',
