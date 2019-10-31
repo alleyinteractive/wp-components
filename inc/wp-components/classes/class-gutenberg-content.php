@@ -208,6 +208,6 @@ class Gutenberg_Content extends Component {
 			$blocks[] = ( new HTML() )->set_config( 'content', $content );
 		}
 
-		return $blocks;
+		return apply_filters( 'wp_components_html_block', $blocks, $content );
 	}
 }
