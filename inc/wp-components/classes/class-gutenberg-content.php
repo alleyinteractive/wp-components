@@ -194,8 +194,10 @@ class Gutenberg_Content extends Component {
 	 *
 	 * @param array  $blocks  Array of block components to merge new HTML component into.
 	 * @param string $content HTML content to be rendered.
+	 * 
+	 * @return array
 	 */
-	public function merge_or_create_html_block( $blocks, $content ) {
+	public function merge_or_create_html_block( array $blocks, string $content ): array {
 		$last_block = end( $blocks );
 
 		// Merge rendered static blocks into a single HTML component.
