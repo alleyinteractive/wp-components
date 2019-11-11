@@ -262,4 +262,41 @@ class Image_Tests extends WP_UnitTestCase {
 			$this->image->get_config( 'url' )
 		);
 	}
+
+	/**
+	 * Test thumbnail editor config.
+	 */
+	public function test_crops() {
+		$this->image::register_crop_sizes(
+			[
+				'Test crops' => [
+					'test' => [
+						'height' => 640,
+						'width'  => 480,
+					],
+				],
+			]
+		);
+		update_post_meta(
+			$this::$attachment_id,
+			'wpcom_thumbnail_edit',
+			[
+				'test' => [ 682, 0, 640, 480 ],
+			]
+		);
+		$this->image->configure( self::$attachment_id, 'test' );
+		$this->assertArraySubset(
+			[
+				'id'     => self::$attachment_id,
+				'crops'  => [
+					'test' => [ 682, 0, 640, 480 ],
+				],
+				'srcset' => $this->image->attachment->guid . '?crop=682px%2C0px%2C-42px%2C480px&resize=1280,960 1280w,' .
+					$this->image->attachment->guid . '?crop=682px%2C0px%2C-42px%2C480px&resize=640,480 640w,' .
+					$this->image->attachment->guid . '?crop=682px%2C0px%2C-42px%2C480px&resize=960,720 960w,' .
+					$this->image->attachment->guid . '?crop=682px%2C0px%2C-42px%2C480px&resize=480,360 480w',
+			],
+			$this->image->config
+		);
+	}
 }

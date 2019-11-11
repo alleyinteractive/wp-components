@@ -267,8 +267,11 @@ class Image extends Component {
 		// Set image dimensions (via trait).
 		$this->set_attachment_dimensions();
 
+		// Set crop transforms
+		$this->configure_crops( $image_size );
+
 		// Set image config.
-		$this->merge_config(
+		return $this->merge_config(
 			[
 				'caption'     => $this->get_attachment_caption(),
 				'lqip_src'    => $this->get_lqip_src(),
@@ -281,8 +284,6 @@ class Image extends Component {
 				'lazyload'    => $this->get_lazyload( $size_config ),
 			]
 		);
-
-		return $this->configure_crops( $image_size );
 	}
 
 	/**
