@@ -66,7 +66,7 @@ class Image extends Component {
 			'height'              => 0,
 			'image_size'          => 'full',
 			'lazyload'            => true,
-			'lqip_src'            => 'data: image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7',
+			'lqip_src'            => 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7',
 			'post_id'             => 0,
 			'retina'              => true,
 			'show_caption'        => false,
@@ -131,16 +131,14 @@ class Image extends Component {
 	/**
 	 * Register global fallback image URL.
 	 *
-	 * @param number $fallback_image_id Attachment ID of fallback image.
+	 * @param int $fallback_image_id Attachment ID of fallback image.
 	 */
-	public static function register_fallback_image( number $fallback_image_id ) {
-		if ( is_numeric( $fallback_image_id ) ) {
-			// Treat a number as an attachment ID.
-			$url = wp_get_attachment_image_url( $fallback_image_id );
+	public static function register_fallback_image( int $fallback_image_id ) {
+		// Treat a number as an attachment ID.
+		$url = wp_get_attachment_url( $fallback_image_id );
 
-			if ( ! empty( $url ) ) {
-				self::$fallback_image_url = $url;
-			}
+		if ( ! empty( $url ) ) {
+			self::$fallback_image_url = $url;
 		}
 	}
 
@@ -220,36 +218,35 @@ class Image extends Component {
 	/**
 	 * Prepare config for use with an <img> or <picture> tag.
 	 *
-	 * @param number $id         Attachment ID or Post ID.
+	 * @param int    $id         Attachment ID or Post ID.
 	 * @param string $image_size Image size configuration to use for this component.
 	 * @param bool   $picture    Whether or not to use a <picture> element.
 	 * @return Component Current instance of this class.
 	 */
 	public function configure( $id, $image_size = 'full', $picture = false ): self {
-		$sizes       = self::$sizes;
-		$size_config = [];
+		$sizes = self::$sizes;
+		// Set config size and fallback.
+		$size_config = $sizes[ $image_size ] ?? [];
 
 		// Attempt to set attachment by ID, if not set already.
 		if ( empty( $this->attachment ) ) {
 			$this->set_id( $id );
 		}
 
-		// Return early if attachment failed to set.
-		if ( empty( $this->attachment ) ) {
-			return $this;
+		// Set fallback image if no url configured.
+		if ( empty( $this->get_config( 'url' ) ) ) {
+			$this->set_config( 'url', $this->get_fallback_image( $size_config ) );
 		}
 
 		// Return early with just a src if no size config exists for provided size.
 		if ( empty( $sizes[ $image_size ] ) ) {
-			$this->config['src'] = $this->config['url'];
-			return $this;
+			return $this->set_config( 'src', $this->get_config( 'url' ) );
 		}
 
-		// Set config size and fallback.
-		$size_config = $sizes[ $image_size ];
-
-		// Set fallback image.
-		$this->set_config( 'fallback_image', $this->get_fallback_image( $size_config ) );
+		// Return early if attachment failed to set (but still after setting fallback image).
+		if ( empty( $this->attachment ) ) {
+			return $this;
+		}
 
 		// Set aspect ratio.
 		$this->set_config( 'aspect_ratio', $this->get_aspect_ratio( $size_config ) );
@@ -258,7 +255,7 @@ class Image extends Component {
 		$this->merge_config(
 			[
 				'use_basic_img'       => ( 1 === count( $this->get_config( 'sources' ) ) && ! $this->get_config( 'retina' ) ),
-				'using_data_fallback' => strstr( $this->get_config( 'url' ), 'data: ' ),
+				'using_data_fallback' => strstr( $this->get_config( 'url' ), 'data:' ),
 				'image_size'          => $image_size,
 				'sources'             => $size_config['sources'],
 			]
@@ -275,7 +272,6 @@ class Image extends Component {
 			[
 				'caption'     => $this->get_attachment_caption(),
 				'lqip_src'    => $this->get_lqip_src(),
-				'url'         => $this->get_config( 'url' ),
 				'picture'     => $picture,
 				'sizes'       => $this->get_sizes(),
 				'source_tags' => $this->get_source_tags( $picture ),

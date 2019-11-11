@@ -38,6 +38,40 @@ class Image_Tests extends WP_UnitTestCase {
 	 */
 	public function setUp() {
 		$this->image = new \WP_Components\Image();
+		$this->image::register_breakpoints(
+			[
+				'xxl' => '90rem',
+				'xl'  => '80rem',
+				'lg'  => '64rem',
+				'md'  => '48rem',
+				'sm'  => '32rem',
+			]
+		);
+		$this->image::register_sizes(
+			[
+				'test' => [
+					'sources'            => [
+						[
+							'transforms' => [
+								'resize' => [ 640, 480 ],
+							],
+							'descriptor' => 640,
+							'media' => [ 'max' => 'xxl' ],
+						],
+						[
+							'transforms' => [
+								'resize' => [ 480, 360 ],
+							],
+							'descriptor' => 480,
+							'media' => [ 'max' => 'md' ],
+						],
+					],
+					'aspect_ratio'       => 2 / 3,
+					'retina'             => true,
+					'fallback_image_url' => wp_get_attachment_url( self::factory()->attachment->create_object( [ 'file' => 'fallback.jpg' ] ) ),
+				],
+			]
+		);
 		// insert a post.
 		$this->post = $this->factory->post->create_and_get(
 			array(
@@ -109,23 +143,75 @@ class Image_Tests extends WP_UnitTestCase {
 	 * Test <picture> markup
 	 */
 	public function test_picture() {
+		$this->image->configure( self::$attachment_id, 'test', true );
 		$this->assertArraySubset(
 			[
 				'id'          => self::$attachment_id,
 				'url'         => $this->image->attachment->guid,
 				'src'         => $this->image->attachment->guid,
-				'lqip_src'   => $this->image->attachment->guid . '?quality=60&resize=60,60',
-				'srcset'      => $this->image->attachment->guid . '?resize=600,600 600w,' . $this->image->attachment->guid . '?resize=300,300 300w',
+				'lqip_src'    => $this->image->attachment->guid . '?quality=60&resize=60,40',
 				'source_tags' => [
 					[
-						'srcset' => $this->image->attachment->guid . '?resize=300,300 1x,' . $this->image->attachment->guid . '?resize=600,600 2x',
-						'media'  => 'all'
+						'srcset' => $this->image->attachment->guid . '?resize=640,480 1x,' . $this->image->attachment->guid . '?resize=1280,960 2x',
+						'media'  => '(max-width: 90rem)'
+					],
+					[
+						'srcset' => $this->image->attachment->guid . '?resize=480,360 1x,' . $this->image->attachment->guid . '?resize=960,720 2x',
+						'media'  => '(max-width: 48rem)'
 					],
 				],
+				'sizes'       => '(max-width: 90rem) 640px,(max-width: 48rem) 480px,100vw',
 				'crops'       => [],
-				'image_size'  => 'medium',
+				'image_size'  => 'test',
+				'picture'     => 1,
 			],
 			$this->image->config
+		);
+	}
+
+	/**
+	 * Test default fallback image configuration.
+	 */
+	public function test_default_fallback() {
+		$this->image->configure( 0, 'this-size-should-not-exist' );
+
+		$this->assertEquals(
+			$this->image->get_config( 'url' ),
+			$this->image::$fallback_image_url
+		);
+	}
+
+	/**
+	 * Test custom global fallback image configuration.
+	 */
+	public function test_custom_fallback() {
+		// Create new image and register as a fallback.
+		$this->image::register_fallback_image(
+			self::factory()->attachment->create_object(
+				[
+					'file'           => 'image.jpg',
+					'post_mime_type' => 'foo',
+					'post_type'      => 'attachment',
+					'post_status'    => 'inherit',
+				]
+			)
+		);
+
+		$this->image->configure( 0, 'this-size-should-not-exist' );
+		$this->assertEquals(
+			'http://example.org/wp-content/uploads/image.jpg',
+			$this->image->get_config( 'url' )
+		);
+	}
+
+	/**
+	 * Test custom size-specific fallback image configuration.
+	 */
+	public function test_size_fallback() {
+		$this->image->configure( 0, 'test' );
+		$this->assertEquals(
+			'http://example.org/wp-content/uploads/fallback.jpg',
+			$this->image->get_config( 'url' )
 		);
 	}
 }
