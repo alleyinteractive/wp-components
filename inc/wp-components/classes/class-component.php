@@ -267,7 +267,7 @@ class Component implements \JsonSerializable {
 		// Prepend to group if group is valid, otherwise prepend to children.
 		if ( $this->is_valid_group( $group ) && ! empty( $children ) ) {
 			$this->component_groups[ $group ] = array_merge( array_filter( $children ), $this->component_groups[ $group ] );
-		} elseif ( $this->is_component( $group ) || '' === $group ) {
+		} elseif ( $this->is_component( $group ) ) {
 			$this->children = array_merge( array_filter( $group ), $this->children );
 		} elseif ( '' === $group && $this->is_component( $children ) ) {
 			$this->children = array_merge( array_filter( $children ), $this->children );
