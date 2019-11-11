@@ -113,6 +113,12 @@ class Byline_Wrapper extends Component {
 								return $byline->set_byline_manager_profile( $byline_entry->get_post() );
 							}
 
+							if (
+								$byline_entry instanceof \Byline_Manager\Models\TextProfile
+							) {
+								return $byline->set_config( 'name', $byline_entry->atts['text'] );
+							}
+
 							return $byline;
 						}
 					);
