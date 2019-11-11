@@ -22,12 +22,11 @@ trait Attachment {
 	/**
 	 * Set the post object.
 	 *
-	 * @param mixed $post Post object, post ID, or null to use global $post
+	 * @param mixed $attachment Post object, post ID, or null to use global $post
 	 *                    object.
 	 * @return object Instance of the class this trait is implemented on.
 	 */
 	public function set_attachment( $attachment = null ) : self {
-
 		// Post was passed.
 		if ( $attachment instanceof \WP_Post ) {
 			$this->attachment = $attachment;
@@ -37,16 +36,16 @@ trait Attachment {
 
 		// Post ID was passed.
 		if ( 0 !== absint( $attachment ) ) {
-			$post = get_post( $post );
+			$post = get_post( $attachment );
 
 			if ( 'post' === $post->post_type ) {
 				$attachment_id = get_post_thumbnail_id( $post );
-				$post = get_post( $attachment_id );
+				$post          = get_post( $attachment_id );
 			}
 
 			// Don't set post if empty.
 			if ( ! empty( $post ) ) {
-				$this->attachment = $attachment;
+				$this->set_attachment( $post );
 			}
 
 			return $this;
@@ -89,16 +88,6 @@ trait Attachment {
 	}
 
 	/**
-	 * Set the `id` config to the post ID.
-	 *
-	 * @return object Instance of the class this trait is implemented on.
-	 */
-	public function set_attachment_id() : self {
-		$this->set_config( 'id', $this->attachment_get_id() );
-		return $this;
-	}
-
-	/**
 	 * Get the post title.
 	 *
 	 * @return string
@@ -128,10 +117,17 @@ trait Attachment {
 	/**
 	 * Get the post permalink.
 	 *
+	 * @param string $size Image size.
 	 * @return string
 	 */
-	public function get_attachment_url( $size = 'full' ): string {
-		wp_get_attachment_image_url( $this->get_attachment_id(), $size );
+	public function get_attachment_src( $size = 'full' ): string {
+		$image_src = wp_get_attachment_image_src( $this->get_attachment_id(), $size );
+
+		if ( ! empty( $image_src[0] ) ) {
+			return $image_src[0];
+		}
+
+		return '';
 	}
 
 	/**
@@ -141,7 +137,7 @@ trait Attachment {
 	 */
 	public function get_attachment_alt(): string {
 		// First check attachment alt text meta.
-		$id = $this->get_attachment_id();
+		$id        = $this->get_attachment_id();
 		$image_alt = get_post_meta( $id, '_wp_attachment_image_alt', true );
 
 		if ( ! empty( $image_alt ) ) {
@@ -155,7 +151,7 @@ trait Attachment {
 		}
 
 		// Use image description as final fallback.
-		$post = get_post( $attachment_id );
+		$post = get_post( $this->get_attachment_id() );
 		if ( $post ) {
 			// We can't rely on get_the_excerpt(), because it relies on The Loop
 			// global variables that are not correctly set within the Irving context.
@@ -175,21 +171,12 @@ trait Attachment {
 	}
 
 	/**
-	 * Retrieve metadata for the attachment.
-	 *
-	 * @return array
-	 */
-	public function get_attachment_meta(): array {
-		return wp_get_attachment_metadata( $this->get_attachment_id() ) ?? [];
-	}
-
-	/**
 	 * Set width and height dimensions for image.
 	 *
 	 * @return self.
 	 */
 	public function set_attachment_dimensions(): self {
-		$attachment_meta = $this->get_attachment_meta();
+		$attachment_meta = wp_get_attachment_image_src( $this->get_attachment_id() );
 
 		return $this->merge_config(
 			[
