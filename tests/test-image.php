@@ -120,6 +120,23 @@ class Image_Tests extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Test simplest possible call to configure().
+	 */
+	public function test_simple_configure() {
+		$this->image->configure( self::$attachment_id );
+		$this->assertArraySubset(
+			[
+				'id'         => self::$attachment_id,
+				'url'        => $this->image->attachment->guid,
+				'src'        => $this->image->attachment->guid,
+				'crops'      => [],
+				'image_size' => 'full',
+			],
+			$this->image->config
+		);
+	}
+
+	/**
 	 * Test setting config for size.
 	 */
 	public function test_set_config_for_size() {
@@ -164,6 +181,37 @@ class Image_Tests extends WP_UnitTestCase {
 				'crops'       => [],
 				'image_size'  => 'test',
 				'picture'     => 1,
+			],
+			$this->image->config
+		);
+	}
+
+	/**
+	 * Test transforms.
+	 */
+	public function test_transforms() {
+		$this->image::register_sizes(
+			[
+				'transforms' => [
+					'sources'            => [
+						[
+							'transforms' => [
+								'w'       => [ 640 ],
+								'h'       => [ 480 ],
+								'quality' => [ 40 ],
+							],
+							'descriptor' => 640,
+						],
+					],
+				],
+			]
+		);
+		$this->image->configure( self::$attachment_id, 'transforms' );
+
+		$this->assertArraySubset(
+			[
+				'id'         => self::$attachment_id,
+				'srcset'     => $this->image->attachment->guid . '?w=1280&h=960&quality=40 1280w,' . $this->image->attachment->guid . '?w=640&h=480&quality=40 640w',
 			],
 			$this->image->config
 		);

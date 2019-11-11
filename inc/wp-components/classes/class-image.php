@@ -803,7 +803,7 @@ class Image extends Component {
 		foreach ( $transforms as $transform => $values ) {
 			// Add multiplier.
 			$values[] = $density_multiplier;
-			$url = $this->apply_transform( $transform, $values, $url );
+			$url      = $this->apply_transform( $transform, $values, $url );
 		}
 
 		return $url;
