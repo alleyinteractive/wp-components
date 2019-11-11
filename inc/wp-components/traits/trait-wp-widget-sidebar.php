@@ -13,6 +13,13 @@ namespace WP_Components;
 trait WP_Widget_Sidebar {
 
 	/**
+	 * Component groups.
+	 *
+	 * @var array
+	 */
+	public $wp_widget_sidebar_component_group = '';
+
+	/**
 	 * Set and render the sidebar.
 	 *
 	 * @param int|string $index Optional, default is 1. Index, name or ID of dynamic sidebar.
@@ -22,6 +29,17 @@ trait WP_Widget_Sidebar {
 		add_filter( 'widget_display_callback', [ $this, 'create_component_for_widget' ], 10, 3 );
 		dynamic_sidebar( $index );
 		remove_filter( 'widget_display_callback', [ $this, 'create_component_for_widget' ] );
+		return $this;
+	}
+
+	/**
+	 * Change the target group/component group for this widget sidebar.
+	 *
+	 * @param string $group Name of the group.
+	 * @return self
+	 */
+	public function set_sidebar_group( $group ) {
+		$this->wp_widget_sidebar_component_group = $group;
 		return $this;
 	}
 
@@ -39,11 +57,11 @@ trait WP_Widget_Sidebar {
 		// Fallback to HTML component of the content.
 		if ( method_exists( $widget, 'create_component' ) ) {
 			$child = $widget->create_component( $args, $instance );
-			$this->append_child( $child );
+			$this->append_child( $this->wp_widget_sidebar_component_group, $child );
 		} elseif ( ! empty( $this->wp_widget_sidebar_get_mapping()[ get_class( $widget ) ] ) ) {
 			$callback = $this->wp_widget_sidebar_get_mapping()[ get_class( $widget ) ];
 			$child    = call_user_func( [ $this, $callback ], $args, $instance );
-			$this->append_child( $child );
+			$this->append_child( $this->wp_widget_sidebar_component_group, $child );
 		} else {
 			// Get title.
 			$title = $instance['title'];
@@ -54,6 +72,7 @@ trait WP_Widget_Sidebar {
 			$widget->widget( $args, $instance );
 			$content = ob_get_clean();
 			$this->append_child(
+				$this->wp_widget_sidebar_component_group,
 				( new \WP_Components\HTML() )
 					->set_config( 'content', $content ?? '' )
 					->set_config( 'title', $title ?? '' )
