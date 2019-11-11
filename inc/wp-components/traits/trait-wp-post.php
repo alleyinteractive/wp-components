@@ -61,8 +61,7 @@ trait WP_Post {
 		}
 
 		// Something else went wrong.
-		// @todo determine how to handle error messages.
-		return $this;
+		return $this->has_error( __( 'Post was not an instance of \WP_Post or valid post ID.', 'wp-components' ) );
 	}
 
 	/**

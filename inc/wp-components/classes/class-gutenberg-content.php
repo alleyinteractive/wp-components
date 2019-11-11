@@ -95,13 +95,15 @@ class Gutenberg_Content extends Component {
 		 * React instead.
 		 *
 		 * @param array $exceptions Array of block render excepctions.
+		 * @param array $block      Current block.
 		 */
 		$block_render_exceptions = apply_filters(
 			'wp_components_block_render_exceptions',
 			[
 				'core/columns',
 				'core/column',
-			]
+			],
+			$block
 		);
 
 		// If there's no block name, but there is innerHTML.
@@ -194,8 +196,10 @@ class Gutenberg_Content extends Component {
 	 *
 	 * @param array  $blocks  Array of block components to merge new HTML component into.
 	 * @param string $content HTML content to be rendered.
+	 *
+	 * @return array
 	 */
-	public function merge_or_create_html_block( $blocks, $content ) {
+	public function merge_or_create_html_block( array $blocks, string $content ): array {
 		$last_block = end( $blocks );
 
 		// Merge rendered static blocks into a single HTML component.
