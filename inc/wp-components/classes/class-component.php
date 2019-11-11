@@ -302,7 +302,7 @@ class Component implements \JsonSerializable {
 	 * @return self
 	 */
 	public function prepend_child( $group, $child = [] ) : self {
-		if ( is_array( $child ) ) {
+		if ( is_array( $child ) && ! empty( $child ) ) {
 			$child = $child[0];
 		}
 
