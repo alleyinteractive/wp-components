@@ -249,6 +249,8 @@ class Component implements \JsonSerializable {
 			$this->component_groups[ $group ] = array_merge( $this->component_groups[ $group ], array_filter( $children ) );
 		} elseif ( $this->is_component( $group ) ) {
 			$this->children = array_merge( $this->children, array_filter( $group ) );
+		} elseif ( '' === $group && $this->is_component( $children ) ) {
+			$this->children = array_merge( $this->children, array_filter( $children ) );
 		}
 
 		return $this;
@@ -267,6 +269,8 @@ class Component implements \JsonSerializable {
 			$this->component_groups[ $group ] = array_merge( array_filter( $children ), $this->component_groups[ $group ] );
 		} elseif ( $this->is_component( $group ) ) {
 			$this->children = array_merge( array_filter( $group ), $this->children );
+		} elseif ( '' === $group && $this->is_component( $children ) ) {
+			$this->children = array_merge( array_filter( $children ), $this->children );
 		}
 
 		return $this;
@@ -289,6 +293,8 @@ class Component implements \JsonSerializable {
 			array_push( $this->component_groups[ $group ], $child );
 		} elseif ( $this->is_component( $group ) ) {
 			array_push( $this->children, $group );
+		} elseif ( '' === $group && $this->is_component( $child ) ) {
+			array_push( $this->children, $child );
 		}
 
 		return $this;
@@ -302,7 +308,7 @@ class Component implements \JsonSerializable {
 	 * @return self
 	 */
 	public function prepend_child( $group, $child = [] ) : self {
-		if ( is_array( $child ) ) {
+		if ( is_array( $child ) && ! empty( $child ) ) {
 			$child = $child[0];
 		}
 
@@ -311,6 +317,8 @@ class Component implements \JsonSerializable {
 			array_unshift( $this->component_groups[ $group ], $child );
 		} elseif ( $this->is_component( $group ) ) {
 			array_unshift( $this->children, $group );
+		} elseif ( '' === $group && $this->is_component( $child ) ) {
+			array_unshift( $this->children, $child );
 		}
 
 		return $this;

@@ -74,4 +74,8 @@
 		<type>warning</type>
 	</rule>
 
+	<rule ref="WordPress">
+		<exclude name="Generic.Arrays.DisallowShortArraySyntax.Found"/>
+	</rule>
+
 </ruleset>
