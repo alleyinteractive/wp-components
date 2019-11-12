@@ -267,7 +267,7 @@ class Image extends Component {
 		// Set image dimensions (via trait).
 		$this->set_attachment_dimensions();
 
-		// Set crop transforms
+		// Set crop transforms.
 		$this->configure_crops( $image_size );
 
 		// Set image config.
@@ -619,8 +619,7 @@ class Image extends Component {
 	 * @return Component Current instance of this class.
 	 */
 	public function set_url( string $url ) {
-		$this->set_config( 'url', $url );
-		return $this;
+		return $this->set_config( 'url', $url );
 	}
 
 	/**
@@ -630,16 +629,16 @@ class Image extends Component {
 	 * @return Component Current instance of this class.
 	 */
 	public function alt( string $alt ) {
-		$this->set_config( 'alt', $alt );
-		return $this;
+		return $this->set_config( 'alt', $alt );
 	}
 
 	/**
 	 * Shortcut for setting 'lazyload' config value.
+	 *
+	 * @param bool $value Value to which `lazyload` config property should be changed.
 	 */
 	public function lazyload( $value = true ) {
-		$this->set_config( 'lazyload', $value );
-		return $this;
+		return $this->set_config( 'lazyload', $value );
 	}
 
 	/**
@@ -649,8 +648,7 @@ class Image extends Component {
 	 * @param float|bool $ratio Aspect ratio of image expressed as a decimal.
 	 */
 	public function aspect_ratio( $ratio ) {
-		$this->set_config( 'aspect_ratio', $ratio );
-		return $this;
+		return $this->set_config( 'aspect_ratio', $ratio );
 	}
 
 	/**
