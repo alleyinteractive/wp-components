@@ -151,8 +151,6 @@ trait Content_List {
 
 		$backfill_query = $this->get_backfill_wp_query( $backfill_args );
 
-		error_log( print_r( $backfill_query, true ) );
-
 		if ( ! empty( $backfill_query->posts ?? [] ) ) {
 			$content_item_ids = array_merge( $content_item_ids, $backfill_query->posts );
 		}
