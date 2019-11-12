@@ -11,6 +11,9 @@ namespace WP_Components;
  * Image
  */
 class Image extends Component {
+
+	use Attachment;
+
 	/**
 	 * Unique component slug.
 	 *
@@ -52,16 +55,18 @@ class Image extends Component {
 	 * @return array Default config.
 	 */
 	public function default_config() : array {
+		$this->register_default_sizes();
+
 		return [
 			'aspect_ratio'        => 9 / 16,
-			'attachment_id'       => 0,
+			'id'                  => 0,
 			'alt'                 => '',
 			'caption'             => '',
 			'crops'               => '',
 			'height'              => 0,
 			'image_size'          => 'full',
 			'lazyload'            => true,
-			'lqip_src'            => 'data: image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7',
+			'lqip_src'            => 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7',
 			'post_id'             => 0,
 			'retina'              => true,
 			'show_caption'        => false,
@@ -74,6 +79,35 @@ class Image extends Component {
 			'using_data_fallback' => false,
 			'width'               => 0,
 		];
+	}
+
+	/**
+	 * Register default image size.
+	 *
+	 * @return void
+	 */
+	protected function register_default_sizes() {
+		$options              = wp_load_alloptions();
+		$default_size_configs = [];
+
+		foreach ( [ 'thumbnail', 'medium', 'large' ] as $default_size ) {
+			$default_size_configs[ $default_size ] = [
+				'sources' => [
+					[
+						'transforms' => [
+							'resize' => [
+								$options[ $default_size . '_size_w' ],
+								$options[ $default_size . '_size_h' ],
+							],
+						],
+						'descriptor' => $options[ $default_size . '_size_w' ],
+					],
+				],
+				'aspect_ratio' => $options[ $default_size . '_size_h' ] / $options[ $default_size . '_size_w' ],
+			];
+		}
+
+		$this->register_sizes( $default_size_configs );
 	}
 
 	/**
@@ -95,24 +129,17 @@ class Image extends Component {
 	}
 
 	/**
-	 * Register fallback image URL.
+	 * Register global fallback image URL.
 	 *
-	 * @param string|number $fallback_image Array of breakpoints.
+	 * @param int $fallback_image_id Attachment ID of fallback image.
 	 */
-	public static function register_fallback_image( $fallback_image ) {
-		if ( is_numeric( $fallback_image ) ) {
-			// Treat a number as an attachment ID.
-			$url = wp_get_attachment_image_url( $fallback_image );
+	public static function register_fallback_image( int $fallback_image_id ) {
+		// Treat a number as an attachment ID.
+		$url = wp_get_attachment_url( $fallback_image_id );
 
-			if ( ! empty( $attachment_url ) ) {
-				$url = $attachment_url;
-			}
-		} else {
-			// Treat anything else as a URL.
-			$url = $fallback_image;
+		if ( ! empty( $url ) ) {
+			self::$fallback_image_url = $url;
 		}
-
-		self::$fallback_image_url = $url;
 	}
 
 	/**
@@ -159,55 +186,21 @@ class Image extends Component {
 	}
 
 	/**
-	 * Setup this component using a post.
+	 * Run after attachment ID is set.
 	 *
-	 * @param int $post_id Post ID.
-	 * @return Component Current instance of this class.
+	 * @return void
 	 */
-	public function set_post_id( $post_id ) {
-		// Get the URL.
-		$attachment_id = get_post_thumbnail_id( $post_id );
-		$this->set_config( 'post_id', $post_id );
-
-		return $this->set_attachment_id( $attachment_id );
-	}
-
-	/**
-	 * Setup this component using an attachment.
-	 *
-	 * @param int $attachment_id Attachemnt ID.
-	 * @return Component Current instance of this class.
-	 */
-	public function set_attachment_id( $attachment_id ) {
-		$this->set_config( 'attachment_id', absint( $attachment_id ) );
-
+	public function attachment_has_set() {
 		// Get crops from post meta.
-		$crops = (array) get_post_meta( $attachment_id, 'wpcom_thumbnail_edit', true );
-		$this->set_config( 'crops', array_filter( $crops ) );
+		$crops = (array) get_post_meta( $this->get_attachment_id(), 'wpcom_thumbnail_edit', true );
 
-		return $this;
-	}
-
-	/**
-	 * Set the URL.
-	 *
-	 * @param string $url Image URL.
-	 * @return Component Current instance of this class.
-	 */
-	public function set_url( string $url ) {
-		$this->set_config( 'url', $url );
-		return $this;
-	}
-
-	/**
-	 * Set alt text for image.
-	 *
-	 * @param string $alt Alt text for image.
-	 * @return Component Current instance of this class.
-	 */
-	public function alt( string $alt ) {
-		$this->set_config( 'alt', $alt );
-		return $this;
+		$this->merge_config(
+			[
+				'crops' => array_filter( $crops ),
+				'id'    => $this->get_attachment_id(),
+				'url'   => $this->get_attachment_src( 'full' ),
+			]
+		);
 	}
 
 	/**
@@ -215,41 +208,97 @@ class Image extends Component {
 	 *
 	 * @param string $image_size Key of the size.
 	 * @param bool   $picture Whether or not to use a <picture> element.
+	 * @return \Wp_Components\Image Current instance of this class.
+	 */
+	public function set_config_for_size( string $image_size, $picture = false ): self {
+		// Call configure method.
+		return $this->configure( $this->get_config( 'attachment_id' ), $image_size, $picture );
+	}
+
+	/**
+	 * Prepare config for use with an <img> or <picture> tag.
+	 *
+	 * @param int    $id         Attachment ID or Post ID.
+	 * @param string $image_size Image size configuration to use for this component.
+	 * @param bool   $picture    Whether or not to use a <picture> element.
 	 * @return Component Current instance of this class.
 	 */
-	public function set_config_for_size( string $image_size, $picture = false ) {
-		$sizes       = self::$sizes;
-		$size_config = [];
-		$crops       = $this->config['crops'];
+	public function configure( $id, $image_size = 'full', $picture = false ): self {
+		$sizes = self::$sizes;
+		// Set config size and fallback.
+		$size_config = $sizes[ $image_size ] ?? [];
 
+		// Attempt to set attachment by ID, if not set already.
+		if ( empty( $this->attachment ) ) {
+			$this->set_id( $id );
+		}
+
+		// Set fallback image if no url configured.
+		if ( empty( $this->get_config( 'url' ) ) ) {
+			$this->set_config( 'url', $this->get_fallback_image( $size_config ) );
+		}
+
+		// Return early with just a src if no size config exists for provided size.
 		if ( empty( $sizes[ $image_size ] ) ) {
-			// Return empty component if missing image size or URL.
-			$this->config['src'] = $this->config['url'];
-			return $this;
-		} else {
-			$size_config        = $sizes[ $image_size ];
-			$fallback_image_url = $size_config['fallback_image_url'] ?? self::$fallback_image_url;
-			$attachment_url     = strtok( wp_get_attachment_image_url( $this->get_config( 'attachment_id' ), 'full' ), '?' );
-			$url                = ! empty( $attachment_url ) ? $attachment_url : $fallback_image_url;
+			return $this->set_config( 'src', $this->get_config( 'url' ) );
+		}
 
-			$this->merge_config(
-				[
-					'image_size'         => $image_size,
-					'sources'            => $size_config['sources'],
-					'retina'             => $size_config['retina'] ?? $this->config['retina'],
-					'lazyload'           => $size_config['lazyload'] ?? $this->config['lazyload'],
-					'fallback_image_url' => $fallback_image_url,
-					'url'                => $url,
-				]
-			);
+		// Return early if attachment failed to set (but still after setting fallback image).
+		if ( empty( $this->attachment ) ) {
+			return $this;
 		}
 
 		// Set aspect ratio.
 		$this->set_config( 'aspect_ratio', $this->get_aspect_ratio( $size_config ) );
 
+		// Set flags for using a basic <img> tag or using the fallback URL.
+		$this->merge_config(
+			[
+				'use_basic_img'       => ( 1 === count( $this->get_config( 'sources' ) ) && ! $this->get_config( 'retina' ) ),
+				'using_data_fallback' => strstr( $this->get_config( 'url' ), 'data:' ),
+				'image_size'          => $image_size,
+				'sources'             => $size_config['sources'],
+			]
+		);
+
+		// Set image alt text (via trait).
+		$this->set_alt_text();
+
+		// Set image dimensions (via trait).
+		$this->set_attachment_dimensions();
+
+		// Set crop transforms.
+		$this->configure_crops( $image_size );
+
+		// Set image config.
+		return $this->merge_config(
+			[
+				'caption'     => $this->get_attachment_caption(),
+				'lqip_src'    => $this->get_lqip_src(),
+				'picture'     => $picture,
+				'sizes'       => $this->get_sizes(),
+				'source_tags' => $this->get_source_tags( $picture ),
+				'src'         => $this->get_src(),
+				'srcset'      => $this->get_srcset(),
+				'retina'      => $this->get_retina( $size_config ),
+				'lazyload'    => $this->get_lazyload( $size_config ),
+			]
+		);
+	}
+
+	/**
+	 * Configure crop setttings for a particular image size.
+	 *
+	 * @param string $image_size Image size for which crops should be configured.
+	 * @return Component
+	 */
+	public function configure_crops( $image_size ): self {
+		$crops = $this->get_config( 'crops' );
+
 		// If the size key matches a crop option, apply that transform.
 		if ( ! empty( $crops[ $image_size ] ) ) {
-			$sources = $this->config['sources'];
+			$sources = $this->get_config( 'sources' );
+
 			foreach ( $sources as &$source ) {
 				// Convert stored coordinates into crop friendly parameters.
 				$source['transforms'] = array_merge(
@@ -264,49 +313,41 @@ class Image extends Component {
 					$source['transforms']
 				);
 			}
+
 			$this->set_config( 'sources', $sources );
 		}
-
-		$this->configure( $picture );
 
 		return $this;
 	}
 
 	/**
-	 * Prepare config for use with an <img> or <picture> tag.
+	 * Get configured fallback image.
 	 *
-	 * @param bool $picture Whether or not to use a <picture> element.
-	 * @return Component Current instance of this class.
+	 * @param array $size_config Config for current image size.
+	 * @return string
 	 */
-	public function configure( $picture ) {
-		$image_meta = wp_get_attachment_metadata( $this->config['attachment_id'] );
+	public function get_fallback_image( $size_config ): string {
+		return $size_config['fallback_image_url'] ?? self::$fallback_image_url;
+	}
 
-		// Set flags for using a basic <img> tag or using the fallback URL.
-		$this->merge_config(
-			[
-				'use_basic_img'       => ( 1 === count( $this->get_config( 'sources' ) ) && ! $this->get_config( 'retina' ) ),
-				'using_data_fallback' => strstr( $this->get_config( 'url' ), 'data:' ),
-			]
-		);
+	/**
+	 * Get lazyload setting.
+	 *
+	 * @param array $size_config Config for current image size.
+	 * @return string
+	 */
+	public function get_lazyload( $size_config ): string {
+		return $size_config['lazyload'] ?? $this->get_config( 'lazyload' );
+	}
 
-		// Set image config.
-		$this->merge_config(
-			[
-				'alt'         => $this->get_alt_text(),
-				'caption'     => ! empty( $this->config['attachment_id'] ) ? wp_get_attachment_caption( $this->config['attachment_id'] ) : '',
-				'height'      => $image_meta['height'] ?? 0,
-				'lqip_src'    => $this->get_lqip_src(),
-				'url'         => $this->get_config( 'url' ),
-				'picture'     => $picture,
-				'sizes'       => $this->get_sizes(),
-				'source_tags' => $picture ? $this->get_source_tags() : [],
-				'src'         => $this->get_src(),
-				'srcset'      => $this->get_srcset(),
-				'width'       => $image_meta['width'] ?? 0,
-			]
-		);
-
-		return $this;
+	/**
+	 * Get retina image setting.
+	 *
+	 * @param array $size_config Config for current image size.
+	 * @return string
+	 */
+	public function get_retina( $size_config ): string {
+		return $size_config['retina'] ?? $this->get_config( 'retina' );
 	}
 
 	/**
@@ -320,9 +361,8 @@ class Image extends Component {
 
 		// Useful if you're ouptutting an image with only one constrained dimension (like a max height or max width, but no specific aspect ratio). Usually involves `fit`, `w`, or `h` transforms.
 		if ( 'auto' === $aspect_ratio ) {
-			$image_meta = wp_get_attachment_metadata( $this->config['attachment_id'] );
-			if ( ! empty( $image_meta['width'] ) && ! empty( $image_meta['height'] ) ) {
-				return intval( $image_meta['height'] ) / intval( $image_meta['width'] );
+			if ( ! empty( $this->get_config( 'width' ) ) && ! empty( $this->get_config( 'height' ) ) ) {
+				return intval( $this->get_config( 'height' ) ) / intval( $this->get_config( 'width' ) );
 			}
 
 			return false;
@@ -332,52 +372,21 @@ class Image extends Component {
 	}
 
 	/**
-	 * Retrieve alt text for current image.
-	 *
-	 * @return string
-	 */
-	public function get_alt_text() {
-		if ( ! empty( $this->config['alt'] ) ) {
-			return esc_attr( $this->config['alt'] );
-		}
-
-		$attachment_id = $this->config['attachment_id'];
-
-		if ( ! empty( $attachment_id ) ) {
-			// First check attachment alt text field.
-			$image_alt = get_post_meta( $attachment_id, '_wp_attachment_image_alt', true );
-			if ( ! empty( $image_alt ) ) {
-				return esc_attr( $image_alt );
-			}
-
-			// Use image caption as a fallback.
-			if ( ! empty( $this->config['caption'] ) ) {
-				return esc_attr( $this->config['caption'] );
-			}
-
-			// Use image description as final fallback.
-			$post = get_post( $attachment_id );
-			if ( $post ) {
-				// We can't rely on get_the_excerpt(), because it relies on The Loop
-				// global variables that are not correctly set within the Irving context.
-				return esc_attr( $post->post_excerpt );
-			}
-		}
-
-		return '';
-	}
-
-	/**
 	 * Prepare config for use with an <picture> tag.
 	 *
+	 * @param bool $picture Should this image use <picture> markup.
 	 * @return array
 	 */
-	public function get_source_tags() {
+	public function get_source_tags( $picture = false ) {
 		$source_tags = [];
 		$sources     = (array) $this->config['sources'];
 
 		// Don't set this if we're using a basic <img> tag or using the fallback image.
-		if ( $this->get_config( 'use_basic_img' ) || $this->get_config( 'using_data_fallback' ) ) {
+		if (
+			! $picture
+			|| $this->get_config( 'use_basic_img' )
+			|| $this->get_config( 'using_data_fallback' )
+		) {
 			return [];
 		}
 
@@ -389,7 +398,7 @@ class Image extends Component {
 			// Add retina source to srcset, if applicable.
 			if ( $this->config['retina'] ) {
 				$retina_url    = $this->apply_transforms( $transforms, 2 );
-				$srcset_string = "{$src_url} 1x, {$retina_url} 2x";
+				$srcset_string = "{$src_url} 1x,{$retina_url} 2x";
 			} else {
 				$srcset_string = $src_url;
 			}
@@ -473,7 +482,7 @@ class Image extends Component {
 			}
 		}
 
-		return html_entity_decode( esc_attr( implode( $srcset, ',' ) ) );
+		return html_entity_decode( esc_attr( implode( ',', $srcset ) ) );
 	}
 
 	/**
@@ -492,7 +501,6 @@ class Image extends Component {
 		}
 
 		foreach ( $sources as $params ) {
-
 			// Ensure descriptor is set.
 			if ( ! isset( $params['descriptor'] ) ) {
 				continue;
@@ -512,7 +520,7 @@ class Image extends Component {
 
 		$sizes[] = ! empty( $default ) ? $default : '100vw';
 
-		return esc_attr( implode( $sizes, ',' ) );
+		return esc_attr( implode( ',', $sizes ) );
 	}
 
 	/**
@@ -525,7 +533,7 @@ class Image extends Component {
 		$breakpoints = self::$breakpoints;
 
 		if ( ! is_array( $media_params ) ) {
-			return false;
+			return 'all';
 		}
 
 		// Use custom media if it's set.
@@ -554,11 +562,83 @@ class Image extends Component {
 	}
 
 	/**
-	 * Disable lazyloading for this instance.
+	 * Shortcut for attempting to set attachment or post ID.
+	 *
+	 * @param int $id Attachment or Post ID.
+	 * @return Component Current instance of this class.
 	 */
-	public function disable_lazyload() {
-		$this->set_config( 'lazyload', false );
+	public function set_id( $id ): self {
+		// Attempt to set attachment ID first.
+		$this->set_attachment_id( $id );
+
+		// Attempt to set post ID if it doesn't work.
+		if ( empty( $this->attachment ) ) {
+			$this->set_post_id( $id );
+		}
+
 		return $this;
+	}
+
+	/**
+	 * Setup this component using a post.
+	 *
+	 * @param int $post_id Post ID.
+	 * @return Component Current instance of this class.
+	 */
+	public function set_post_id( $post_id ): self {
+		// Get the URL.
+		$attachment_id = get_post_thumbnail_id( $post_id );
+
+		return $this->set_attachment( $attachment_id );
+	}
+
+	/**
+	 * Setup this component using an attachment.
+	 * (preserved for backwards compatibility, use `$this->configure()` instead).
+	 *
+	 * @param int $attachment_id Attachemnt ID.
+	 * @return Component Current instance of this class.
+	 */
+	public function set_attachment_id( $attachment_id ): self {
+		return $this->set_attachment( $attachment_id );
+	}
+
+	/**
+	 * Retrieve alt text for current image.
+	 *
+	 * @return Component
+	 */
+	public function set_alt_text(): self {
+		return $this->set_config( 'alt', $this->get_attachment_alt() );
+	}
+
+	/**
+	 * Set the URL to the original image.
+	 *
+	 * @param string $url Image URL.
+	 * @return Component Current instance of this class.
+	 */
+	public function set_url( string $url ) {
+		return $this->set_config( 'url', $url );
+	}
+
+	/**
+	 * Set alt text for image.
+	 *
+	 * @param string $alt Alt text for image.
+	 * @return Component Current instance of this class.
+	 */
+	public function alt( string $alt ) {
+		return $this->set_config( 'alt', $alt );
+	}
+
+	/**
+	 * Shortcut for setting 'lazyload' config value.
+	 *
+	 * @param bool $value Value to which `lazyload` config property should be changed.
+	 */
+	public function lazyload( $value = true ) {
+		return $this->set_config( 'lazyload', $value );
 	}
 
 	/**
@@ -568,8 +648,7 @@ class Image extends Component {
 	 * @param float|bool $ratio Aspect ratio of image expressed as a decimal.
 	 */
 	public function aspect_ratio( $ratio ) {
-		$this->set_config( 'aspect_ratio', $ratio );
-		return $this;
+		return $this->set_config( 'aspect_ratio', $ratio );
 	}
 
 	/**
@@ -723,7 +802,7 @@ class Image extends Component {
 		foreach ( $transforms as $transform => $values ) {
 			// Add multiplier.
 			$values[] = $density_multiplier;
-			$url = $this->apply_transform( $transform, $values, $url );
+			$url      = $this->apply_transform( $transform, $values, $url );
 		}
 
 		return $url;
