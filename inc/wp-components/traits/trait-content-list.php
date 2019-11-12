@@ -141,7 +141,7 @@ trait Content_List {
 		// phpcs:disable WordPressVIPMinimum.Performance.WPQueryParams.PostNotIn
 		$backfill_args['post__not_in'] = array_unique(
 			array_merge(
-				$backfill_args['post__not_in'],
+				$backfill_args['post__not_in'] ?? [],
 				$content_item_ids
 			)
 		);
