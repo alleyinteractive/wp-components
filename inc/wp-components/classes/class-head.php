@@ -51,7 +51,7 @@ class Head extends Component {
 		// exist since it's a default child).
 		foreach ( $this->children as &$child ) {
 			if ( 'title' === $child->name ) {
-				$child->children[0] = html_entity_decode( $value );
+				$child->children[0] = html_entity_decode( $value, ENT_QUOTES );
 			}
 		}
 
