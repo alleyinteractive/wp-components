@@ -138,7 +138,14 @@ trait Content_List {
 		}
 
 		// Modify backfill args.
-		$backfill_args['post__not_in']   = $content_item_ids;
+		// phpcs:disable WordPressVIPMinimum.Performance.WPQueryParams.PostNotIn
+		$backfill_args['post__not_in'] = array_unique(
+			array_merge(
+				$backfill_args['post__not_in'] ?? [],
+				$content_item_ids
+			)
+		);
+		// phpcs:enable WordPressVIPMinimum.Performance.WPQueryParams.PostNotIn
 		$backfill_args['posts_per_page'] = $backfill_to - count( $content_item_ids );
 		$backfill_args['fields']         = 'ids';
 
