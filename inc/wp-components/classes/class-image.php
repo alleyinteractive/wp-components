@@ -212,7 +212,7 @@ class Image extends Component {
 	 */
 	public function set_config_for_size( string $image_size, $picture = false ): self {
 		// Call configure method.
-		return $this->configure( $this->get_config( 'attachment_id' ), $image_size, $picture );
+		return $this->configure( $this->get_config( 'id' ), $image_size, $picture );
 	}
 
 	/**
