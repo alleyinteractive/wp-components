@@ -27,7 +27,7 @@ class Gutenberg_Content extends Component {
 	 * @return self
 	 */
 	public function post_has_set() : self {
-		$components = $this->parse_and_convert_block_content( $this->wp_post_get_content() );
+		$components = $this->parse_and_convert_block_content( $this->post->post_content ?? '' );
 
 		return $this->append_children( $components );
 	}
