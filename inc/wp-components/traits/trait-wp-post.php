@@ -190,15 +190,6 @@ trait WP_Post {
 	}
 
 	/**
-	 * Get the post content.
-	 *
-	 * @return string
-	 */
-	public function wp_post_get_content(): string {
-		return apply_filters( 'the_content', $this->post->post_content ?? '' );
-	}
-
-	/**
 	 * Create Image component and append to children.
 	 *
 	 * @param string $size Image size to use for child image component.
