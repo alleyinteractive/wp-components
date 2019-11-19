@@ -359,6 +359,14 @@ class Head extends Component {
 				'og:height',
 				apply_filters( 'wp_components_head_og_image_height', $image_source[2], $this->post->ID )
 			);
+			$this->add_meta(
+				'og:image:width',
+				apply_filters( 'wp_components_head_og_image_width', $image_source[1], $this->post->ID )
+			);
+			$this->add_meta(
+				'og:image:height',
+				apply_filters( 'wp_components_head_og_image_height', $image_source[2], $this->post->ID )
+			);
 		}
 
 		// Property specific meta.
