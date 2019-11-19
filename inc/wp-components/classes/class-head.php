@@ -506,10 +506,13 @@ class Head extends Component {
 	 */
 	protected function get_image_source() : array {
 
-		// Get image url.
+		// Filter the meta key where this is stored.
+		$meta_key = apply_filters( 'wp_components_head_image_source_key', '_social_image_id' );
+
+		// Get filterable image url.
 		$image_id = apply_filters(
 			'wp_components_head_image_id',
-			absint( get_post_meta( $this->post->ID, '_social_image_id', true ) )
+			absint( get_post_meta( $this->post->ID, $meta_key, true ) )
 		);
 
 		$image_source = apply_filters(
