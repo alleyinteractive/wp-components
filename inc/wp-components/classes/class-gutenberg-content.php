@@ -79,8 +79,8 @@ class Gutenberg_Content extends Component {
 		/**
 		 * Filters the array of blocks after they're converted to components.
 		 *
-		 * @param array $blocks Parsed array of blocks.
-		 * @param array $this   Current component instance.
+		 * @param array $components Array of compoents created from parsed Gutenberg blocks.
+		 * @param array $this       Current component instance.
 		 */
 		$components = apply_filters(
 			'wp_components_post_convert_blocks',
