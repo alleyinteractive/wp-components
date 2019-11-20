@@ -74,13 +74,19 @@ class Gutenberg_Content extends Component {
 			)
 		);
 
-		$blocks = apply_filters(
-			'wp_components_pre_convert_blocks',
-			$blocks,
+		$components = array_reduce( $blocks, [ $this, 'convert_block_to_component' ], [] );
+
+		/**
+		 * Filters the array of blocks after they're converted to components.
+		 *
+		 * @param array $blocks Parsed array of blocks.
+		 * @param array $this   Current component instance.
+		 */
+		$components = apply_filters(
+			'wp_components_post_convert_blocks',
+			$components,
 			$this
 		);
-
-		$components = array_reduce( $blocks, [ $this, 'convert_block_to_component' ], [] );
 
 		return $components ?? [];
 	}
