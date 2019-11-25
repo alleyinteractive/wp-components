@@ -423,6 +423,7 @@ class Component implements \JsonSerializable {
 	 * Helper to set theme on this component.
 	 *
 	 * @param string $theme_name Name of theme to set.
+	 * @param bool   $force      Force the theme name, ignore the validation.
 	 * @return self
 	 */
 	public function set_theme( $theme_name, $force = false ) : self {
