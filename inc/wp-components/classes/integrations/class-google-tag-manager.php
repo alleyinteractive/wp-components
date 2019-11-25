@@ -94,25 +94,26 @@ class Google_Tag_Manager extends \WP_Components\Component {
 	}
 
 	/**
-	 * Get value for tags targeting.
+	 * Get array of taxnomy terms for data layer.
 	 *
+	 * @param  string $taxonomy Taxonomy for which terms should be extracted.
 	 * @return array
 	 */
-	public function get_tags() : array {
+	public function get_taxonomy_terms( $taxonomy ) : array {
 		// Single article.
 		if ( $this->query->is_single() ) {
-			$tags = wp_get_post_tags( $this->query->post->ID ?? 0 );
+			$terms = wp_get_post_terms( $this->query->post->ID, $taxonomy );
 
 			return array_map(
-				function( $tag ) {
-					return $tag->name;
+				function( $term ) {
+					return $term->name;
 				},
-				$tags
+				$terms
 			);
 		}
 
 		// Tag landing.
-		if ( $this->query->is_tag() ) {
+		if ( $this->query->is_tax( $taxonomy ) ) {
 			return [ $this->query->queried_object->name ];
 		}
 
@@ -120,33 +121,12 @@ class Google_Tag_Manager extends \WP_Components\Component {
 	}
 
 	/**
-	 * Get category.
-	 *
-	 * @return string|null
-	 */
-	public function get_category() {
-		// Single article.
-		if ( $this->query->is_single() ) {
-			$categories = get_the_category( $this->query->queried_object->ID ?? 0 );
-
-			return $categories[0]->name ?? null;
-		}
-
-		// Category landing.
-		if ( $this->query->is_category() ) {
-			return $this->query->queried_object->name ?? null;
-		}
-
-		return null;
-	}
-
-	/**
-	 * Get custom taxonomy term, if applicable.
+	 * Get taxonomy term, if applicable.
 	 *
 	 * @param  string $taxonomy Taxonomy for which the first term should be extracted.
 	 * @return string|null
 	 */
-	public function get_taxonomy_term( $taxonomy ) {
+	public function get_single_taxonomy_term( $taxonomy ) {
 		// Single article.
 		if ( $this->query->is_single() ) {
 			$terms = wp_get_post_terms( $this->query->post->ID, $taxonomy );
