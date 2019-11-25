@@ -426,7 +426,7 @@ class Component implements \JsonSerializable {
 	 * @param bool   $force      Force the theme name, ignore the validation.
 	 * @return self
 	 */
-	public function set_theme( $theme_name, $force = false ) : self {
+	public function set_theme( string $theme_name, bool $force = false ) : self {
 		// Only set theme if it's configured in the themes property OR no
 		// other themes are configured (besides `default`), implicitly
 		// indicating theme validation should not be used.
