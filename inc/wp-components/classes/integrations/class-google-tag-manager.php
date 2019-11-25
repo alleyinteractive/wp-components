@@ -104,6 +104,11 @@ class Google_Tag_Manager extends \WP_Components\Component {
 		if ( $this->query->is_single() ) {
 			$terms = wp_get_post_terms( $this->query->post->ID, $taxonomy );
 
+			// Check for error.
+			if ( is_wp_error( $terms ) ) {
+				return [];
+			}
+
 			return array_map(
 				function( $term ) {
 					return $term->name;
@@ -112,7 +117,7 @@ class Google_Tag_Manager extends \WP_Components\Component {
 			);
 		}
 
-		// Tag landing.
+		// Taxonomy landing.
 		if ( $this->query->is_tax( $taxonomy ) ) {
 			return [ $this->query->queried_object->name ];
 		}
@@ -131,10 +136,15 @@ class Google_Tag_Manager extends \WP_Components\Component {
 		if ( $this->query->is_single() ) {
 			$terms = wp_get_post_terms( $this->query->post->ID, $taxonomy );
 
+			// Check for error.
+			if ( is_wp_error( $terms ) ) {
+				return null;
+			}
+
 			return $terms[0]->name ?? null;
 		}
 
-		// Section taxonomy landing.
+		// Taxonomy landing.
 		if ( $this->query->is_tax( $taxonomy ) ) {
 			return $this->query->queried_object->name ?? null;
 		}
