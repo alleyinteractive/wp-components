@@ -120,6 +120,48 @@ class Google_Tag_Manager extends \WP_Components\Component {
 	}
 
 	/**
+	 * Get category.
+	 *
+	 * @return string|null
+	 */
+	public function get_category() : ?string {
+		// Single article.
+		if ( $this->query->is_single() ) {
+			$categories = get_the_category( $this->query->queried_object->ID ?? 0 );
+
+			return $categories[0]->name ?? null;
+		}
+
+		// Category landing.
+		if ( $this->query->is_category() ) {
+			return $this->query->queried_object->name ?? null;
+		}
+
+		return null;
+	}
+
+	/**
+	 * Get custom taxonomy term, if applicable.
+	 *
+	 * @return string|null
+	 */
+	public function get_section( $taxonomy ) : ?string {
+		// Single article.
+		if ( $this->query->is_single() ) {
+			$terms = wp_get_post_terms( $this->query->post->ID, $taxonomy );
+
+			return $terms[0]->name ?? null;
+		}
+
+		// Section taxonomy landing.
+		if ( $this->query->is_tax( $taxonomy ) ) {
+			return $this->query->queried_object->name ?? null;
+		}
+
+		return null;
+	}
+
+	/**
 	 * Get post title, if applicable
 	 *
 	 * @return string
