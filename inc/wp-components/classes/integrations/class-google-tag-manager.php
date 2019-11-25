@@ -124,7 +124,7 @@ class Google_Tag_Manager extends \WP_Components\Component {
 	 *
 	 * @return string|null
 	 */
-	public function get_category() : ?string {
+	public function get_category() {
 		// Single article.
 		if ( $this->query->is_single() ) {
 			$categories = get_the_category( $this->query->queried_object->ID ?? 0 );
@@ -143,9 +143,10 @@ class Google_Tag_Manager extends \WP_Components\Component {
 	/**
 	 * Get custom taxonomy term, if applicable.
 	 *
+	 * @param  string $taxonomy Taxonomy for which the first term should be extracted.
 	 * @return string|null
 	 */
-	public function get_section( $taxonomy ) : ?string {
+	public function get_taxonomy_term( $taxonomy ) {
 		// Single article.
 		if ( $this->query->is_single() ) {
 			$terms = wp_get_post_terms( $this->query->post->ID, $taxonomy );
