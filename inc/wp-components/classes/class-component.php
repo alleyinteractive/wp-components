@@ -423,16 +423,20 @@ class Component implements \JsonSerializable {
 	 * Helper to set theme on this component.
 	 *
 	 * @param string $theme_name Name of theme to set.
+	 * @param bool   $force      Force the theme name, ignore the validation.
 	 * @return self
 	 */
-	public function set_theme( $theme_name ) : self {
-		// Only set theme if it's configured in the themes property OR no other themes are configured (besides `default`), implicitly indicating theme validation should not be used.
+	public function set_theme( string $theme_name, bool $force = false ) : self {
+		// Only set theme if it's configured in the themes property OR no
+		// other themes are configured (besides `default`), implicitly
+		// indicating theme validation should not be used.
 		if (
-			in_array( $theme_name, $this->themes, true )
-			|| ( 1 === count( $this->themes ) && 'default' === $this->themes[0] )
+			in_array( $theme_name, $this->themes, true ) // Is a valid theme.
+			|| ( 1 === count( $this->themes ) && 'default' === $this->themes[0] ) // No custom themes have been white-listed.
+			|| true === $force // Forcing.
 		) {
 			// Return camel cased theme name, if it isn't camel cased already.
-			return $this->set_config( 'theme_name', $this->camel_case_string( $theme_name ) );
+			return $this->set_config( 'theme_name', $theme_name );
 		}
 
 		// Set theme to 'default' if the theme is not configured.
@@ -480,6 +484,11 @@ class Component implements \JsonSerializable {
 		// desired).
 		if ( ! $this->is_valid ) {
 			$this->name = $this->name . '-invalid';
+		}
+
+		// Camel case theme name on output.
+		if ( '' !== ( $this->get_config( 'theme_name' ) ?? '' ) ) {
+			$this->set_config( 'theme_name', $this->camel_case_string( $this->get_config( 'theme_name' ) ) );
 		}
 
 		return [
