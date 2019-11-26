@@ -219,7 +219,7 @@ trait WP_Post {
 	 * @return string
 	 */
 	public function wp_post_get_published_timestamp( string $date_format = 'F j, Y' ) : string {
-		return get_the_date( 'F j, Y', $this->get_post_id() );
+		return get_the_date( $date_format, $this->get_post_id() );
 	}
 
 	/**
