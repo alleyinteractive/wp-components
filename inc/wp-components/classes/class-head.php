@@ -359,6 +359,14 @@ class Head extends Component {
 				'og:height',
 				apply_filters( 'wp_components_head_og_image_height', $image_source[2], $this->post->ID )
 			);
+			$this->add_meta(
+				'og:image:width',
+				apply_filters( 'wp_components_head_og_image_width', $image_source[1], $this->post->ID )
+			);
+			$this->add_meta(
+				'og:image:height',
+				apply_filters( 'wp_components_head_og_image_height', $image_source[2], $this->post->ID )
+			);
 		}
 
 		// Property specific meta.
@@ -506,10 +514,13 @@ class Head extends Component {
 	 */
 	protected function get_image_source() : array {
 
-		// Get image url.
+		// Filter the meta key where this is stored.
+		$meta_key = apply_filters( 'wp_components_head_image_source_key', '_social_image_id' );
+
+		// Get filterable image url.
 		$image_id = apply_filters(
 			'wp_components_head_image_id',
-			absint( get_post_meta( $this->post->ID, '_social_image_id', true ) )
+			absint( get_post_meta( $this->post->ID, $meta_key, true ) )
 		);
 
 		$image_source = apply_filters(
