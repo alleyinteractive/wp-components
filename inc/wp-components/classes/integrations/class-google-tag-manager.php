@@ -153,13 +153,26 @@ class Google_Tag_Manager extends \WP_Components\Component {
 	}
 
 	/**
-	 * Get post title, if applicable
+	 * Get post title, if applicable.
 	 *
 	 * @return string
 	 */
 	public function get_title() : string {
 		if ( $this->query->is_single() ) {
 			return $this->query->post->post_title ?? '';
+		}
+
+		return '';
+	}
+
+	/**
+	 * Get Publish date, if applicable.
+	 *
+	 * @return string
+	 */
+	public function get_pub_date() : string {
+		if ( $this->query->is_single() ) {
+			return $this->query->post->post_date ?? '';
 		}
 
 		return '';
