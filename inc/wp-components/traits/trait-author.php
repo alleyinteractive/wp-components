@@ -88,6 +88,33 @@ trait Author {
 	}
 
 	/**
+	 * Get the author email address.
+	 *
+	 * @return string
+	 */
+	public function get_author_email() : string {
+		$email_address = '';
+
+		switch ( $this->get_author_type() ) {
+			case 'wp_user':
+				$email_address = $this->user->data->user_email;
+				break;
+
+			case 'guest_author':
+				$email_address = $this->guest_author->user_email;
+				break;
+
+			/*
+			case 'byline_manager_profile':
+				$email_address = $this->byline_manager_profile->user_email;
+				break;
+			*/
+		}
+
+		return $email_address;
+	}
+
+	/**
 	 * Set the author using either a WP_User or Guest Author post object.
 	 *
 	 * @param mixed $author The author.
