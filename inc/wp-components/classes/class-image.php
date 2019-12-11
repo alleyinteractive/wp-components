@@ -586,6 +586,11 @@ class Image extends Component {
 	 * @return Component Current instance of this class.
 	 */
 	public function set_post_id( $post_id ): self {
+
+		if ( 0 === absint( $post_id ) ) {
+			return $this;
+		}
+
 		// Get the URL.
 		$attachment_id = get_post_thumbnail_id( $post_id );
 
