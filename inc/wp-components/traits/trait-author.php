@@ -104,11 +104,8 @@ trait Author {
 				$email_address = $this->guest_author->user_email;
 				break;
 
-			/*
-			case 'byline_manager_profile':
-				$email_address = $this->byline_manager_profile->user_email;
+			default:
 				break;
-			*/
 		}
 
 		return $email_address;
