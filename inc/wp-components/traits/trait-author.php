@@ -97,11 +97,11 @@ trait Author {
 
 		switch ( $this->get_author_type() ) {
 			case 'wp_user':
-				$email_address = $this->user->data->user_email;
+				$email_address = $this->user->data->user_email ?? '';
 				break;
 
 			case 'guest_author':
-				$email_address = $this->guest_author->user_email;
+				$email_address = $this->guest_author->user_email ?? '';
 				break;
 
 			default:
