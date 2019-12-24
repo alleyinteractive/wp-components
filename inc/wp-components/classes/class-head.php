@@ -145,7 +145,7 @@ class Head extends Component {
 	 */
 	public function query_has_set() : self {
 		$title = $this->get_the_head_title();
-		if ( apply_filters( 'wp_components_head_append_trailing_title', '__return_true' ) ) {
+		if ( apply_filters( 'wp_components_head_append_trailing_title', true ) ) {
 			$title .= $this->get_trailing_title();
 		}
 		$this->set_title( $title );
@@ -160,7 +160,7 @@ class Head extends Component {
 	 */
 	public function post_has_set() : self {
 		$title = $this->get_meta_title();
-		if ( apply_filters( 'wp_components_head_append_trailing_title', '__return_true' ) ) {
+		if ( apply_filters( 'wp_components_head_append_trailing_title', true ) ) {
 			$title .= $this->get_trailing_title();
 		}
 		$this->set_title( $title );
