@@ -144,7 +144,11 @@ class Head extends Component {
 	 * @return self
 	 */
 	public function query_has_set() : self {
-		$this->set_title( $this->get_the_head_title() . $this->get_trailing_title() );
+		$title = $this->get_the_head_title();
+		if ( apply_filters( 'wp_components_head_append_trailing_title', '__return_true' ) ) {
+			$title .= $this->get_trailing_title();
+		}
+		$this->set_title( $title );
 		$this->set_additional_meta_tags();
 		return $this;
 	}
@@ -155,7 +159,11 @@ class Head extends Component {
 	 * @return self
 	 */
 	public function post_has_set() : self {
-		$this->set_title( $this->get_meta_title() . $this->get_trailing_title() );
+		$title = $this->get_meta_title();
+		if ( apply_filters( 'wp_components_head_append_trailing_title', '__return_true' ) ) {
+			$title .= $this->get_trailing_title();
+		}
+		$this->set_title( $title );
 		$this->set_additional_meta_tags();
 		$this->set_standard_meta();
 		$this->set_open_graph_meta();
