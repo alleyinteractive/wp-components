@@ -286,8 +286,10 @@ class Image_Tests extends WP_UnitTestCase {
 			self::$attachment_id
 		);
 
+		// Set global post
 		$post = $this->post;
 
+		// Create image components
 		$image_one = ( new \WP_Components\Image() )->configure( self::$attachment_id, 'test' );
 		$image_two = ( new \WP_Components\Image() )->configure( $post_two->ID, 'test' );
 
