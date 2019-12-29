@@ -22,8 +22,7 @@ trait Attachment {
 	/**
 	 * Set the post object.
 	 *
-	 * @param mixed $attachment Post object, post ID, or null to use global $post
-	 *                    object.
+	 * @param mixed $attachment Attachment object or post ID.
 	 * @return object Instance of the class this trait is implemented on.
 	 */
 	public function set_attachment( $attachment = null ) : self {
@@ -36,16 +35,16 @@ trait Attachment {
 
 		// Post ID was passed.
 		if ( 0 !== absint( $attachment ) ) {
-			$post = get_post( $attachment );
+			$attachment_post = get_post( $attachment );
 
-			if ( 'post' === $post->post_type ) {
-				$attachment_id = get_post_thumbnail_id( $post );
-				$post          = get_post( $attachment_id );
+			if ( ! empty( $attachment_post->post_type ) && 'attachment' !== $attachment_post->post_type ) {
+				$attachment_id   = get_post_thumbnail_id( $attachment_post );
+				$attachment_post = get_post( $attachment_id );
 			}
 
 			// Don't set post if empty.
-			if ( ! empty( $post ) ) {
-				$this->set_attachment( $post );
+			if ( ! empty( $attachment_post ) ) {
+				$this->set_attachment( $attachment_post );
 			}
 
 			return $this;
@@ -151,11 +150,11 @@ trait Attachment {
 		}
 
 		// Use image description as final fallback.
-		$post = get_post( $this->get_attachment_id() );
-		if ( $post ) {
+		$attachment_post = get_post( $this->get_attachment_id() );
+		if ( $attachment_post ) {
 			// We can't rely on get_the_excerpt(), because it relies on The Loop
 			// global variables that are not correctly set within the Irving context.
-			return esc_attr( $post->post_excerpt );
+			return esc_attr( $attachment_post->post_excerpt );
 		}
 
 		return '';
