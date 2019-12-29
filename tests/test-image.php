@@ -269,6 +269,8 @@ class Image_Tests extends WP_UnitTestCase {
 	 * instead of fallinb back to image attached to global $post.
 	 */
 	public function test_missing_image() {
+		global $post;
+
 		// insert a second post.
 		$post_two = $this->factory->post->create_and_get(
 			array(
@@ -284,8 +286,10 @@ class Image_Tests extends WP_UnitTestCase {
 			self::$attachment_id
 		);
 
+		$post = $this->post;
+
 		$image_one = ( new \WP_Components\Image() )->configure( self::$attachment_id, 'test' );
-		$image_two = ( new \WP_Components\Image() )->configure( 123456, 'test' );
+		$image_two = ( new \WP_Components\Image() )->configure( $post_two->ID, 'test' );
 
 		$this->assertEquals(
 			'http://example.org/wp-content/uploads/2019/12/test-image.jpg',
