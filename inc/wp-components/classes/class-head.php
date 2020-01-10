@@ -111,14 +111,19 @@ class Head extends Component {
 	 * @return self
 	 */
 	public function add_script( $src, $defer = true, $async = true ) : self {
-		return $this->add_tag(
-			'script',
-			[
-				'src'   => $src,
-				'defer' => $defer,
-				'async' => $async,
-			]
-		);
+
+		// Attributes.
+		$attrs = [ 'src' => $src ];
+
+		if ( $defer ) {
+			$attrs['defer'] = $defer;
+		}
+
+		if ( $async ) {
+			$attrs['async'] = $async;
+		}
+
+		return $this->add_tag( 'script', $attrs );
 	}
 
 	/**
