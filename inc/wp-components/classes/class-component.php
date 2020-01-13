@@ -336,10 +336,11 @@ class Component implements \JsonSerializable {
 	 * the method chain.
 	 *
 	 * @param callable $callable Callable.
+	 * @param mixed    $args     Additional args to pass to the callback. Optional.
 	 * @return function
 	 */
-	public function callback( $callable ) {
-		return call_user_func_array( $callable, [ &$this ] );
+	public function callback( $callable, ...$args ) {
+		return call_user_func_array( $callable, array_merge( [ &$this ], $args ) );
 	}
 
 	/**
