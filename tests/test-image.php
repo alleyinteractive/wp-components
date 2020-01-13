@@ -265,8 +265,8 @@ class Image_Tests extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Test that image component will not rely on global $post and use fallbacks approrpriately,
-	 * instead of fallinb back to image attached to global $post.
+	 * Test that image component will not rely on global $post and use fallbacks appropriately,
+	 * instead of falling back to image attached to global $post.
 	 */
 	public function test_missing_image() {
 		global $post;
