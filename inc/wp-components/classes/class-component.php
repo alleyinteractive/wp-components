@@ -336,7 +336,7 @@ class Component implements \JsonSerializable {
 	 * the method chain.
 	 *
 	 * @param callable $callable Callable.
-	 * @param mixed    $args     Additional args to pass to the callback. Optional.
+	 * @param mixed    ...$args  Additional args to pass to the callback. Optional.
 	 * @return function
 	 */
 	public function callback( $callable, ...$args ) {
