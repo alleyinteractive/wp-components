@@ -265,8 +265,8 @@ class Image_Tests extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Test that image component will not rely on global $post and use fallbacks approrpriately,
-	 * instead of fallinb back to image attached to global $post.
+	 * Test that image component will not rely on global $post and use fallbacks appropriately,
+	 * instead of falling back to image attached to global $post.
 	 */
 	public function test_missing_image() {
 		global $post;
@@ -293,8 +293,8 @@ class Image_Tests extends WP_UnitTestCase {
 		$image_one = ( new \WP_Components\Image() )->configure( self::$attachment_id, 'test' );
 		$image_two = ( new \WP_Components\Image() )->configure( $post_two->ID, 'test' );
 
-		$this->assertEquals(
-			'http://example.org/wp-content/uploads/2019/12/test-image.jpg',
+		$this->assertStringEndsWith(
+			'/test-image.jpg',
 			$image_one->get_config( 'src' )
 		);
 		$this->assertEquals(
