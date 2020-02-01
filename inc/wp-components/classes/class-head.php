@@ -111,14 +111,19 @@ class Head extends Component {
 	 * @return self
 	 */
 	public function add_script( $src, $defer = true, $async = true ) : self {
-		return $this->add_tag(
-			'script',
-			[
-				'src'   => $src,
-				'defer' => $defer,
-				'async' => $async,
-			]
-		);
+
+		// Attributes.
+		$attrs = [ 'src' => $src ];
+
+		if ( $defer ) {
+			$attrs['defer'] = $defer;
+		}
+
+		if ( $async ) {
+			$attrs['async'] = $async;
+		}
+
+		return $this->add_tag( 'script', $attrs );
 	}
 
 	/**
@@ -144,7 +149,11 @@ class Head extends Component {
 	 * @return self
 	 */
 	public function query_has_set() : self {
-		$this->set_title( $this->get_the_head_title() . $this->get_trailing_title() );
+		$title = $this->get_the_head_title();
+		if ( apply_filters( 'wp_components_head_append_trailing_title', true ) ) {
+			$title .= $this->get_trailing_title();
+		}
+		$this->set_title( $title );
 		$this->set_additional_meta_tags();
 		return $this;
 	}
@@ -155,7 +164,11 @@ class Head extends Component {
 	 * @return self
 	 */
 	public function post_has_set() : self {
-		$this->set_title( $this->get_meta_title() . $this->get_trailing_title() );
+		$title = $this->get_meta_title();
+		if ( apply_filters( 'wp_components_head_append_trailing_title', true ) ) {
+			$title .= $this->get_trailing_title();
+		}
+		$this->set_title( $title );
 		$this->set_additional_meta_tags();
 		$this->set_standard_meta();
 		$this->set_open_graph_meta();
@@ -359,6 +372,14 @@ class Head extends Component {
 				'og:height',
 				apply_filters( 'wp_components_head_og_image_height', $image_source[2], $this->post->ID )
 			);
+			$this->add_meta(
+				'og:image:width',
+				apply_filters( 'wp_components_head_og_image_width', $image_source[1], $this->post->ID )
+			);
+			$this->add_meta(
+				'og:image:height',
+				apply_filters( 'wp_components_head_og_image_height', $image_source[2], $this->post->ID )
+			);
 		}
 
 		// Property specific meta.
@@ -506,10 +527,13 @@ class Head extends Component {
 	 */
 	protected function get_image_source() : array {
 
-		// Get image url.
+		// Filter the meta key where this is stored.
+		$meta_key = apply_filters( 'wp_components_head_image_source_key', '_social_image_id' );
+
+		// Get filterable image url.
 		$image_id = apply_filters(
 			'wp_components_head_image_id',
-			absint( get_post_meta( $this->post->ID, '_social_image_id', true ) )
+			absint( get_post_meta( $this->post->ID, $meta_key, true ) )
 		);
 
 		$image_source = apply_filters(

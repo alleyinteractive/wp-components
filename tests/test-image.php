@@ -72,11 +72,12 @@ class Image_Tests extends WP_UnitTestCase {
 				],
 			]
 		);
+
 		// insert a post.
 		$this->post = $this->factory->post->create_and_get(
 			array(
 				'post_title' => rand_str(),
-				'post_date'  => '2009-07-01 00:00:00',
+				'post_date'  => '2020-01-01 00:00:00',
 			)
 		);
 	}
@@ -224,7 +225,7 @@ class Image_Tests extends WP_UnitTestCase {
 		$this->image->configure( 0, 'this-size-should-not-exist' );
 
 		$this->assertEquals(
-			$this->image->get_config( 'url' ),
+			$this->image->get_config( 'src' ),
 			$this->image::$fallback_image_url
 		);
 	}
@@ -248,7 +249,7 @@ class Image_Tests extends WP_UnitTestCase {
 		$this->image->configure( 0, 'this-size-should-not-exist' );
 		$this->assertEquals(
 			'http://example.org/wp-content/uploads/image.jpg',
-			$this->image->get_config( 'url' )
+			$this->image->get_config( 'src' )
 		);
 	}
 
@@ -259,7 +260,46 @@ class Image_Tests extends WP_UnitTestCase {
 		$this->image->configure( 0, 'test' );
 		$this->assertEquals(
 			'http://example.org/wp-content/uploads/fallback.jpg',
-			$this->image->get_config( 'url' )
+			$this->image->get_config( 'src' )
+		);
+	}
+
+	/**
+	 * Test that image component will not rely on global $post and use fallbacks appropriately,
+	 * instead of falling back to image attached to global $post.
+	 */
+	public function test_missing_image() {
+		global $post;
+
+		// insert a second post.
+		$post_two = $this->factory->post->create_and_get(
+			array(
+				'post_title' => rand_str(),
+				'post_date'  => '2020-01-01 00:00:00',
+			)
+		);
+
+		// Add thumbnail to first post, but not second
+		update_post_meta(
+			$this->post->ID,
+			'_thumbnail_id',
+			self::$attachment_id
+		);
+
+		// Set global post
+		$post = $this->post;
+
+		// Create image components
+		$image_one = ( new \WP_Components\Image() )->configure( self::$attachment_id, 'test' );
+		$image_two = ( new \WP_Components\Image() )->configure( $post_two->ID, 'test' );
+
+		$this->assertStringEndsWith(
+			'/test-image.jpg',
+			$image_one->get_config( 'src' )
+		);
+		$this->assertEquals(
+			'http://example.org/wp-content/uploads/fallback.jpg',
+			$image_two->get_config( 'src' )
 		);
 	}
 

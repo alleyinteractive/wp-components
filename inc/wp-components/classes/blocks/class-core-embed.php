@@ -1,6 +1,6 @@
 <?php
 /**
- * Gutenberg Content component.
+ * Core Embed component.
  *
  * @package WP_Components
  */
@@ -8,7 +8,7 @@
 namespace WP_Components\Blocks;
 
 /**
- * Gutenberg Content.
+ * Core Embed.
  */
 class Core_Embed extends \WP_Components\Component {
 
@@ -106,7 +106,7 @@ class Core_Embed extends \WP_Components\Component {
 			);
 		}
 		// phpcs:enable WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase
-		$content = str_replace( $block['attrs']['url'], $doc->saveHTML(), $block['innerHTML'] );
+		$content = str_replace( $block['attrs']['url'], $doc->saveHTML(), html_entity_decode( $block['innerHTML'] ) );
 
 		// Restore original error optional value.
 		libxml_use_internal_errors( false );

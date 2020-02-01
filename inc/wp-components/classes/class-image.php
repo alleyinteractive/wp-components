@@ -212,7 +212,7 @@ class Image extends Component {
 	 */
 	public function set_config_for_size( string $image_size, $picture = false ): self {
 		// Call configure method.
-		return $this->configure( $this->get_config( 'attachment_id' ), $image_size, $picture );
+		return $this->configure( $this->get_config( 'id' ), $image_size, $picture );
 	}
 
 	/**
@@ -239,13 +239,8 @@ class Image extends Component {
 		}
 
 		// Return early with just a src if no size config exists for provided size.
-		if ( empty( $sizes[ $image_size ] ) ) {
+		if ( empty( $sizes[ $image_size ] ) || empty( $this->attachment ) ) {
 			return $this->set_config( 'src', $this->get_config( 'url' ) );
-		}
-
-		// Return early if attachment failed to set (but still after setting fallback image).
-		if ( empty( $this->attachment ) ) {
-			return $this;
 		}
 
 		// Set aspect ratio.
@@ -586,6 +581,13 @@ class Image extends Component {
 	 * @return Component Current instance of this class.
 	 */
 	public function set_post_id( $post_id ): self {
+
+		// Validate $post_id.
+		if ( ! get_post( $post_id ) instanceof \WP_Post ) {
+			// trigger fallback image or other settings.
+			return $this;
+		}
+
 		// Get the URL.
 		$attachment_id = get_post_thumbnail_id( $post_id );
 
