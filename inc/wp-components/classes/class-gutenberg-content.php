@@ -23,6 +23,8 @@ class Gutenberg_Content extends Component {
 
 	/**
 	 * Callback to inject components in the component array
+	 *
+	 * @var callable
 	 */
 	private $components_callback = null;
 
@@ -39,9 +41,13 @@ class Gutenberg_Content extends Component {
 
 	/**
 	 * Provide a callback to inject a component
+	 *
+	 * @param callable $cb function to run during block processing.
+	 * @return self
 	 */
-	public function set_components_callback( Callable $cb ) {
+	public function set_components_callback( callable $cb ) {
 		$this->components_callback = $cb;
+		return $this;
 	}
 
 	/**
