@@ -22,6 +22,13 @@ class Gutenberg_Content extends Component {
 	public $name = 'gutenberg-content';
 
 	/**
+	 * Callback to inject components in the component array
+	 *
+	 * @var callable
+	 */
+	private $components_callback = null;
+
+	/**
 	 * Fires after the post object has been set on this class.
 	 *
 	 * @return self
@@ -30,6 +37,17 @@ class Gutenberg_Content extends Component {
 		$components = $this->parse_and_convert_block_content( $this->post->post_content ?? '' );
 
 		return $this->append_children( $components );
+	}
+
+	/**
+	 * Provide a callback to inject a component
+	 *
+	 * @param callable $cb function to run during block processing.
+	 * @return self
+	 */
+	public function set_components_callback( callable $cb ) {
+		$this->components_callback = $cb;
+		return $this;
 	}
 
 	/**
@@ -117,6 +135,10 @@ class Gutenberg_Content extends Component {
 			],
 			$block
 		);
+
+		if ( is_callable( $this->components_callback ) ) {
+			$blocks = call_user_func( $this->components_callback, $blocks );
+		}
 
 		// If there's no block name, but there is innerHTML.
 		if (
