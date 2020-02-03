@@ -136,7 +136,7 @@ class Gutenberg_Content extends Component {
 			$block
 		);
 
-		if ( $this->components_callback ) {
+		if ( is_callable( $this->components_callback ) ) {
 			$blocks = call_user_func( $this->components_callback, $blocks );
 		}
 
