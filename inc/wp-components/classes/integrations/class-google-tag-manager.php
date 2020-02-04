@@ -133,7 +133,7 @@ class Google_Tag_Manager extends \WP_Components\Component {
 	 */
 	public function get_single_taxonomy_term( $taxonomy ) {
 		// Single article.
-		if ( $this->query->is_single() ?? false ) {
+		if ( ! is_null( $this->query ) && $this->query->is_single() ) {
 			$terms = wp_get_post_terms( $this->query->post->ID, $taxonomy );
 
 			// Check for error.
