@@ -145,7 +145,7 @@ class Google_Tag_Manager extends \WP_Components\Component {
 		}
 
 		// Taxonomy landing.
-		if ( $this->query->is_tax( $taxonomy ) ) {
+		if ( ! is_null( $this->query ) && $this->query->is_tax( $taxonomy ) ) {
 			return $this->query->queried_object->name ?? null;
 		}
 
