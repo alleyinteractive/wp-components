@@ -55,7 +55,6 @@ trait WP_User {
 		// user ID was passed.
 		if ( 0 !== absint( $user ) ) {
 			$this->set_user( get_user_by( 'ID', $user ) );
-			$this->user_has_set();
 			return $this;
 		}
 
