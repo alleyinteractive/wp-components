@@ -293,8 +293,8 @@ class Image_Tests extends WP_UnitTestCase {
 		$image_one = ( new \WP_Components\Image() )->configure( self::$attachment_id, 'test' );
 		$image_two = ( new \WP_Components\Image() )->configure( $post_two->ID, 'test' );
 
-		$this->assertStringEndsWith(
-			'/test-image.jpg',
+		$this->assertContains(
+			'test-image',
 			$image_one->get_config( 'src' )
 		);
 		$this->assertEquals(
