@@ -266,9 +266,10 @@ class Image_Tests extends WP_UnitTestCase {
 
 	/**
 	 * Test that image component will not rely on global $post and use fallbacks appropriately,
-	 * instead of falling back to image attached to global $post.
+	 * instead of falling back to image attached to global $post when using the
+	 * configure method.
 	 */
-	public function test_missing_image() {
+	public function test_missing_image_using_configure() {
 		global $post;
 
 		// insert a second post.
@@ -289,9 +290,53 @@ class Image_Tests extends WP_UnitTestCase {
 		// Set global post
 		$post = $this->post;
 
-		// Create image components
+		// Create image components using configure().
 		$image_one = ( new \WP_Components\Image() )->configure( self::$attachment_id, 'test' );
 		$image_two = ( new \WP_Components\Image() )->configure( $post_two->ID, 'test' );
+
+		$this->assertContains(
+			'test-image',
+			$image_one->get_config( 'src' )
+		);
+		$this->assertEquals(
+			'http://example.org/wp-content/uploads/fallback.jpg',
+			$image_two->get_config( 'src' )
+		);
+	}
+
+	/**
+	 * Test that image component will not rely on global $post and use fallbacks appropriately,
+	 * instead of falling back to image attached to global $post when using the
+	 * set_post_id method.
+	 */
+	public function test_missing_image_using_set_post_id() {
+		global $post;
+
+		// Insert a second post.
+		$post_two = $this->factory->post->create_and_get(
+			array(
+				'post_title' => rand_str(),
+				'post_date'  => '2020-01-01 00:00:00',
+			)
+		);
+
+		// Add thumbnail to first post, but not second.
+		update_post_meta(
+			$this->post->ID,
+			'_thumbnail_id',
+			self::$attachment_id
+		);
+
+		// Set global post.
+		$post = $this->post;
+
+		// Create image components using set_post_id().
+		$image_one = ( new \WP_Components\Image() )
+			->set_post_id( $this->post->ID )
+			->set_config_for_size( 'test' );
+		$image_two = ( new \WP_Components\Image() )
+			->set_post_id( $post_two->ID )
+			->set_config_for_size( 'test' );
 
 		$this->assertContains(
 			'test-image',
