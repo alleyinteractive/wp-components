@@ -583,7 +583,10 @@ class Image extends Component {
 	public function set_post_id( $post_id ): self {
 
 		// Validate $post_id.
-		if ( ! get_post( $post_id ) instanceof \WP_Post ) {
+		if (
+			0 === $post_id
+			|| ! get_post( $post_id ) instanceof \WP_Post
+		) {
 			// trigger fallback image or other settings.
 			return $this;
 		}
