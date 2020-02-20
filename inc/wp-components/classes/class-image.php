@@ -198,7 +198,7 @@ class Image extends Component {
 			[
 				'crops' => array_filter( $crops ),
 				'id'    => $this->get_attachment_id(),
-				'url'   => $this->get_attachment_src( 'full' ),
+				'url'   => strtok( $this->get_attachment_src( 'full' ), '?' ),
 			]
 		);
 	}
