@@ -74,6 +74,6 @@ class Yoast_Schema extends \WP_Components\Component {
 			return '';
 		}
 
-		return wp_strip_all_tags( $schema );
+		return strip_tags( $schema );
 	}
 }
