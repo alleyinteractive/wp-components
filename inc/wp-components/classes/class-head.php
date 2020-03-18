@@ -229,6 +229,11 @@ class Head extends Component {
 				$title = get_bloginfo( 'name' );
 		}
 
+		/**
+		 * Modify the title used in the head component.
+		 *
+		 * @param string $title Title.
+		 */
 		return apply_filters( 'wp_components_head_title', $title );
 	}
 
