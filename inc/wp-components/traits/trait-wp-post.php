@@ -27,6 +27,15 @@ trait WP_Post {
 	public function get_post_id() {
 		return $this->wp_post_get_id();
 	}
+	
+	/**
+	 * Get the post Type.
+	 *
+	 * @return string
+	 */
+	public function get_post_type() {
+		return $this->wp_post_get_type();
+	}
 
 	/**
 	 * Set the post object.
@@ -94,7 +103,16 @@ trait WP_Post {
 		$post_id = $this->post->ID ?? 0;
 		return absint( $post_id );
 	}
-
+	
+	/**
+	 * Get the post type
+	 * @return sting
+	 */
+	public function wp_post_get_type() : string {
+		$post_type = $this->post->post_type ?? '';
+		return $post_type;
+	}
+	
 	/**
 	 * Set the `id` config to the post ID.
 	 *
