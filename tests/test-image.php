@@ -70,6 +70,26 @@ class Image_Tests extends WP_UnitTestCase {
 					'retina'             => true,
 					'fallback_image_url' => wp_get_attachment_url( self::factory()->attachment->create_object( [ 'file' => 'fallback.jpg' ] ) ),
 				],
+				'test2' => [
+					'sources'            => [
+						[
+							'transforms' => [
+								'resize' => [ 640, 480 ],
+							],
+							'descriptor' => 640,
+							'media' => [ 'max' => 'xxl' ],
+						],
+						[
+							'transforms' => [
+								'resize' => [ 480, 360 ],
+							],
+							'descriptor' => 480,
+							'media' => [ 'max' => 'md' ],
+						],
+					],
+					'aspect_ratio'       => false,
+					'retina'             => false,
+				],
 			]
 		);
 
@@ -345,6 +365,31 @@ class Image_Tests extends WP_UnitTestCase {
 		$this->assertEquals(
 			'http://example.org/wp-content/uploads/fallback.jpg',
 			$image_two->get_config( 'src' )
+		);
+	}
+
+	/**
+	 * Test retina configuration
+	 */
+	public function test_retina() {
+		$this->image->configure( self::$attachment_id, 'test2' );
+		$this->assertArraySubset(
+			[
+				'id'     => self::$attachment_id,
+				'srcset' => $this->image->attachment->guid . '?resize=640,480 640w,' . $this->image->attachment->guid . '?resize=480,360 480w',
+			],
+			$this->image->config
+		);
+
+		$this->image->set_config( 'retina', false );
+		$this->image->configure( self::$attachment_id, 'thumbnail' );
+
+		$this->assertArraySubset(
+			[
+				'id'     => self::$attachment_id,
+				'srcset' => $this->image->attachment->guid . '?resize=150,150 150w',
+			],
+			$this->image->config
 		);
 	}
 
