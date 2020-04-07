@@ -182,43 +182,59 @@ class Head extends Component {
 	 * @return string
 	 */
 	public function get_the_head_title() : string {
+
+		$title = '';
+
 		switch ( true ) {
 			// Search results.
 			case $this->query->is_search():
-				return sprintf(
+				$title = sprintf(
 					/* translators: search term */
 					__( 'Search results: %s', 'wp-components' ),
 					$this->query->get( 's' )
 				);
+				break;
 
 			// Author archive.
 			case $this->query->is_author():
 				$this->set_author( $this->query->get( 'author_name' ) );
-				return sprintf(
+				$title = sprintf(
 					/* translators: author display name */
 					__( 'Articles by %s', 'wp-components' ),
 					$this->get_author_display_name()
 				);
+				break;
 
 			// Term archives.
 			case $this->query->is_category():
 			case $this->query->is_tag():
 			case $this->query->is_tax():
 				$this->set_term( $this->query->get_queried_object() );
-				return $this->wp_term_get_name();
+				$title = $this->wp_term_get_name();
+				break;
 
 			// Generic 404.
 			case $this->query->is_404():
-				return __( '404 - Page not found', 'wp-components' );
+				$title = __( '404 - Page not found', 'wp-components' );
+				break;
 
 			// Post type archives.
 			case $this->query->is_post_type_archive():
 				$post_type   = $this->query->get( 'post_type' );
 				$post_object = get_post_type_object( $post_type );
-				return $post_object->label;
+				$title = $post_object->label;
+				break;
+
+			default:
+				$title = get_bloginfo( 'name' );
 		}
 
-		return get_bloginfo( 'name' );
+		/**
+		 * Modify the title used in the head component.
+		 *
+		 * @param string $title Title.
+		 */
+		return apply_filters( 'wp_components_head_title', $title );
 	}
 
 	/**
