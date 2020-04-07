@@ -29,6 +29,13 @@ class Image extends Component {
 	public static $sizes = [];
 
 	/**
+	 * Current configuration for this image component.
+	 *
+	 * @var array
+	 */
+	public static $size_config = [];
+
+	/**
 	 * Media queries for sizes attribute or source tags.
 	 *
 	 * @var array
@@ -226,7 +233,7 @@ class Image extends Component {
 	public function configure( $id, $image_size = 'full', $picture = false ): self {
 		$sizes = self::$sizes;
 		// Set config size and fallback.
-		$size_config = $sizes[ $image_size ] ?? [];
+		$this->size_config = $sizes[ $image_size ] ?? [];
 
 		// Attempt to set attachment by ID, if not set already.
 		if ( empty( $this->attachment ) ) {
@@ -235,7 +242,7 @@ class Image extends Component {
 
 		// Set fallback image if no url configured.
 		if ( empty( $this->get_config( 'url' ) ) ) {
-			$this->set_config( 'url', $this->get_fallback_image( $size_config ) );
+			$this->set_config( 'url', $this->get_fallback_image() );
 		}
 
 		// Return early with just a src if no size config exists for provided size.
@@ -244,15 +251,15 @@ class Image extends Component {
 		}
 
 		// Set aspect ratio.
-		$this->set_config( 'aspect_ratio', $this->get_aspect_ratio( $size_config ) );
+		$this->set_config( 'aspect_ratio', $this->get_aspect_ratio() );
 
 		// Set flags for using a basic <img> tag or using the fallback URL.
 		$this->merge_config(
 			[
-				'use_basic_img'       => ( 1 === count( $this->get_config( 'sources' ) ) && ! $this->get_config( 'retina' ) ),
+				'use_basic_img'       => ( 1 === count( $this->get_config( 'sources' ) ) && ! $this->get_retina() ),
 				'using_data_fallback' => strstr( $this->get_config( 'url' ), 'data:' ),
 				'image_size'          => $image_size,
-				'sources'             => $size_config['sources'],
+				'sources'             => $this->size_config['sources'],
 			]
 		);
 
@@ -274,9 +281,9 @@ class Image extends Component {
 				'sizes'       => $this->get_sizes(),
 				'source_tags' => $this->get_source_tags( $picture ),
 				'src'         => $this->get_src(),
-				'srcset'      => $this->get_srcset( $size_config ),
-				'retina'      => $this->get_retina( $size_config ),
-				'lazyload'    => $this->get_lazyload( $size_config ),
+				'srcset'      => $this->get_srcset(),
+				'retina'      => $this->get_retina(),
+				'lazyload'    => $this->get_lazyload(),
 			]
 		);
 	}
@@ -318,41 +325,37 @@ class Image extends Component {
 	/**
 	 * Get configured fallback image.
 	 *
-	 * @param array $size_config Config for current image size.
 	 * @return string
 	 */
-	public function get_fallback_image( $size_config ): string {
-		return $size_config['fallback_image_url'] ?? self::$fallback_image_url;
+	public function get_fallback_image(): string {
+		return $this->size_config['fallback_image_url'] ?? self::$fallback_image_url;
 	}
 
 	/**
 	 * Get lazyload setting.
 	 *
-	 * @param array $size_config Config for current image size.
 	 * @return string
 	 */
-	public function get_lazyload( $size_config ): string {
-		return $size_config['lazyload'] ?? $this->get_config( 'lazyload' );
+	public function get_lazyload(): string {
+		return $this->size_config['lazyload'] ?? $this->get_config( 'lazyload' );
 	}
 
 	/**
 	 * Get retina image setting.
 	 *
-	 * @param array $size_config Config for current image size.
 	 * @return string
 	 */
-	public function get_retina( $size_config ): string {
-		return $size_config['retina'] ?? $this->get_config( 'retina' );
+	public function get_retina(): string {
+		return $this->size_config['retina'] ?? $this->get_config( 'retina' );
 	}
 
 	/**
 	 * Retrieve aspect ratio value from either image size config, image component config, or original width and height values
 	 *
-	 * @param array $size_config Configuration for current image size.
 	 * @return string
 	 */
-	public function get_aspect_ratio( $size_config ) {
-		$aspect_ratio = ( $size_config['aspect_ratio'] ?? $this->config['aspect_ratio'] ) ?? false;
+	public function get_aspect_ratio() {
+		$aspect_ratio = ( $this->size_config['aspect_ratio'] ?? $this->config['aspect_ratio'] ) ?? false;
 
 		// Useful if you're ouptutting an image with only one constrained dimension (like a max height or max width, but no specific aspect ratio). Usually involves `fit`, `w`, or `h` transforms.
 		if ( 'auto' === $aspect_ratio ) {
@@ -391,7 +394,7 @@ class Image extends Component {
 			$src_url    = $this->apply_transforms( $transforms );
 
 			// Add retina source to srcset, if applicable.
-			if ( $this->config['retina'] ) {
+			if ( $this->get_retina() ) {
 				$retina_url    = $this->apply_transforms( $transforms, 2 );
 				$srcset_string = "{$src_url} 1x,{$retina_url} 2x";
 			} else {
@@ -447,7 +450,7 @@ class Image extends Component {
 	 *
 	 * @return array Sources.
 	 */
-	public function get_srcset( $size_config ) : string {
+	public function get_srcset() : string {
 		$srcset  = [];
 		$sources = (array) $this->config['sources'];
 
@@ -465,7 +468,7 @@ class Image extends Component {
 
 			// Add retina source to srcset, if applicable.
 			if ( is_numeric( $descriptor ) ) {
-				if ( $this->get_retina ) {
+				if ( $this->get_retina() ) {
 					$retina_url        = $this->apply_transforms( $params['transforms'], 2 );
 					$retina_descriptor = absint( $descriptor ) * 2;
 					$srcset[]          = "{$retina_url} {$retina_descriptor}w";
