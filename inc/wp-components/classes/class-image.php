@@ -274,7 +274,7 @@ class Image extends Component {
 				'sizes'       => $this->get_sizes(),
 				'source_tags' => $this->get_source_tags( $picture ),
 				'src'         => $this->get_src(),
-				'srcset'      => $this->get_srcset(),
+				'srcset'      => $this->get_srcset( $size_config ),
 				'retina'      => $this->get_retina( $size_config ),
 				'lazyload'    => $this->get_lazyload( $size_config ),
 			]
@@ -447,7 +447,7 @@ class Image extends Component {
 	 *
 	 * @return array Sources.
 	 */
-	public function get_srcset() : string {
+	public function get_srcset( $size_config ) : string {
 		$srcset  = [];
 		$sources = (array) $this->config['sources'];
 
@@ -465,7 +465,7 @@ class Image extends Component {
 
 			// Add retina source to srcset, if applicable.
 			if ( is_numeric( $descriptor ) ) {
-				if ( $this->config['retina'] && ( empty( $params['retina'] ?? '' ) || $params['retina'] ) ) {
+				if ( $this->get_retina ) {
 					$retina_url        = $this->apply_transforms( $params['transforms'], 2 );
 					$retina_descriptor = absint( $descriptor ) * 2;
 					$srcset[]          = "{$retina_url} {$retina_descriptor}w";
