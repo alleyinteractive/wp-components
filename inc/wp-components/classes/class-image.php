@@ -22,18 +22,18 @@ class Image extends Component {
 	public $name = 'image';
 
 	/**
+	 * Current configuration for this image component.
+	 *
+	 * @var array
+	 */
+	public $size_config = [];
+
+	/**
 	 * Image sizes.
 	 *
 	 * @var array
 	 */
 	public static $sizes = [];
-
-	/**
-	 * Current configuration for this image component.
-	 *
-	 * @var array
-	 */
-	public static $size_config = [];
 
 	/**
 	 * Media queries for sizes attribute or source tags.
